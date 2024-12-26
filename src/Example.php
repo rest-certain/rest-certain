@@ -17,7 +17,7 @@
  * License along with rest-certain/rest-certain.
  * If not, see <https://www.gnu.org/licenses/>.
  *
- * @copyright Copyright (c) REST Certain Contributors <contributors@rest-certain.dev>
+ * @copyright Copyright (c) REST Certain Contributors
  * @license https://opensource.org/license/lgpl-3-0/ GNU Lesser General Public License version 3 or later
  */
 

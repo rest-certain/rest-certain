@@ -12,16 +12,31 @@
     ],
     "authors": [
         {
-            "name": "Ben Ramsey",
-            "email": "ben@ramsey.dev",
-            "homepage": "https://ben.ramsey.dev"
+            "name": "REST Certain Contributors",
+            "homepage": "https://rest-certain.dev"
         }
     ],
     "require": {
-        "php": "^8.1"
+        "php": "~8.3.0 || ~8.4.0",
+        "hamcrest/hamcrest-php": "^2.0",
+        "phpunit/phpunit": "^12.0"
     },
     "require-dev": {
-        "ramsey/devtools": "^2.1"
+        "captainhook/captainhook": "^5.25",
+        "captainhook/plugin-composer": "^5.3",
+        "ergebnis/composer-normalize": "^2.47",
+        "mockery/mockery": "^1.6",
+        "phly/keep-a-changelog": "^2.13",
+        "php-parallel-lint/php-console-highlighter": "^1.0",
+        "php-parallel-lint/php-parallel-lint": "^1.4",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-mockery": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "ramsey/coding-standard": "^2.3",
+        "ramsey/composer-repl": "^1.5",
+        "ramsey/conventional-commits": "^1.6",
+        "roave/security-advisories": "dev-latest"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -42,8 +57,7 @@
             "ergebnis/composer-normalize": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "ramsey/composer-repl": true,
-            "ramsey/devtools": true
+            "ramsey/composer-repl": true
         },
         "sort-packages": true
     },
@@ -53,10 +67,43 @@
         },
         "ramsey/conventional-commits": {
             "configFile": "conventional-commits.json"
-        },
-        "ramsey/devtools": {
-            "command-prefix": "dev",
-            "memory-limit": "-1"
         }
+    },
+    "scripts": {
+        "dev:analyze": [
+            "@dev:analyze:phpstan"
+        ],
+        "dev:analyze:phpstan": "phpstan analyse --ansi",
+        "dev:build:clean": "git clean -fX build/",
+        "dev:lint": [
+            "@dev:lint:syntax",
+            "@dev:lint:style"
+        ],
+        "dev:lint:fix": "phpcbf",
+        "dev:lint:style": "phpcs --colors",
+        "dev:lint:syntax": "parallel-lint --colors src/ tests/",
+        "dev:test": [
+            "@dev:lint",
+            "@dev:analyze",
+            "@dev:test:unit"
+        ],
+        "dev:test:coverage:ci": "@php -d 'xdebug.mode=coverage' vendor/bin/phpunit --colors=always --coverage-text --coverage-clover build/coverage/clover.xml --coverage-cobertura build/coverage/cobertura.xml --coverage-crap4j build/coverage/crap4j.xml --coverage-xml build/coverage/coverage-xml --log-junit build/junit.xml",
+        "dev:test:coverage:html": "@php -d 'xdebug.mode=coverage' vendor/bin/phpunit --colors=always --coverage-html build/coverage/coverage-html/",
+        "dev:test:unit": "phpunit --colors=always",
+        "test": "@dev:test"
+    },
+    "scripts-descriptions": {
+        "dev:analyze": "Runs all static analysis checks.",
+        "dev:analyze:phpstan": "Runs the PHPStan static analyzer.",
+        "dev:build:clean": "Cleans the build/ directory.",
+        "dev:lint": "Runs all linting checks.",
+        "dev:lint:fix": "Auto-fixes coding standards issues, if possible.",
+        "dev:lint:style": "Checks for coding standards issues.",
+        "dev:lint:syntax": "Checks for syntax errors.",
+        "dev:test": "Runs linting, static analysis, and unit tests.",
+        "dev:test:coverage:ci": "Runs unit tests and generates CI coverage reports.",
+        "dev:test:coverage:html": "Runs unit tests and generates HTML coverage report.",
+        "dev:test:unit": "Runs unit tests.",
+        "test": "Runs linting, static analysis, and unit tests."
     }
 }

@@ -16,10 +16,8 @@ TODO: Make sure the following URLs are correct and working for your project.
     <a href="https://github.com/rest-certain/rest-certain/blob/main/LICENSE"><img src="https://img.shields.io/packagist/l/rest-certain/rest-certain.svg?style=flat-square&colorB=darkcyan" alt="Read License"></a>
     <a href="https://github.com/rest-certain/rest-certain/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/rest-certain/rest-certain/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
     <a href="https://codecov.io/gh/rest-certain/rest-certain"><img src="https://img.shields.io/codecov/c/gh/rest-certain/rest-certain?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
-    <a href="https://shepherd.dev/github/rest-certain/rest-certain"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Frest-certain%2Frest-certain%2Fcoverage" alt="Psalm Type Coverage"></a>
 </p>
 -->
-
 
 ## About
 
@@ -29,18 +27,16 @@ TODO: Use this space to provide more details about your package. Try to be
       your package does and how it can help them build applications.
 -->
 
-
 This project adheres to a [code of conduct](CODE_OF_CONDUCT.md).
 By participating in this project and its community, you are expected to
 uphold this code.
 
-
 ## Installation
 
-Install this package as a dependency using [Composer](https://getcomposer.org).
+Install this package as a development dependency using [Composer](https://getcomposer.org).
 
 ``` bash
-composer require rest-certain/rest-certain
+composer require --dev rest-certain/rest-certain
 ```
 
 <!--
@@ -58,7 +54,6 @@ echo $example->greet('fellow human');
 ```
 -->
 
-
 ## Contributing
 
 Contributions are welcome! To contribute, please familiarize yourself with
@@ -71,17 +66,12 @@ contribution of external security researchers. If you believe you've found a
 security issue in software that is maintained in this repository, please read
 [SECURITY.md](SECURITY.md) for instructions on submitting a vulnerability report.
 
-
-
-
-
-
 ## Copyright and License
 
 rest-certain/rest-certain is copyright © [REST Certain Contributors](https://rest-certain.dev)
-and licensed for use under the terms of the
-GNU Lesser General Public License (LGPL-3.0-or-later) as published by the Free
-Software Foundation. Please see [COPYING.LESSER](COPYING.LESSER),
-[COPYING](COPYING), and [NOTICE](NOTICE) for more information.
+and licensed for use under the terms of the GNU Lesser General Public License
+(LGPL-3.0-or-later) as published by the Free Software Foundation. Please see
+[COPYING.LESSER](COPYING.LESSER), [COPYING](COPYING), and [NOTICE](NOTICE) for
+more information.
 
 
