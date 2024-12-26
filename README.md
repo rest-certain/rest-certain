@@ -1,4 +1,4 @@
-<h1 align="center">rest-certain/rest-certain</h1>
+<h1 align="center">REST Certain</h1>
 
 <p align="center">
     <strong>PHP DSL for easy testing of REST services, with a nod to the Java DSL, REST Assured</strong>
@@ -68,7 +68,7 @@ security issue in software that is maintained in this repository, please read
 
 ## Copyright and License
 
-rest-certain/rest-certain is copyright © [REST Certain Contributors](https://rest-certain.dev)
+REST Certain is copyright © [REST Certain Contributors](https://rest-certain.dev)
 and licensed for use under the terms of the GNU Lesser General Public License
 (LGPL-3.0-or-later) as published by the Free Software Foundation. Please see
 [COPYING.LESSER](COPYING.LESSER), [COPYING](COPYING), and [NOTICE](NOTICE) for
