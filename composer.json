@@ -19,9 +19,12 @@
     "require": {
         "php": "~8.3.0 || ~8.4.0",
         "hamcrest/hamcrest-php": "^2.0",
+        "php-http/discovery": "^1.20",
         "phpunit/phpunit": "^12.0",
         "psr/http-client": "^1.0",
+        "psr/http-client-implementation": "*",
         "psr/http-factory": "^1.1",
+        "psr/http-factory-implementation": "*",
         "psr/http-message": "^2.0"
     },
     "require-dev": {
@@ -29,6 +32,7 @@
         "captainhook/plugin-composer": "^5.3",
         "ergebnis/composer-normalize": "^2.47",
         "mockery/mockery": "^1.6",
+        "nyholm/psr7": "^1.8",
         "phly/keep-a-changelog": "^2.13",
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "php-parallel-lint/php-parallel-lint": "^1.4",
@@ -39,7 +43,8 @@
         "ramsey/coding-standard": "^2.3",
         "ramsey/composer-repl": "^1.5",
         "ramsey/conventional-commits": "^1.6",
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "symfony/http-client": "^7.2"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -58,7 +63,7 @@
             "captainhook/plugin-composer": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "ergebnis/composer-normalize": true,
-            "php-http/discovery": true,
+            "php-http/discovery": false,
             "phpstan/extension-installer": true,
             "ramsey/composer-repl": true
         },
