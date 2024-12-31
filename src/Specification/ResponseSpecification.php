@@ -117,6 +117,13 @@ interface ResponseSpecification
     public function response(): static;
 
     /**
+     * Sets the request specification to use with this response specification.
+     *
+     * @return $this
+     */
+    public function setRequestSpecification(RequestSpecification $requestSpecification): static;
+
+    /**
      * An expectation to validate the given response status code against the given value or matcher.
      *
      * @return $this

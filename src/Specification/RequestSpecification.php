@@ -27,6 +27,7 @@ namespace RestCertain\Specification;
 use JsonSerializable;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use SplFileInfo;
 use Stringable;
 
 interface RequestSpecification extends RequestSender
@@ -76,7 +77,7 @@ interface RequestSpecification extends RequestSender
      *
      * @return $this
      */
-    public function body(JsonSerializable | StreamInterface | Stringable | string $body): static;
+    public function body(JsonSerializable | SplFileInfo | StreamInterface | Stringable | string $body): static;
 
     /**
      * Sets the content type for the request.
@@ -89,7 +90,7 @@ interface RequestSpecification extends RequestSender
      * Sets a cookie that will be sent with the request.
      *
      * @param string $name The name of the cookie.
-     * @param Stringable | string | null $value The value of the cookie. If null, the cookie will be set with no value.
+     * @param Stringable | string $value The value of the cookie.
      * @param Stringable | string ...$additionalValues Additional values to set for the cookie. Each additional value
      *     will be set as a separate cookie with the same name.
      *
@@ -97,7 +98,7 @@ interface RequestSpecification extends RequestSender
      */
     public function cookie(
         string $name,
-        Stringable | string | null $value = null,
+        Stringable | string $value = '',
         Stringable | string ...$additionalValues,
     ): static;
 
@@ -106,7 +107,7 @@ interface RequestSpecification extends RequestSender
      *
      * @see self::cookie() for more information about the parameters.
      *
-     * @param array<string, Stringable | string | list<Stringable | string> | null> $cookies
+     * @param array<string, Stringable | string | list<Stringable | string>> $cookies
      *
      * @return $this
      */
@@ -134,7 +135,7 @@ interface RequestSpecification extends RequestSender
      */
     public function formParam(
         string $name,
-        Stringable | string | array $value,
+        Stringable | array | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
@@ -206,7 +207,7 @@ interface RequestSpecification extends RequestSender
      */
     public function param(
         string $name,
-        Stringable | string | array $value,
+        Stringable | array | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
@@ -253,14 +254,14 @@ interface RequestSpecification extends RequestSender
      *
      * @return $this
      */
-    public function pathParam(string $name, Stringable | string $value): static;
+    public function pathParam(string $name, Stringable | int | string $value): static;
 
     /**
      * Sets multiple path parameters to improve readability of the request path.
      *
      * @see self::pathParam() for more information about usage.
      *
-     * @param array<string, Stringable | string> $parameters
+     * @param array<string, Stringable | int | string> $parameters
      *
      * @return $this
      */
@@ -291,7 +292,7 @@ interface RequestSpecification extends RequestSender
      */
     public function queryParam(
         string $name,
-        Stringable | string | array $value,
+        Stringable | array | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
@@ -322,6 +323,13 @@ interface RequestSpecification extends RequestSender
      * Returns the response specification to set expectations on the response.
      */
     public function response(): ResponseSpecification;
+
+    /**
+     * Sets the response specification to use with this request specification.
+     *
+     * @return $this
+     */
+    public function setResponseSpecification(ResponseSpecification $responseSpecification): static;
 
     /**
      * Syntactic sugar, this returns the same instance.
