@@ -90,24 +90,16 @@ interface RequestSpecification extends RequestSender
      * Sets a cookie that will be sent with the request.
      *
      * @param string $name The name of the cookie.
-     * @param Stringable | string $value The value of the cookie.
-     * @param Stringable | string ...$additionalValues Additional values to set for the cookie. Each additional value
-     *     will be set as a separate cookie with the same name.
+     * @param Stringable | string | null $value The value of the cookie.
      *
      * @return $this
      */
-    public function cookie(
-        string $name,
-        Stringable | string $value = '',
-        Stringable | string ...$additionalValues,
-    ): static;
+    public function cookie(string $name, Stringable | string | null $value = null): static;
 
     /**
      * Sets the cookies that will be sent with the request.
      *
-     * @see self::cookie() for more information about the parameters.
-     *
-     * @param array<string, Stringable | string | list<Stringable | string>> $cookies
+     * @param array<string, Stringable | string | null> $cookies
      *
      * @return $this
      */

@@ -74,18 +74,17 @@ class RequestSpecificationImplTest extends TestCase
     {
         $this->assertSame($this->spec, $this->spec->cookie('foo', 'bar'));
         $this->assertSame($this->spec, $this->spec->cookie('baz', new Str('qux')));
-        $this->assertSame($this->spec, $this->spec->cookie('quux', 'corge', new Str('grault'), 'garply'));
-        $this->assertSame($this->spec, $this->spec->cookie('waldo'));
+        $this->assertSame($this->spec, $this->spec->cookie('quux', ''));
+        $this->assertSame($this->spec, $this->spec->cookie('corge'));
     }
 
     public function testCookies(): void
     {
         $this->assertSame($this->spec, $this->spec->cookies([
-            'foo' => ['bar', new Str('baz')],
-            'qux' => new Str('quux'),
-            'corge' => 'grault',
-            'garply' => [new Str('waldo'), 'fred', 'plugh'],
-            'xyzzy' => '',
+            'foo' => 'bar',
+            'baz' => new Str('qux'),
+            'quux' => '',
+            'corge' => null,
         ]));
     }
 

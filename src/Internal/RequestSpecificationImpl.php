@@ -24,6 +24,8 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
+use Dflydev\FigCookies\Cookie;
+use Dflydev\FigCookies\Cookies;
 use JsonException;
 use JsonSerializable;
 use Override;
@@ -39,7 +41,6 @@ use SplFileInfo;
 use Stringable;
 
 use function array_merge;
-use function array_unshift;
 use function count;
 use function is_array;
 use function json_encode;
@@ -58,9 +59,7 @@ final class RequestSpecificationImpl implements RequestSpecification
     private UriInterface $baseUri;
     private ?StreamInterface $body = null;
     private ?string $contentType = null;
-
-    /** @var array<string, string[]> */
-    private array $cookies = [];
+    private Cookies $cookies;
 
     /** @var array<string, string | string[]> */
     private array $formParams = [];
@@ -86,6 +85,7 @@ final class RequestSpecificationImpl implements RequestSpecification
         $this->basePath = $this->config->basePath;
         $this->baseUri = $this->config->baseUri;
         $this->port = $this->config->port;
+        $this->cookies = new Cookies();
     }
 
     #[Override] public function accept(Stringable | string $contentType): static
@@ -146,20 +146,9 @@ final class RequestSpecificationImpl implements RequestSpecification
         return $this;
     }
 
-    #[Override] public function cookie(
-        string $name,
-        Stringable | string $value = '',
-        Stringable | string ...$additionalValues,
-    ): static {
-        array_unshift($additionalValues, $value);
-
-        if (!isset($this->cookies[$name])) {
-            $this->cookies[$name] = [];
-        }
-
-        foreach ($additionalValues as $v) {
-            $this->cookies[$name][] = (string) $v;
-        }
+    #[Override] public function cookie(string $name, Stringable | string | null $value = null): static
+    {
+        $this->cookies = $this->cookies->with(new Cookie($name, $value !== null ? (string) $value : null));
 
         return $this;
     }
@@ -170,11 +159,7 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function cookies(array $cookies): static
     {
         foreach ($cookies as $name => $value) {
-            if (is_array($value)) {
-                $this->cookie($name, ...$value);
-            } else {
-                $this->cookie($name, $value);
-            }
+            $this->cookie($name, $value);
         }
 
         return $this;
