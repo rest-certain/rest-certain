@@ -16,7 +16,7 @@ class ConfigTest extends TestCase
     {
         $config = new Config();
 
-        $this->assertSame('http://localhost:8000/', (string) $config->baseUri);
+        $this->assertSame('http://localhost', (string) $config->baseUri);
         $this->assertSame('/', $config->basePath);
         $this->assertSame(8000, $config->port);
         $this->assertInstanceOf(HttpFactory::class, $config->httpClient);
@@ -45,7 +45,7 @@ class ConfigTest extends TestCase
             $uriFactory,
         );
 
-        $this->assertSame('https://api.example.net:8080/foo', (string) $config->baseUri);
+        $this->assertSame('https://api.example.net', (string) $config->baseUri);
         $this->assertSame('/foo', $config->basePath);
         $this->assertSame(8080, $config->port);
         $this->assertSame($httpClient, $config->httpClient);

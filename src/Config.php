@@ -63,9 +63,7 @@ final readonly class Config
         $this->responseFactory = $responseFactory ?? $this->httpFactory();
         $this->streamFactory = $streamFactory ?? $this->httpFactory();
         $this->uriFactory = $uriFactory ?? $this->httpFactory();
-
-        $baseUri = $baseUri instanceof UriInterface ? $baseUri : $this->uriFactory->createUri((string) $baseUri);
-        $this->baseUri = $baseUri->withPort($this->port)->withPath($this->basePath);
+        $this->baseUri = $baseUri instanceof UriInterface ? $baseUri : $this->uriFactory->createUri((string) $baseUri);
     }
 
     private function httpFactory(): HttpFactory
