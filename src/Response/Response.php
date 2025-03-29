@@ -41,7 +41,7 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      *
      * @see self::getBody()
      */
-    public function body(): ResponseBody & StreamInterface;
+    public function body(): ResponseBody;
 
     /**
      * Returns the value of the Content-Type header or null if the Content-Type header does not exist.
@@ -67,7 +67,7 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      *
      * @see self::body()
      */
-    public function getBody(): ResponseBody & StreamInterface;
+    public function getBody(): ResponseBody;
 
     /**
      * Returns the value of the Content-Type header or null if the Content-Type header does not exist.
@@ -180,4 +180,22 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      * @see self::getTime()
      */
     public function time(): int;
+
+    /**
+     * @inheritDoc
+     */
+    public function withAddedHeader(string $name, $value): Response;
+
+    /**
+     * @inheritDoc
+     */
+    public function withHeader(string $name, $value): Response;
+
+    public function withBody(StreamInterface $body): Response;
+
+    public function withoutHeader(string $name): Response;
+
+    public function withProtocolVersion(string $version): Response;
+
+    public function withStatus(int $code, string $reasonPhrase = ''): Response;
 }
