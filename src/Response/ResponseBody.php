@@ -24,9 +24,7 @@ declare(strict_types=1);
 
 namespace RestCertain\Response;
 
-use Psr\Http\Message\StreamInterface;
-
-interface ResponseBody extends StreamInterface
+interface ResponseBody
 {
     /**
      * Returns the body as a "pretty" formatted string.

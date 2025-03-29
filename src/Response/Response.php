@@ -41,7 +41,7 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      *
      * @see self::getBody()
      */
-    public function body(): ResponseBody;
+    public function body(): ResponseBody & StreamInterface;
 
     /**
      * Returns the value of the Content-Type header or null if the Content-Type header does not exist.
@@ -67,7 +67,7 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      *
      * @see self::body()
      */
-    public function getBody(): ResponseBody;
+    public function getBody(): ResponseBody & StreamInterface;
 
     /**
      * Returns the value of the Content-Type header or null if the Content-Type header does not exist.
