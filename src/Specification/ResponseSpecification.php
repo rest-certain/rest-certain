@@ -24,7 +24,6 @@ declare(strict_types=1);
 
 namespace RestCertain\Specification;
 
-use Hamcrest\Matcher;
 use PHPUnit\Framework\Constraint\Constraint;
 use RestCertain\Response\Response;
 use Stringable;
@@ -41,19 +40,25 @@ interface ResponseSpecification
     /**
      * An expectation to validate the given response body against the given matchers.
      *
-     * @param string | null $path An optional body path in JSONPath syntax; if provided, only this path will be
-     *     validated for these constraints or matchers. If not provided, the entire body will be validated.
+     * @return $this
+     */
+    public function body(Constraint | Stringable | string ...$expectedValue): static;
+
+    /**
+     * An expectation to validate the given response path in the response body against the given matchers.
+     *
+     * @param string $path A body path in JSONPath syntax.
      *
      * @return $this
      */
-    public function body(?string $path = null, Constraint | Matcher ...$expectedValue): static;
+    public function bodyPath(string $path, Constraint | Stringable | string ...$expectedValue): static;
 
     /**
      * An expectation to validate the given response Content-Type against the given value or matcher.
      *
      * @return $this
      */
-    public function contentType(Constraint | Matcher | Stringable | string $expectedValue): static;
+    public function contentType(Constraint | Stringable | string $expectedValue): static;
 
     /**
      * An expectation to validate the given response cookie against the given value or matcher.
@@ -64,13 +69,13 @@ interface ResponseSpecification
      */
     public function cookie(
         string $name,
-        Constraint | Matcher | Stringable | string | null $expectedValue = null,
+        Constraint | Stringable | string | null $expectedValue = null,
     ): static;
 
     /**
      * An expectation to validate the given response cookies against the given values or matchers.
      *
-     * @param array<string, Constraint | Matcher | Stringable | string> $expectedCookies
+     * @param array<string, Constraint | Stringable | string> $expectedCookies
      *
      * @return $this
      */
@@ -93,12 +98,12 @@ interface ResponseSpecification
      *
      * @return $this
      */
-    public function header(string $name, Constraint | Matcher | Stringable | string $expectedValue): static;
+    public function header(string $name, Constraint | Stringable | string $expectedValue): static;
 
     /**
      * An expectation to validate the given response headers against the given values or matchers.
      *
-     * @param array<string, Constraint | Matcher | Stringable | string> $expectedHeaders
+     * @param array<string, Constraint | Stringable | string> $expectedHeaders
      *
      * @return $this
      */
@@ -128,14 +133,14 @@ interface ResponseSpecification
      *
      * @return $this
      */
-    public function statusCode(Constraint | Matcher | int $expectedValue): static;
+    public function statusCode(Constraint | int $expectedValue): static;
 
     /**
      * An expectation to validate the given response status line against the given value or matcher.
      *
      * @return $this
      */
-    public function statusLine(Constraint | Matcher | Stringable | string $expectedValue): static;
+    public function statusLine(Constraint | Stringable | string $expectedValue): static;
 
     /**
      * Syntactic sugar, this returns the same instance.
@@ -156,7 +161,7 @@ interface ResponseSpecification
      *
      * @return $this
      */
-    public function time(Constraint | Matcher $matcher): static;
+    public function time(Constraint $matcher): static;
 
     /**
      * Validates the given response against this specification.
