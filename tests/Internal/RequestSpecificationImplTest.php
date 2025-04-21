@@ -102,7 +102,7 @@ class RequestSpecificationImplTest extends TestCase
     {
         $this->assertSame($this->spec, $this->spec->formParam('foo', 'bar'));
         $this->assertSame($this->spec, $this->spec->formParam('baz', new Str('qux')));
-        $this->assertSame($this->spec, $this->spec->formParam('quux', ['corge', new Str('grault')]));
+        $this->assertSame($this->spec, $this->spec->formParam('quux', 'corge', new Str('grault')));
         $this->assertSame($this->spec, $this->spec->formParam('grault', 'garply', 'waldo', new Str('fred')));
         $this->assertSame($this->spec, $this->spec->formParam('foo', 'plugh', 'xyzzy'));
         $this->assertSame($this->spec, $this->spec->formParam('thud', ''));
@@ -159,7 +159,7 @@ class RequestSpecificationImplTest extends TestCase
     {
         $this->assertSame($this->spec, $this->spec->param('foo', 'bar'));
         $this->assertSame($this->spec, $this->spec->param('baz', new Str('qux')));
-        $this->assertSame($this->spec, $this->spec->param('quux', ['corge', new Str('grault')]));
+        $this->assertSame($this->spec, $this->spec->param('quux', 'corge', new Str('grault')));
         $this->assertSame($this->spec, $this->spec->param('grault', 'garply', 'waldo', new Str('fred')));
         $this->assertSame($this->spec, $this->spec->param('foo', 'plugh', 'xyzzy'));
         $this->assertSame($this->spec, $this->spec->param('thud', ''));
@@ -215,7 +215,7 @@ class RequestSpecificationImplTest extends TestCase
     {
         $this->assertSame($this->spec, $this->spec->queryParam('foo', 'bar'));
         $this->assertSame($this->spec, $this->spec->queryParam('baz', new Str('qux')));
-        $this->assertSame($this->spec, $this->spec->queryParam('quux', ['corge', new Str('grault')]));
+        $this->assertSame($this->spec, $this->spec->queryParam('quux', 'corge', new Str('grault')));
         $this->assertSame($this->spec, $this->spec->queryParam('grault', 'garply', 'waldo', new Str('fred')));
         $this->assertSame($this->spec, $this->spec->queryParam('foo', 'plugh', 'xyzzy'));
         $this->assertSame($this->spec, $this->spec->queryParam('thud', ''));

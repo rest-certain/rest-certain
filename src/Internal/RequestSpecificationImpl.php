@@ -41,9 +41,10 @@ use SplFileInfo;
 use Stringable;
 
 use function array_merge;
-use function count;
 use function is_array;
 use function json_encode;
+use function strtolower;
+use function strtoupper;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -61,13 +62,13 @@ final class RequestSpecificationImpl implements RequestSpecification
     private ?string $contentType = null;
     private Cookies $cookies;
 
-    /** @var array<string, string | string[]> */
+    /** @var array<string, list<string>> */
     private array $formParams = [];
 
-    /** @var array<string, string[]> */
+    /** @var array<string, list<string>> */
     private array $headers = [];
 
-    /** @var array<string, string | string[]> */
+    /** @var array<string, list<string>> */
     private array $params = [];
 
     /** @var array<string, string> */
@@ -75,7 +76,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     private int $port;
 
-    /** @var array<string, string | string[]> */
+    /** @var array<string, list<string>> */
     private array $queryParams = [];
 
     private ResponseSpecification $responseSpecification;
@@ -180,7 +181,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     #[Override] public function formParam(
         string $name,
-        Stringable | array | string $value = '',
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static {
         $this->formParams[$name] = $this->buildParameterValue(
@@ -198,7 +199,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function formParams(array $parameters): static
     {
         foreach ($parameters as $name => $value) {
-            $this->formParam($name, $value);
+            if (!is_array($value)) {
+                $value = [$value];
+            }
+            $this->formParam($name, ...$value);
         }
 
         return $this;
@@ -230,15 +234,14 @@ final class RequestSpecificationImpl implements RequestSpecification
         Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static {
-        $existingValue = $this->headers[$name] ?? [];
-        $headerValues = [];
+        $name = strtolower($name);
+        $headerValues = $this->headers[$name] ?? [];
 
-        /** @var Stringable | string $v */
-        foreach (array_merge((array) $value, $additionalValues) as $v) {
+        foreach ([$value, ...$additionalValues] as $v) {
             $headerValues[] = (string) $v;
         }
 
-        $this->headers[$name] = array_merge($existingValue, $headerValues);
+        $this->headers[$name] = $headerValues;
 
         return $this;
     }
@@ -268,7 +271,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     #[Override] public function param(
         string $name,
-        Stringable | array | string $value,
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static {
         $this->params[$name] = $this->buildParameterValue(
@@ -286,7 +289,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function params(array $parameters): static
     {
         foreach ($parameters as $name => $value) {
-            $this->param($name, $value);
+            if (!is_array($value)) {
+                $value = [$value];
+            }
+            $this->param($name, ...$value);
         }
 
         return $this;
@@ -344,7 +350,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     #[Override] public function queryParam(
         string $name,
-        Stringable | array | string $value,
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static {
         $this->queryParams[$name] = $this->buildParameterValue(
@@ -362,7 +368,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function queryParams(array $parameters): static
     {
         foreach ($parameters as $name => $value) {
-            $this->queryParam($name, $value);
+            if (!is_array($value)) {
+                $value = [$value];
+            }
+            $this->queryParam($name, ...$value);
         }
 
         return $this;
@@ -417,26 +426,20 @@ final class RequestSpecificationImpl implements RequestSpecification
     }
 
     /**
-     * @param Stringable | string | array<Stringable | string> $value
      * @param array<Stringable | string> $additionalValues
-     * @param string | array<string> $existingValue
+     * @param list<string> $existingValue
      *
-     * @return string | list<string>
+     * @return list<string>
      */
     private function buildParameterValue(
-        Stringable | array | string $value,
+        Stringable | string $value,
         array $additionalValues = [],
-        array | string $existingValue = [],
-    ): array | string {
-        $newValue = [];
+        array $existingValue = [],
+    ): array {
+        $newValue = $existingValue;
 
-        /** @var Stringable | string $v */
-        foreach (array_merge((array) $existingValue, (array) $value, $additionalValues) as $v) {
+        foreach ([$value, ...$additionalValues] as $v) {
             $newValue[] = (string) $v;
-        }
-
-        if (count($newValue) === 1 && !is_array($value)) {
-            $newValue = $newValue[0];
         }
 
         return $newValue;

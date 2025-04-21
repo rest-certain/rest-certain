@@ -113,29 +113,42 @@ interface RequestSpecification extends RequestSender
     /**
      * Sets a form parameter that will be sent with the request.
      *
-     * If there is a single value, the form parameter is treated as a single-value form parameter. If there are multiple
-     * values, the form parameter is treated as a multi-value form parameter (i.e., an array). If `$value` is an array,
-     * then `$additionalValues` is ignored, and the form parameter is treated as a multi-value form parameter.
+     * Note that parameters may have multiple values. Each value will be sent in the request with the same name. For
+     * example:
+     *
+     *     $specification->formParam('cheese', 'cheddar', 'havarti', 'swiss');
+     *     $specification->formParam('crackers', 'yes');
+     *
+     * Will send the following data:
+     *
+     *     cheese=cheddar&cheese=havarti&cheese=swiss&crackers=yes
      *
      * Note that this method is the same as {@see self::param()} for all HTTP methods except for `PUT` or `PATCH`, where
      * {@see self::param()} will treat the params as query string parameters, while this method always treats them as
      * form parameters.
      *
-     * @param Stringable | string | list<Stringable | string> $value
-     *
      * @return $this
      */
     public function formParam(
         string $name,
-        Stringable | array | string $value,
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
     /**
      * Sets form parameters that will be sent with the request.
      *
-     * If a name has a single value, the form parameter is treated as a single-value form parameter. If the value is an
-     * array, then the form parameter is treated as a multi-value form parameter (i.e., an array).
+     * Each parameter may be a single value or an array of values. If the value is an array, each value will be sent in
+     * the request with the same name. For example:
+     *
+     *     $specification->formParams([
+     *         'cheese' => ['edam', 'brie', 'gruyère'],
+     *         'crackers' => 'yes',
+     *     ]);
+     *
+     * Will send the following data:
+     *
+     *     cheese=edam&cheese=brie&cheese=gruy%C3%A8re&crackers=yes
      *
      * Note that this method is the same as {@see self::params()} for all HTTP methods except for `PUT` or `PATCH`,
      * where {@see self::params()} will treat the params as query string parameters, while this method always treats
@@ -184,30 +197,43 @@ interface RequestSpecification extends RequestSender
     /**
      * Sets a parameter that will be sent with the request.
      *
-     * If there is a single value, the form parameter is treated as a single-value form parameter. If there are multiple
-     * values, the form parameter is treated as a multi-value form parameter (i.e., an array). If `$value` is an array,
-     * then `$additionalValues` is ignored, and the form parameter is treated as a multi-value form parameter.
+     * Note that parameters may have multiple values. Each value will be sent in the request with the same name. For
+     * example:
+     *
+     *     $specification->param('cheese', 'ricotta', 'blue stilton', 'comté');
+     *     $specification->param('crackers', 'no');
+     *
+     * Will send the following data:
+     *
+     *     cheese=ricotta&cheese=blue+stilton&cheese=comt%C3%A9&crackers=no
      *
      * Note that parameters are treated as query string parameters for all HTTP requests except for `POST`, where they
      * are sent in the body. If you want to send parameters in the body on `PUT` or `PATCH` requests, use
      * {@see self::formParams()} instead. If you want to send parameters in the query string on `POST` requests, use
      * {@see self::queryParams()} instead.
      *
-     * @param Stringable | string | list<Stringable | string> $value
-     *
      * @return $this
      */
     public function param(
         string $name,
-        Stringable | array | string $value,
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
     /**
      * Sets parameters that will be sent with the request.
      *
-     * If a name has a single value, the parameter is treated as a single-value parameter. If the value is an array,
-     * then the parameter is treated as a multi-value parameter (i.e., an array).
+     * Each parameter may be a single value or an array of values. If the value is an array, each value will be sent in
+     * the request with the same name. For example:
+     *
+     *     $specification->formParams([
+     *         'cheese' => ['emmental', 'bergkäse', 'langres'],
+     *         'crackers' => 'yes',
+     *     ]);
+     *
+     * Will send the following data:
+     *
+     *     cheese=emmental&cheese=bergk%C3%A4se&cheese=langres&crackers=yes
      *
      * Note that parameters are treated as query string parameters for all HTTP requests except for `POST`, where they
      * are sent in the body. If you want to send parameters in the body on `PUT` or `PATCH` requests, use
@@ -269,31 +295,42 @@ interface RequestSpecification extends RequestSender
     /**
      * Sets a query string parameter that will be sent with the request.
      *
-     * If there is a single value, the query string parameter is treated as a single-value query string parameter. If
-     * there are multiple values, the query string parameter is treated as a multi-value query string parameter (i.e.,
-     * an array). If `$value` is an array, then `$additionalValues` is ignored, and the query string parameter is
-     * treated as a multi-value query string parameter.
+     * Note that parameters may have multiple values. Each value will be sent in the request with the same name. For
+     * example:
+     *
+     *     $specification->param('cheese', 'paneer', 'nguri', 'ayibe');
+     *     $specification->param('crackers', 'no');
+     *
+     * Will send the following data:
+     *
+     *     cheese=paneer&cheese=nguri&cheese=ayibe&crackers=no
      *
      * Note that this method is the same as {@see self::param()} for all HTTP methods except for `POST`, where
      * {@see self::param()} will treat the params as form parameters, while this method always treats them as query
      * string parameters.
      *
-     * @param Stringable | string | list<Stringable | string> $value
-     *
      * @return $this
      */
     public function queryParam(
         string $name,
-        Stringable | array | string $value,
+        Stringable | string $value,
         Stringable | string ...$additionalValues,
     ): static;
 
     /**
      * Sets query string parameters that will be sent with the request.
      *
-     * If a name has a single value, the query string parameter is treated as a single-value query string parameter. If
-     * the value is an array, then the query string parameter is treated as a multi-value query string parameter (i.e.,
-     * an array).
+     * Each parameter may be a single value or an array of values. If the value is an array, each value will be sent in
+     * the request with the same name. For example:
+     *
+     *     $specification->formParams([
+     *         'cheese' => ['Sakura cheese', 'feta', 'höfðingi'],
+     *         'crackers' => 'yes',
+     *     ]);
+     *
+     * Will send the following data:
+     *
+     *     cheese=Sakura+cheese&cheese=feta&cheese=h%C3%B6f%C3%B0ingi&crackers=yes
      *
      * Note that this method is the same as {@see self::params()} for all HTTP methods except for `POST`, where
      * {@see self::params()} will treat the params as form parameters, while this method always treats them as query
