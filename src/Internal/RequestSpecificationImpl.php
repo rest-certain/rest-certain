@@ -28,6 +28,7 @@ use Dflydev\FigCookies\Cookie;
 use Dflydev\FigCookies\Cookies;
 use JsonException;
 use JsonSerializable;
+use LogicException;
 use Override;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -171,7 +172,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function delete(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement delete() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function expect(): ResponseSpecification
@@ -213,7 +214,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function get(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement get() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function given(): static
@@ -226,7 +227,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function head(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement head() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function header(
@@ -266,7 +267,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function options(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement options() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function param(
@@ -303,7 +304,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function patch(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement patch() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function pathParam(string $name, Stringable | int | string $value): static
@@ -337,7 +338,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function post(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement post() method.
+        throw new LogicException('Not implemented yet');
     }
 
     /**
@@ -345,7 +346,7 @@ final class RequestSpecificationImpl implements RequestSpecification
      */
     #[Override] public function put(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        // TODO: Implement put() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function queryParam(
@@ -390,7 +391,7 @@ final class RequestSpecificationImpl implements RequestSpecification
         Stringable | UriInterface | string $path,
         array $pathParams = [],
     ): Response {
-        // TODO: Implement request() method.
+        throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function response(): ResponseSpecification
