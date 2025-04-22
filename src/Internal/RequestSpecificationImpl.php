@@ -41,11 +41,9 @@ use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
 use Stringable;
 
-use function array_merge;
 use function is_array;
 use function json_encode;
 use function strtolower;
-use function strtoupper;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -56,11 +54,11 @@ use const JSON_UNESCAPED_UNICODE;
  */
 final class RequestSpecificationImpl implements RequestSpecification
 {
-    private ?string $accept = null;
-    private string $basePath;
-    private UriInterface $baseUri;
-    private ?StreamInterface $body = null;
-    private ?string $contentType = null;
+    private ?string $accept = null; // @phpstan-ignore property.onlyWritten
+    private string $basePath; // @phpstan-ignore property.onlyWritten
+    private UriInterface $baseUri; // @phpstan-ignore property.onlyWritten
+    private ?StreamInterface $body = null; // @phpstan-ignore property.onlyWritten
+    private ?string $contentType = null; // @phpstan-ignore property.onlyWritten
     private Cookies $cookies;
 
     /** @var array<string, list<string>> */
@@ -73,9 +71,9 @@ final class RequestSpecificationImpl implements RequestSpecification
     private array $params = [];
 
     /** @var array<string, string> */
-    private array $pathParams = [];
+    private array $pathParams = []; // @phpstan-ignore property.onlyWritten
 
-    private int $port;
+    private int $port; // @phpstan-ignore property.onlyWritten
 
     /** @var array<string, list<string>> */
     private array $queryParams = [];
