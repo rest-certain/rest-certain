@@ -39,9 +39,9 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 {
     private StreamInterface $stream;
 
-    public function __construct(private ResponseInterface $request)
+    public function __construct(private ResponseInterface $response)
     {
-        $this->stream = $this->request->getBody();
+        $this->stream = $this->response->getBody();
     }
 
     public function __toString(): string
