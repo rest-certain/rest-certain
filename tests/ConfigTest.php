@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace RestCertain\Test;
 
 use Http\Discovery\Psr17Factory;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message;
 use RestCertain\Config;
@@ -12,6 +15,8 @@ use RestCertain\Http\HttpFactory;
 
 class ConfigTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     public function testConfigWithDefaults(): void
     {
         $config = new Config();
@@ -28,10 +33,10 @@ class ConfigTest extends TestCase
 
     public function testConfigWithCustomValues(): void
     {
-        $httpClient = $this->mockery(ClientInterface::class);
-        $requestFactory = $this->mockery(Message\RequestFactoryInterface::class);
-        $responseFactory = $this->mockery(Message\ResponseFactoryInterface::class);
-        $streamFactory = $this->mockery(Message\StreamFactoryInterface::class);
+        $httpClient = Mockery::mock(ClientInterface::class);
+        $requestFactory = Mockery::mock(Message\RequestFactoryInterface::class);
+        $responseFactory = Mockery::mock(Message\ResponseFactoryInterface::class);
+        $streamFactory = Mockery::mock(Message\StreamFactoryInterface::class);
         $uriFactory = new Psr17Factory();
 
         $config = new Config(

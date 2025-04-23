@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace RestCertain\Test\Internal;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\TestCase;
 use RestCertain\Config;
 use RestCertain\Internal\RequestSpecificationImpl;
 use RestCertain\Test\Json;
 use RestCertain\Test\Str;
-use RestCertain\Test\TestCase;
 use SplTempFileObject;
 
 class RequestSpecificationImplTest extends TestCase

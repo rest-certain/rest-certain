@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Http;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use RestCertain\Http\HttpFactory;
-use RestCertain\Test\TestCase;
 
 use function file_put_contents;
 use function fwrite;
@@ -20,6 +22,8 @@ use const UPLOAD_ERR_OK;
 
 class HttpFactoryTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     public function testCreateRequest(): void
     {
         $factory = new HttpFactory();
@@ -105,8 +109,8 @@ class HttpFactoryTest extends TestCase
 
     public function testSendRequest(): void
     {
-        $response = $this->mockery(ResponseInterface::class);
-        $client = $this->mockery(ClientInterface::class);
+        $response = Mockery::mock(ResponseInterface::class);
+        $client = Mockery::mock(ClientInterface::class);
 
         $factory = new HttpFactory($client);
         $request = $factory->createRequest('GET', 'https://example.com');

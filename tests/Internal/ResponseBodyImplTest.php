@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Internal;
 
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Internal\ResponseBodyImpl;
-use RestCertain\Test\TestCase;
 
 use const SEEK_SET;
 
 class ResponseBodyImplTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private ResponseBodyImpl $responseBody;
     private StreamInterface & MockInterface $stream;
 
     protected function setUp(): void
     {
-        $this->stream = $this->mockerySpy(StreamInterface::class, [
+        $this->stream = Mockery::spy(StreamInterface::class, [
             'getContents' => 'Hello, World!',
         ]);
-        $this->responseBody = new ResponseBodyImpl($this->mockery(ResponseInterface::class, [
+        $this->responseBody = new ResponseBodyImpl(Mockery::mock(ResponseInterface::class, [
             'getBody' => $this->stream,
         ]));
     }
