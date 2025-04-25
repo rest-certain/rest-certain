@@ -392,6 +392,15 @@ class ResponseSpecificationImplTest extends TestCase
         );
     }
 
+    public function testWhen(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+
+        $this->responseSpecification->setRequestSpecification($requestSpecification);
+
+        $this->assertSame($requestSpecification, $this->responseSpecification->when());
+    }
+
     public function testWith(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);

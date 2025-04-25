@@ -228,7 +228,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function when(): RequestSender
     {
-        throw new LogicException('Not implemented yet');
+        return $this->requestSpecification;
     }
 
     #[Override] public function with(): RequestSpecification
