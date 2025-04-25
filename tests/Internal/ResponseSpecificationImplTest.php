@@ -19,6 +19,7 @@ use Psr\Http\Message\StreamInterface;
 use RestCertain\Internal\ResponseSpecificationImpl;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
+use RestCertain\Specification\RequestSpecification;
 use RestCertain\Test\Str;
 use Stringable;
 
@@ -180,6 +181,15 @@ class ResponseSpecificationImplTest extends TestCase
         ]);
     }
 
+    public function testGiven(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+
+        $this->responseSpecification->setRequestSpecification($requestSpecification);
+
+        $this->assertSame($requestSpecification, $this->responseSpecification->given());
+    }
+
     /**
      * @param array<Constraint | Stringable | string> $testValue
      */
@@ -248,6 +258,42 @@ class ResponseSpecificationImplTest extends TestCase
                 new StringEndsWith('corge grault'), // This is where it should fail.
             ],
         ]);
+    }
+
+    public function testRequest(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+
+        $this->responseSpecification->setRequestSpecification($requestSpecification);
+
+        $this->assertSame($requestSpecification, $this->responseSpecification->request());
+    }
+
+    public function testSetRequestSpecification(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->setRequestSpecification($requestSpecification),
+        );
+    }
+
+    public function testSetRequestSpecificationOnConstructor(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+        $responseSpecification = new ResponseSpecificationImpl($this->response, $requestSpecification);
+
+        $this->assertSame($requestSpecification, $responseSpecification->request());
+    }
+
+    public function testWith(): void
+    {
+        $requestSpecification = Mockery::mock(RequestSpecification::class);
+
+        $this->responseSpecification->setRequestSpecification($requestSpecification);
+
+        $this->assertSame($requestSpecification, $this->responseSpecification->request());
     }
 
     /**

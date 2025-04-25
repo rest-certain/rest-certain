@@ -42,10 +42,17 @@ use function is_string;
 /**
  * @internal
  */
-final readonly class ResponseSpecificationImpl implements ResponseSpecification
+final class ResponseSpecificationImpl implements ResponseSpecification
 {
-    public function __construct(private Response $response)
-    {
+    private RequestSpecification $requestSpecification;
+
+    public function __construct(
+        private readonly Response $response,
+        ?RequestSpecification $requestSpecification = null,
+    ) {
+        if ($requestSpecification !== null) {
+            $this->setRequestSpecification($requestSpecification);
+        }
     }
 
     #[Override] public function and(): static
@@ -134,7 +141,7 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function given(): RequestSpecification
     {
-        throw new LogicException('Not implemented yet');
+        return $this->requestSpecification;
     }
 
     #[Override] public function header(
@@ -169,7 +176,7 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function request(): RequestSpecification
     {
-        throw new LogicException('Not implemented yet');
+        return $this->requestSpecification;
     }
 
     #[Override] public function response(): static
@@ -179,7 +186,9 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function setRequestSpecification(RequestSpecification $requestSpecification): static
     {
-        throw new LogicException('Not implemented yet');
+        $this->requestSpecification = $requestSpecification;
+
+        return $this;
     }
 
     #[Override] public function statusCode(
@@ -218,6 +227,6 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function with(): RequestSpecification
     {
-        throw new LogicException('Not implemented yet');
+        return $this->requestSpecification;
     }
 }
