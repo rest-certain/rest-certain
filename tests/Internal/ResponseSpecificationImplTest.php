@@ -330,6 +330,33 @@ class ResponseSpecificationImplTest extends TestCase
         );
     }
 
+    /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueSuccessProvider')]
+    public function testStatusLineWithSuccess(string $actualValue, array $testValue): void
+    {
+        $this->response->shouldReceive('getStatusLine')->andReturn($actualValue);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->statusLine(...$testValue),
+        );
+    }
+
+    /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueFailureProvider')]
+    public function testStatusLineWithFailure(string $actualValue, array $testValue): void
+    {
+        $this->response->shouldReceive('getStatusLine')->andReturn($actualValue);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->statusLine(...$testValue);
+    }
+
     public function testWith(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
