@@ -37,7 +37,6 @@ use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
 use function is_array;
-use function is_string;
 
 /**
  * @internal
@@ -64,12 +63,10 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        foreach ([$expectation, ...$additionalExpectations] as $expect) {
-            if ($expect instanceof Stringable || is_string($expect)) {
-                $expect = new IsEqual((string) $expect);
-            }
-            $expect->evaluate($this->response->getBody()->asString());
-        }
+        $this->evaluateExpectations(
+            $this->response->getBody()->asString(),
+            [$expectation, ...$additionalExpectations],
+        );
 
         return $this;
     }
@@ -86,12 +83,10 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        foreach ([$expectation, ...$additionalExpectations] as $expect) {
-            if ($expect instanceof Stringable || is_string($expect)) {
-                $expect = new IsEqual((string) $expect);
-            }
-            $expect->evaluate($this->response->getHeaderLine(Header::CONTENT_TYPE));
-        }
+        $this->evaluateExpectations(
+            $this->response->getHeaderLine(Header::CONTENT_TYPE),
+            [$expectation, ...$additionalExpectations],
+        );
 
         return $this;
     }
@@ -109,12 +104,10 @@ final class ResponseSpecificationImpl implements ResponseSpecification
             return $this;
         }
 
-        foreach ([$expectation, ...$additionalExpectations] as $expect) {
-            if ($expect instanceof Stringable || is_string($expect)) {
-                $expect = new IsEqual((string) $expect);
-            }
-            $expect->evaluate($this->response->getCookie($name));
-        }
+        $this->evaluateExpectations(
+            $this->response->getCookie($name),
+            [$expectation, ...$additionalExpectations],
+        );
 
         return $this;
     }
@@ -149,12 +142,10 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        foreach ([$expectation, ...$additionalExpectations] as $expect) {
-            if ($expect instanceof Stringable || is_string($expect)) {
-                $expect = new IsEqual((string) $expect);
-            }
-            $expect->evaluate($this->response->getHeaderLine($name));
-        }
+        $this->evaluateExpectations(
+            $this->response->getHeaderLine($name),
+            [$expectation, ...$additionalExpectations],
+        );
 
         return $this;
     }
@@ -228,5 +219,23 @@ final class ResponseSpecificationImpl implements ResponseSpecification
     #[Override] public function with(): RequestSpecification
     {
         return $this->requestSpecification;
+    }
+
+    /**
+     * @param array<Constraint | Stringable | int | string> $expectations
+     */
+    private function evaluateExpectations(mixed $value, array $expectations): void
+    {
+        foreach ($expectations as $expectation) {
+            if (!$expectation instanceof Constraint) {
+                if ($expectation instanceof Stringable) {
+                    $expectation = (string) $expectation;
+                }
+
+                $expectation = new IsEqual($expectation);
+            }
+
+            $expectation->evaluate($value);
+        }
     }
 }
