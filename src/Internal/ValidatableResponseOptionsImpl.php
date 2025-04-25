@@ -35,10 +35,6 @@ use Stringable;
  */
 final readonly class ValidatableResponseOptionsImpl implements ValidatableResponseOptions
 {
-    public function __construct()
-    {
-    }
-
     #[Override] public function and(): static
     {
         return $this;
@@ -49,24 +45,32 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
         return $this;
     }
 
-    #[Override] public function body(Constraint | Stringable | string ...$expectedValue): static
-    {
+    #[Override] public function body(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function bodyPath(string $path, Constraint | Stringable | string ...$expectedValue): static
-    {
+    #[Override] public function bodyPath(
+        string $path,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function contentType(Constraint | Stringable | string $expectedValue): static
-    {
+    #[Override] public function contentType(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
     #[Override] public function cookie(
         string $name,
-        Constraint | Stringable | string | null $expectedValue = null,
+        Constraint | Stringable | string | null $expectation = null,
+        Constraint | Stringable | string ...$additionalExpectations,
     ): static {
         throw new LogicException('Not implemented yet');
     }
@@ -74,35 +78,42 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
     /**
      * @inheritDoc
      */
-    #[Override] public function cookies(array $expectedCookies): static
+    #[Override] public function cookies(array $expectations): static
     {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function header(string $name, Constraint | Stringable | string $expectedValue): static
-    {
+    #[Override] public function header(
+        string $name,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
     /**
      * @inheritDoc
      */
-    #[Override] public function headers(array $expectedHeaders): static
+    #[Override] public function headers(array $expectations): static
     {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function statusCode(Constraint | int $expectedValue): static
-    {
+    #[Override] public function statusCode(
+        Constraint | int $expectation,
+        Constraint | int ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function statusLine(Constraint | Stringable | string $expectedValue): static
-    {
+    #[Override] public function statusLine(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function time(Constraint $matcher): static
+    #[Override] public function time(Constraint $expectation, Constraint ...$additionalExpectations): static
     {
         throw new LogicException('Not implemented yet');
     }

@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace RestCertain\Response;
 
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\ExpectationFailedException;
 use Stringable;
 
 interface ValidatableResponseOptions
@@ -47,8 +48,13 @@ interface ValidatableResponseOptions
      * An expectation to validate the given response body against the given matchers.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function body(Constraint | Stringable | string ...$expectedValue): static;
+    public function body(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response path in the response body against the given matchers.
@@ -56,73 +62,107 @@ interface ValidatableResponseOptions
      * @param string $path A body path in JSONPath syntax.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function bodyPath(string $path, Constraint | Stringable | string ...$expectedValue): static;
+    public function bodyPath(
+        string $path,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response Content-Type against the given value or matcher.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function contentType(Constraint | Stringable | string $expectedValue): static;
+    public function contentType(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response cookie against the given value or matcher.
      *
-     * If the $expectedValue is null, this validates whether the cookie exists, instead.
+     * If the $expectation is null, this validates whether the cookie exists, instead, and any additional expectations
+     * are ignored.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
     public function cookie(
         string $name,
-        Constraint | Stringable | string | null $expectedValue = null,
+        Constraint | Stringable | string | null $expectation = null,
+        Constraint | Stringable | string ...$additionalExpectations,
     ): static;
 
     /**
      * An expectation to validate the given response cookies against the given values or matchers.
      *
-     * @param array<string, Constraint | Stringable | string> $expectedCookies
+     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function cookies(array $expectedCookies): static;
+    public function cookies(array $expectations): static;
 
     /**
      * An expectation to validate the given response header against the given value or matcher.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function header(string $name, Constraint | Stringable | string $expectedValue): static;
+    public function header(
+        string $name,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response headers against the given values or matchers.
      *
-     * @param array<string, Constraint | Stringable | string> $expectedHeaders
+     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function headers(array $expectedHeaders): static;
+    public function headers(array $expectations): static;
 
     /**
      * An expectation to validate the given response status code against the given value or matcher.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function statusCode(Constraint | int $expectedValue): static;
+    public function statusCode(Constraint | int $expectation, Constraint | int ...$additionalExpectations): static;
 
     /**
      * An expectation to validate the given response status line against the given value or matcher.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function statusLine(Constraint | Stringable | string $expectedValue): static;
+    public function statusLine(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response time against the given matcher.
      *
      * @return $this
+     *
+     * @throws ExpectationFailedException
      */
-    public function time(Constraint $matcher): static;
+    public function time(Constraint $expectation, Constraint ...$additionalExpectations): static;
 
     /**
      * Syntactic sugar, this returns the same instance.

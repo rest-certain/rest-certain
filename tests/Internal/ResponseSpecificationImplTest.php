@@ -11,6 +11,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqualIgnoringCase;
 use PHPUnit\Framework\Constraint\StringContains;
+use PHPUnit\Framework\Constraint\StringEndsWith;
+use PHPUnit\Framework\Constraint\StringStartsWith;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -75,7 +77,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getHeaderLine')->with('content-type')->andReturn($actualValue);
 
-        $this->assertSame($this->responseSpecification, $this->responseSpecification->contentType($testValue[0]));
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->contentType(...$testValue));
     }
 
     /**
@@ -88,7 +90,7 @@ class ResponseSpecificationImplTest extends TestCase
 
         $this->expectException(ExpectationFailedException::class);
 
-        $this->responseSpecification->contentType($testValue[0]);
+        $this->responseSpecification->contentType(...$testValue);
     }
 
     /**
@@ -101,7 +103,7 @@ class ResponseSpecificationImplTest extends TestCase
 
         $this->assertSame(
             $this->responseSpecification,
-            $this->responseSpecification->cookie('my-cookie', $testValue[0]),
+            $this->responseSpecification->cookie('my-cookie', ...$testValue),
         );
     }
 
@@ -115,7 +117,7 @@ class ResponseSpecificationImplTest extends TestCase
 
         $this->expectException(ExpectationFailedException::class);
 
-        $this->responseSpecification->cookie('my-cookie', $testValue[0]);
+        $this->responseSpecification->cookie('my-cookie', ...$testValue);
     }
 
     public function testCookieIsSet(): void
@@ -133,6 +135,49 @@ class ResponseSpecificationImplTest extends TestCase
         $this->expectExceptionMessage('Failed asserting that cookie "my-cookie" is set.');
 
         $this->responseSpecification->cookie('my-cookie');
+    }
+
+    public function testCookiesWithSuccess(): void
+    {
+        $this->response->shouldReceive('getCookie')->with('aCookie1')->andReturn('foo');
+        $this->response->shouldReceive('getCookie')->with('aCookie2')->andReturn('foo bar');
+        $this->response->shouldReceive('getCookie')->with('aCookie3')->andReturn('foo bar baz');
+        $this->response->shouldReceive('getCookie')->with('aCookie4')->andReturn('foo bar baz qux quux corge grault');
+
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->cookies([
+            'aCookie1' => 'foo',
+            'aCookie2' => new Str('foo bar'),
+            'aCookie3' => new StringContains('bar'),
+            'aCookie4' => [
+                new StringContains('baz'),
+                new StringContains('qux'),
+                new StringStartsWith('foo bar'),
+                'foo bar baz qux quux corge grault',
+            ],
+        ]));
+    }
+
+    public function testCookiesWithFailure(): void
+    {
+        $this->response->shouldReceive('getCookie')->with('aCookie1')->andReturn('foo');
+        $this->response->shouldReceive('getCookie')->with('aCookie2')->andReturn('foo bar');
+        $this->response->shouldReceive('getCookie')->with('aCookie3')->andReturn('foo bar baz');
+        $this->response->shouldReceive('getCookie')->with('aCookie4')->andReturn('foo bar baz qux quux corge grault');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->cookies([
+            'aCookie1' => 'foo',
+            'aCookie2' => new Str('foo bar'),
+            'aCookie3' => new StringContains('bar'),
+            'aCookie4' => [
+                new StringContains('baz'),
+                new StringContains('qux'),
+                new StringStartsWith('foo bar'),
+                'foo bar baz qux quux corge grault',
+                new StringEndsWith('corge grault garply'), // This is where it should fail.
+            ],
+        ]);
     }
 
     /**
@@ -186,11 +231,11 @@ class ResponseSpecificationImplTest extends TestCase
             [
                 'actualValue' => 'foo bar',
                 'testValue' => [
-                    new StringContains('baz'),
                     new StringContains('foo'),
                     new StringContains('bar'),
                     new Str('foo bar'),
                     'foo bar',
+                    new StringContains('baz'), // This is where it should fail.
                 ],
             ],
         ];

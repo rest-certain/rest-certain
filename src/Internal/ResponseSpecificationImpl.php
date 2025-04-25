@@ -36,6 +36,7 @@ use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
+use function is_array;
 use function is_string;
 
 /**
@@ -52,44 +53,48 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
         return $this;
     }
 
-    #[Override] public function body(Constraint | Stringable | string ...$expectedValue): static
-    {
-        foreach ($expectedValue as $value) {
-            if ($value instanceof Stringable || is_string($value)) {
-                $value = new IsEqual((string) $value);
+    #[Override] public function body(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
+        foreach ([$expectation, ...$additionalExpectations] as $expect) {
+            if ($expect instanceof Stringable || is_string($expect)) {
+                $expect = new IsEqual((string) $expect);
             }
-
-            $value->evaluate($this->response->getBody()->asString());
+            $expect->evaluate($this->response->getBody()->asString());
         }
 
         return $this;
     }
 
-    #[Override] public function bodyPath(string $path, Constraint | Stringable | string ...$expectedValue): static
-    {
+    #[Override] public function bodyPath(
+        string $path,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function contentType(Constraint | Stringable | string $expectedValue): static
-    {
-        if ($expectedValue instanceof Stringable || is_string($expectedValue)) {
-            $expectedValue = new IsEqual((string) $expectedValue);
+    #[Override] public function contentType(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
+        foreach ([$expectation, ...$additionalExpectations] as $expect) {
+            if ($expect instanceof Stringable || is_string($expect)) {
+                $expect = new IsEqual((string) $expect);
+            }
+            $expect->evaluate($this->response->getHeaderLine(Header::CONTENT_TYPE));
         }
-
-        $expectedValue->evaluate($this->response->getHeaderLine(Header::CONTENT_TYPE));
 
         return $this;
     }
 
     #[Override] public function cookie(
         string $name,
-        Constraint | Stringable | string | null $expectedValue = null,
+        Constraint | Stringable | string | null $expectation = null,
+        Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        if ($expectedValue instanceof Stringable || is_string($expectedValue)) {
-            $expectedValue = new IsEqual((string) $expectedValue);
-        }
-
-        if ($expectedValue === null) {
+        if ($expectation === null) {
             if ($this->response->getCookie($name) === null) {
                 throw new ExpectationFailedException('Failed asserting that cookie "' . $name . '" is set.');
             }
@@ -97,7 +102,12 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
             return $this;
         }
 
-        $expectedValue->evaluate($this->response->getCookie($name));
+        foreach ([$expectation, ...$additionalExpectations] as $expect) {
+            if ($expect instanceof Stringable || is_string($expect)) {
+                $expect = new IsEqual((string) $expect);
+            }
+            $expect->evaluate($this->response->getCookie($name));
+        }
 
         return $this;
     }
@@ -105,9 +115,16 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
     /**
      * @inheritDoc
      */
-    #[Override] public function cookies(array $expectedCookies): static
+    #[Override] public function cookies(array $expectations): static
     {
-        throw new LogicException('Not implemented yet');
+        foreach ($expectations as $name => $expectation) {
+            if (!is_array($expectation)) {
+                $expectation = [$expectation];
+            }
+            $this->cookie($name, ...$expectation);
+        }
+
+        return $this;
     }
 
     #[Override] public function expect(): static
@@ -120,15 +137,18 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function header(string $name, Constraint | Stringable | string $expectedValue): static
-    {
+    #[Override] public function header(
+        string $name,
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
     /**
      * @inheritDoc
      */
-    #[Override] public function headers(array $expectedHeaders): static
+    #[Override] public function headers(array $expectations): static
     {
         throw new LogicException('Not implemented yet');
     }
@@ -148,13 +168,17 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function statusCode(int | Constraint $expectedValue): static
-    {
+    #[Override] public function statusCode(
+        Constraint | int $expectation,
+        Constraint | int ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
-    #[Override] public function statusLine(Constraint | Stringable | string $expectedValue): static
-    {
+    #[Override] public function statusLine(
+        Constraint | Stringable | string $expectation,
+        Constraint | Stringable | string ...$additionalExpectations,
+    ): static {
         throw new LogicException('Not implemented yet');
     }
 
@@ -168,12 +192,7 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
         return $this;
     }
 
-    #[Override] public function time(Constraint $matcher): static
-    {
-        throw new LogicException('Not implemented yet');
-    }
-
-    #[Override] public function validate(Response $response): Response
+    #[Override] public function time(Constraint $expectation, Constraint ...$additionalExpectations): static
     {
         throw new LogicException('Not implemented yet');
     }
