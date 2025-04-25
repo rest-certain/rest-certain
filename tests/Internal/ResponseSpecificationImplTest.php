@@ -357,6 +357,16 @@ class ResponseSpecificationImplTest extends TestCase
         $this->responseSpecification->statusLine(...$testValue);
     }
 
+    public function testThat(): void
+    {
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->that());
+    }
+
+    public function testThen(): void
+    {
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->then());
+    }
+
     public function testWith(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
