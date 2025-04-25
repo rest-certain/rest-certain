@@ -88,6 +88,9 @@ jobs:
 
       - name: "Publish coverage report to Codecov"
         uses: "codecov/codecov-action@v5"
+        with:
+          token: "${{ secrets.CODECOV_TOKEN }}"
+          slug: "rest-certain/rest-certain"
 
   unit-tests:
     name: "Unit tests"

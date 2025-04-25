@@ -7,8 +7,7 @@
         "rest",
         "api",
         "testing",
-        "phpunit",
-        "xunit"
+        "phpunit"
     ],
     "authors": [
         {
