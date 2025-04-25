@@ -181,6 +181,76 @@ class ResponseSpecificationImplTest extends TestCase
     }
 
     /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueSuccessProvider')]
+    public function testHeaderWithSuccess(string $actualValue, array $testValue): void
+    {
+        $this->response->shouldReceive('getHeaderLine')->with('my-header')->andReturn($actualValue);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->header('my-header', ...$testValue),
+        );
+    }
+
+    /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueFailureProvider')]
+    public function testHeaderWithFailure(string $actualValue, array $testValue): void
+    {
+        $this->response->shouldReceive('getHeaderLine')->with('my-header')->andReturn($actualValue);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->header('my-header', ...$testValue);
+    }
+
+    public function testHeadersWithSuccess(): void
+    {
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader1')->andReturn('foo');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader2')->andReturn('foo bar');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader3')->andReturn('foo bar baz');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader4')->andReturn('foo bar baz qux quux corge');
+
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->headers([
+            'aHeader1' => 'foo',
+            'aHeader2' => new Str('foo bar'),
+            'aHeader3' => new StringContains('bar'),
+            'aHeader4' => [
+                new StringContains('baz'),
+                new StringContains('qux'),
+                new StringStartsWith('foo bar'),
+                'foo bar baz qux quux corge',
+            ],
+        ]));
+    }
+
+    public function testHeadersWithFailure(): void
+    {
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader1')->andReturn('foo');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader2')->andReturn('foo bar');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader3')->andReturn('foo bar baz');
+        $this->response->shouldReceive('getHeaderLine')->with('aHeader4')->andReturn('foo bar baz qux quux corge');
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->headers([
+            'aHeader1' => 'foo',
+            'aHeader2' => new Str('foo bar'),
+            'aHeader3' => new StringContains('bar'),
+            'aHeader4' => [
+                new StringContains('baz'),
+                new StringContains('qux'),
+                new StringStartsWith('foo bar'),
+                'foo bar baz qux quux corge',
+                new StringEndsWith('corge grault'), // This is where it should fail.
+            ],
+        ]);
+    }
+
+    /**
      * @return array<array{actualValue: string, testValue: array<Constraint | Stringable | string>}>
      */
     public static function generalValueSuccessProvider(): array

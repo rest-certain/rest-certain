@@ -142,7 +142,14 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        foreach ([$expectation, ...$additionalExpectations] as $expect) {
+            if ($expect instanceof Stringable || is_string($expect)) {
+                $expect = new IsEqual((string) $expect);
+            }
+            $expect->evaluate($this->response->getHeaderLine($name));
+        }
+
+        return $this;
     }
 
     /**
@@ -150,7 +157,14 @@ final readonly class ResponseSpecificationImpl implements ResponseSpecification
      */
     #[Override] public function headers(array $expectations): static
     {
-        throw new LogicException('Not implemented yet');
+        foreach ($expectations as $name => $expectation) {
+            if (!is_array($expectation)) {
+                $expectation = [$expectation];
+            }
+            $this->header($name, ...$expectation);
+        }
+
+        return $this;
     }
 
     #[Override] public function request(): RequestSpecification
