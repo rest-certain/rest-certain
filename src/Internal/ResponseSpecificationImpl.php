@@ -186,7 +186,12 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | int $expectation,
         Constraint | int ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->evaluateExpectations(
+            $this->response->getStatusCode(),
+            [$expectation, ...$additionalExpectations],
+        );
+
+        return $this;
     }
 
     #[Override] public function statusLine(

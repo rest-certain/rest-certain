@@ -9,11 +9,15 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\Constraint\GreaterThan;
 use PHPUnit\Framework\Constraint\IsEqualIgnoringCase;
+use PHPUnit\Framework\Constraint\IsType;
+use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\StringEndsWith;
 use PHPUnit\Framework\Constraint\StringStartsWith;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Internal\ResponseSpecificationImpl;
@@ -181,6 +185,11 @@ class ResponseSpecificationImplTest extends TestCase
         ]);
     }
 
+    public function testExpect(): void
+    {
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->expect());
+    }
+
     public function testGiven(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
@@ -269,6 +278,11 @@ class ResponseSpecificationImplTest extends TestCase
         $this->assertSame($requestSpecification, $this->responseSpecification->request());
     }
 
+    public function testResponse(): void
+    {
+        $this->assertSame($this->responseSpecification, $this->responseSpecification->response());
+    }
+
     public function testSetRequestSpecification(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
@@ -285,6 +299,35 @@ class ResponseSpecificationImplTest extends TestCase
         $responseSpecification = new ResponseSpecificationImpl($this->response, $requestSpecification);
 
         $this->assertSame($requestSpecification, $responseSpecification->request());
+    }
+
+    public function testStatusCodeWithSuccess(): void
+    {
+        $this->response->shouldReceive('getStatusCode')->andReturn(202);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->statusCode(
+                new IsType(NativeType::Int),
+                new GreaterThan(200),
+                new LessThan(300),
+                202,
+            ),
+        );
+    }
+
+    public function testStatusCodeWithFailure(): void
+    {
+        $this->response->shouldReceive('getStatusCode')->andReturn(204);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->statusCode(
+            new IsType(NativeType::Int),
+            new GreaterThan(200),
+            new LessThan(300),
+            202, // This is where it should fail.
+        );
     }
 
     public function testWith(): void
