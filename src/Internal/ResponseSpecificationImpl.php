@@ -218,7 +218,12 @@ final class ResponseSpecificationImpl implements ResponseSpecification
 
     #[Override] public function time(Constraint $expectation, Constraint ...$additionalExpectations): static
     {
-        throw new LogicException('Not implemented yet');
+        $this->evaluateExpectations(
+            $this->response->getTime(),
+            [$expectation, ...$additionalExpectations],
+        );
+
+        return $this;
     }
 
     #[Override] public function when(): RequestSender

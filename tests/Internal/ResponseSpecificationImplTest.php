@@ -367,6 +367,31 @@ class ResponseSpecificationImplTest extends TestCase
         $this->assertSame($this->responseSpecification, $this->responseSpecification->then());
     }
 
+    public function testTimeWithSuccess(): void
+    {
+        $this->response->shouldReceive('getTime')->andReturn(582);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->time(
+                new IsType(NativeType::Int),
+                new LessThan(1000),
+            ),
+        );
+    }
+
+    public function testTimeWithFailure(): void
+    {
+        $this->response->shouldReceive('getTime')->andReturn(1042);
+
+        $this->expectException(ExpectationFailedException::class);
+
+        $this->responseSpecification->time(
+            new IsType(NativeType::Int),
+            new LessThan(1000), // This is where it should fail.
+        );
+    }
+
     public function testWith(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
