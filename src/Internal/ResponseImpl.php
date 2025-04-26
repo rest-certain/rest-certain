@@ -43,10 +43,10 @@ final readonly class ResponseImpl implements Response
     private SetCookies $setCookies;
     private ValidatableResponseOptions $validatableResponseOptions;
 
-    public function __construct(private ResponseInterface $response)
+    public function __construct(private ResponseInterface $psrResponse)
     {
-        $this->body = new ResponseBodyImpl($this->response);
-        $this->setCookies = SetCookies::fromResponse($this->response);
+        $this->body = new ResponseBodyImpl($this->psrResponse);
+        $this->setCookies = SetCookies::fromResponse($this->psrResponse);
 
         $responseSpec = new ResponseSpecificationImpl($this);
         $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($responseSpec);
@@ -97,11 +97,11 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function getContentType(): ?string
     {
-        if (!$this->response->hasHeader(Header::CONTENT_TYPE)) {
+        if (!$this->psrResponse->hasHeader(Header::CONTENT_TYPE)) {
             return null;
         }
 
-        return $this->response->getHeaderLine(Header::CONTENT_TYPE);
+        return $this->psrResponse->getHeaderLine(Header::CONTENT_TYPE);
     }
 
     #[Override] public function getCookie(string $name): ?string
@@ -128,12 +128,12 @@ final readonly class ResponseImpl implements Response
     #[Override] public function getHeader(string $name): array
     {
         /** @var list<string> */
-        return $this->response->getHeader($name);
+        return $this->psrResponse->getHeader($name);
     }
 
     #[Override] public function getHeaderLine(string $name): string
     {
-        return $this->response->getHeaderLine($name);
+        return $this->psrResponse->getHeaderLine($name);
     }
 
     /**
@@ -142,29 +142,29 @@ final readonly class ResponseImpl implements Response
     #[Override] public function getHeaders(): array
     {
         /** @var array<string, list<string>> */
-        return $this->response->getHeaders();
+        return $this->psrResponse->getHeaders();
     }
 
     #[Override] public function getProtocolVersion(): string
     {
-        return $this->response->getProtocolVersion();
+        return $this->psrResponse->getProtocolVersion();
     }
 
     #[Override] public function getReasonPhrase(): string
     {
-        return $this->response->getReasonPhrase();
+        return $this->psrResponse->getReasonPhrase();
     }
 
     #[Override] public function getStatusCode(): int
     {
-        return $this->response->getStatusCode();
+        return $this->psrResponse->getStatusCode();
     }
 
     #[Override] public function getStatusLine(): string
     {
-        $protocol = $this->response->getProtocolVersion();
-        $code = $this->response->getStatusCode();
-        $reasonPhrase = $this->response->getReasonPhrase();
+        $protocol = $this->psrResponse->getProtocolVersion();
+        $code = $this->psrResponse->getStatusCode();
+        $reasonPhrase = $this->psrResponse->getReasonPhrase();
 
         return "HTTP/$protocol $code $reasonPhrase";
     }
@@ -176,7 +176,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function hasHeader(string $name): bool
     {
-        return $this->response->hasHeader($name);
+        return $this->psrResponse->hasHeader($name);
     }
 
     /**
@@ -185,7 +185,7 @@ final readonly class ResponseImpl implements Response
     #[Override] public function header(string $name): array
     {
         /** @var list<string> */
-        return $this->response->getHeader($name);
+        return $this->psrResponse->getHeader($name);
     }
 
     /**
@@ -194,7 +194,7 @@ final readonly class ResponseImpl implements Response
     #[Override] public function headers(): array
     {
         /** @var array<string, list<string>> */
-        return $this->response->getHeaders();
+        return $this->psrResponse->getHeaders();
     }
 
     #[Override] public function path(string $path): mixed
@@ -214,7 +214,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function statusCode(): int
     {
-        return $this->response->getStatusCode();
+        return $this->psrResponse->getStatusCode();
     }
 
     #[Override] public function statusLine(): string
