@@ -54,11 +54,9 @@ use const JSON_UNESCAPED_UNICODE;
  */
 final class RequestSpecificationImpl implements RequestSpecification
 {
-    private ?string $accept = null; // @phpstan-ignore property.onlyWritten
     private string $basePath; // @phpstan-ignore property.onlyWritten
     private UriInterface $baseUri; // @phpstan-ignore property.onlyWritten
     private ?StreamInterface $body = null; // @phpstan-ignore property.onlyWritten
-    private ?string $contentType = null; // @phpstan-ignore property.onlyWritten
     private Cookies $cookies;
 
     /** @var array<string, list<string>> */
@@ -90,7 +88,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     #[Override] public function accept(Stringable | string $contentType): static
     {
-        $this->accept = (string) $contentType;
+        $this->header(Header::ACCEPT, $contentType);
 
         return $this;
     }
@@ -141,7 +139,7 @@ final class RequestSpecificationImpl implements RequestSpecification
 
     #[Override] public function contentType(Stringable | string $contentType): static
     {
-        $this->contentType = (string) $contentType;
+        $this->header(Header::CONTENT_TYPE, $contentType);
 
         return $this;
     }
