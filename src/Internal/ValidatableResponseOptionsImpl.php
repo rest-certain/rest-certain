@@ -24,10 +24,10 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
-use LogicException;
 use Override;
 use PHPUnit\Framework\Constraint\Constraint;
 use RestCertain\Response\ValidatableResponseOptions;
+use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
 /**
@@ -35,6 +35,10 @@ use Stringable;
  */
 final readonly class ValidatableResponseOptionsImpl implements ValidatableResponseOptions
 {
+    public function __construct(private ResponseSpecification $responseSpecification)
+    {
+    }
+
     #[Override] public function and(): static
     {
         return $this;
@@ -49,7 +53,9 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->body($expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function bodyPath(
@@ -57,14 +63,18 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->bodyPath($path, $expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function contentType(
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->contentType($expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function cookie(
@@ -72,7 +82,9 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
         Constraint | Stringable | string | null $expectation = null,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->cookie($name, $expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     /**
@@ -80,7 +92,9 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
      */
     #[Override] public function cookies(array $expectations): static
     {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->cookies($expectations);
+
+        return $this;
     }
 
     #[Override] public function header(
@@ -88,7 +102,9 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->header($name, $expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     /**
@@ -96,26 +112,34 @@ final readonly class ValidatableResponseOptionsImpl implements ValidatableRespon
      */
     #[Override] public function headers(array $expectations): static
     {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->headers($expectations);
+
+        return $this;
     }
 
     #[Override] public function statusCode(
         Constraint | int $expectation,
         Constraint | int ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->statusCode($expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function statusLine(
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->statusLine($expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function time(Constraint $expectation, Constraint ...$additionalExpectations): static
     {
-        throw new LogicException('Not implemented yet');
+        $this->responseSpecification->time($expectation, ...$additionalExpectations);
+
+        return $this;
     }
 
     #[Override] public function using(): static

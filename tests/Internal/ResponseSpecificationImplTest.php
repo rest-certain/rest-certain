@@ -74,6 +74,11 @@ class ResponseSpecificationImplTest extends TestCase
         $this->responseSpecification->body(...$testValue);
     }
 
+    public function testBodyPath(): void
+    {
+        $this->markTestIncomplete('Need to implement ' . ResponseSpecificationImpl::class . '::bodyPath()');
+    }
+
     /**
      * @param array<Constraint | Stringable | string> $testValue
      */

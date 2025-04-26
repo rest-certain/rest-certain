@@ -44,7 +44,9 @@ final readonly class ResponseImpl implements Response
     public function __construct(private ResponseInterface $response)
     {
         $this->body = new ResponseBodyImpl($this->response);
-        $this->validatableResponseOptions = new ValidatableResponseOptionsImpl();
+
+        $responseSpec = new ResponseSpecificationImpl($this);
+        $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($responseSpec);
     }
 
     #[Override] public function andReturn(): static
