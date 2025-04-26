@@ -240,54 +240,36 @@ final readonly class ResponseImpl implements Response
     /**
      * @inheritDoc
      */
-    #[Override] public function withAddedHeader(string $name, $value): never
+    #[Override] public function withAddedHeader(string $name, $value): Response
     {
-        throw new NotImplemented(
-            'The withAddedHeader() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withAddedHeader($name, $value));
     }
 
-    #[Override] public function withBody(StreamInterface $body): never
+    #[Override] public function withBody(StreamInterface $body): Response
     {
-        throw new NotImplemented(
-            'The withBody() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withBody($body));
     }
 
     /**
      * @inheritDoc
      */
-    #[Override] public function withHeader(string $name, $value): never
+    #[Override] public function withHeader(string $name, $value): Response
     {
-        throw new NotImplemented(
-            'The withHeader() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withHeader($name, $value));
     }
 
-    #[Override] public function withProtocolVersion(string $version): never
+    #[Override] public function withProtocolVersion(string $version): Response
     {
-        throw new NotImplemented(
-            'The withProtocolVersion() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withProtocolVersion($version));
     }
 
-    #[Override] public function withStatus(int $code, string $reasonPhrase = ''): never
+    #[Override] public function withStatus(int $code, string $reasonPhrase = ''): Response
     {
-        throw new NotImplemented(
-            'The withStatus() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withStatus($code, $reasonPhrase));
     }
 
-    #[Override] public function withoutHeader(string $name): never
+    #[Override] public function withoutHeader(string $name): Response
     {
-        throw new NotImplemented(
-            'The withoutHeader() method is not implemented, since it does not '
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        return new ResponseImpl($this->psrResponse->withoutHeader($name));
     }
 }

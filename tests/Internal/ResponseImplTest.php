@@ -7,11 +7,9 @@ namespace RestCertain\Test\Internal;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use RestCertain\Internal\NotImplemented;
 use RestCertain\Internal\ResponseBodyImpl;
 use RestCertain\Internal\ResponseImpl;
 use RestCertain\Internal\ValidatableResponseOptionsImpl;
@@ -218,33 +216,46 @@ class ResponseImplTest extends TestCase
         $this->assertSame($this->response, $this->response->thenReturn());
     }
 
-    /**
-     * @param mixed[] $args
-     */
-    #[DataProvider('notImplementedMethodsProvider')]
-    public function testNotImplementedMethods(string $method, array $args): void
+    public function testWithAddedHeader(): void
     {
-        $this->expectException(NotImplemented::class);
-        $this->expectExceptionMessage(
-            "The $method() method is not implemented, since it does not "
-            . 'make sense to manipulate the response in the context of REST Certain',
-        );
+        $this->psrResponse->expects('withAddedHeader')->with('foo', 'bar')->andReturns(clone $this->psrResponse);
 
-        $this->response->{$method}(...$args);
+        $this->assertNotSame($this->response, $this->response->withAddedHeader('foo', 'bar'));
     }
 
-    /**
-     * @return array<array{method: string, args: mixed[]}>
-     */
-    public static function notImplementedMethodsProvider(): array
+    public function testWithBody(): void
     {
-        return [
-            ['method' => 'withAddedHeader', 'args' => ['foo', 'bar']],
-            ['method' => 'withBody', 'args' => [Mockery::mock(StreamInterface::class)]],
-            ['method' => 'withHeader', 'args' => ['foo', 'bar']],
-            ['method' => 'withProtocolVersion', 'args' => ['1.2']],
-            ['method' => 'withStatus', 'args' => [404, 'Not Found']],
-            ['method' => 'withoutHeader', 'args' => ['foo']],
-        ];
+        $body = Mockery::mock(StreamInterface::class);
+        $this->psrResponse->expects('withBody')->with($body)->andReturns(clone $this->psrResponse);
+
+        $this->assertNotSame($this->response, $this->response->withBody($body));
+    }
+
+    public function testWithHeader(): void
+    {
+        $this->psrResponse->expects('withHeader')->with('foo', 'bar')->andReturns(clone $this->psrResponse);
+
+        $this->assertNotSame($this->response, $this->response->withHeader('foo', 'bar'));
+    }
+
+    public function testWithProtocolVersion(): void
+    {
+        $this->psrResponse->expects('withProtocolVersion')->with('1.1')->andReturns(clone $this->psrResponse);
+
+        $this->assertNotSame($this->response, $this->response->withProtocolVersion('1.1'));
+    }
+
+    public function testWithStatus(): void
+    {
+        $this->psrResponse->expects('withStatus')->with(303, '')->andReturns(clone $this->psrResponse);
+
+        $this->assertNotSame($this->response, $this->response->withStatus(303));
+    }
+
+    public function testWithoutHeader(): void
+    {
+        $this->psrResponse->expects('withoutHeader')->with('foo')->andReturns(clone $this->psrResponse);
+
+        $this->assertNotSame($this->response, $this->response->withoutHeader('foo'));
     }
 }

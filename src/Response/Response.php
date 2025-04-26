@@ -180,4 +180,22 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      * @see self::getTime()
      */
     public function time(): int;
+
+    /**
+     * @inheritDoc
+     */
+    public function withAddedHeader(string $name, $value): Response;
+
+    public function withBody(StreamInterface $body): Response;
+
+    /**
+     * @inheritDoc
+     */
+    public function withHeader(string $name, $value): Response;
+
+    public function withProtocolVersion(string $version): Response;
+
+    public function withStatus(int $code, string $reasonPhrase = ''): Response;
+
+    public function withoutHeader(string $name): Response;
 }
