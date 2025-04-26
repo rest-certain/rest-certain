@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RestCertain\Test\Internal;
 
 use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\GreaterThan;
@@ -19,6 +20,8 @@ use RestCertain\Test\Str;
 
 class ValidatableResponseOptionsImplTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private ResponseSpecification & MockInterface $responseSpecification;
     private ValidatableResponseOptionsImpl $validatableResponseOptions;
 
