@@ -24,6 +24,7 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
+use Dflydev\FigCookies\SetCookies;
 use LogicException;
 use Override;
 use Psr\Http\Message\ResponseInterface;
@@ -39,11 +40,13 @@ use RestCertain\Response\ValidatableResponseOptions;
 final readonly class ResponseImpl implements Response
 {
     private ResponseBody $body;
+    private SetCookies $setCookies;
     private ValidatableResponseOptions $validatableResponseOptions;
 
     public function __construct(private ResponseInterface $response)
     {
         $this->body = new ResponseBodyImpl($this->response);
+        $this->setCookies = SetCookies::fromResponse($this->response);
 
         $responseSpec = new ResponseSpecificationImpl($this);
         $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($responseSpec);
@@ -76,7 +79,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function cookie(string $name): ?string
     {
-        throw new LogicException('Not implemented yet');
+        return $this->getCookie($name);
     }
 
     /**
@@ -84,7 +87,7 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function cookies(): array
     {
-        throw new LogicException('Not implemented yet');
+        return $this->getCookies();
     }
 
     #[Override] public function getBody(): ResponseBody & StreamInterface
@@ -103,7 +106,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function getCookie(string $name): ?string
     {
-        throw new LogicException('Not implemented yet');
+        return $this->setCookies->get($name)?->getValue();
     }
 
     /**
@@ -111,7 +114,12 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function getCookies(): array
     {
-        throw new LogicException('Not implemented yet');
+        $cookies = [];
+        foreach ($this->setCookies->getAll() as $setCookie) {
+            $cookies[$setCookie->getName()] = (string) $setCookie->getValue();
+        }
+
+        return $cookies;
     }
 
     /**
@@ -232,36 +240,54 @@ final readonly class ResponseImpl implements Response
     /**
      * @inheritDoc
      */
-    #[Override] public function withAddedHeader(string $name, $value): Response
+    #[Override] public function withAddedHeader(string $name, $value): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withAddedHeader() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 
-    #[Override] public function withBody(StreamInterface $body): Response
+    #[Override] public function withBody(StreamInterface $body): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withBody() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 
     /**
      * @inheritDoc
      */
-    #[Override] public function withHeader(string $name, $value): Response
+    #[Override] public function withHeader(string $name, $value): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withHeader() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 
-    #[Override] public function withProtocolVersion(string $version): Response
+    #[Override] public function withProtocolVersion(string $version): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withProtocolVersion() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 
-    #[Override] public function withStatus(int $code, string $reasonPhrase = ''): Response
+    #[Override] public function withStatus(int $code, string $reasonPhrase = ''): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withStatus() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 
-    #[Override] public function withoutHeader(string $name): Response
+    #[Override] public function withoutHeader(string $name): never
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(
+            'The withoutHeader() method is not implemented, since it does not '
+            . 'make sense to manipulate the response in the context of REST Certain',
+        );
     }
 }
