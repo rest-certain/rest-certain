@@ -4,16 +4,42 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Internal;
 
+use JsonSerializable;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\StreamInterface;
 use RestCertain\Config;
+use RestCertain\Http\Method;
+use RestCertain\Http\RequestFailed;
+use RestCertain\Internal\RequestNotSent;
 use RestCertain\Internal\RequestSpecificationImpl;
+use RestCertain\Internal\ResponseImpl;
+use RestCertain\Internal\ResponseSpecificationImpl;
+use RestCertain\Internal\TooManyBodies;
+use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Json;
 use RestCertain\Test\Str;
+use RuntimeException;
+use SplFileInfo;
+use SplFileObject;
 use SplTempFileObject;
+use Stringable;
+use stdClass;
+
+use function basename;
+use function strtoupper;
+use function sys_get_temp_dir;
+use function tempnam;
 
 class RequestSpecificationImplTest extends TestCase
 {
+    use MockeryPHPUnitIntegration;
+
     private Psr17Factory $factory;
     private RequestSpecificationImpl $spec;
 
@@ -88,14 +114,75 @@ class RequestSpecificationImplTest extends TestCase
         ]));
     }
 
-    public function testDelete(): void
+    #[DataProvider('requestMethodProvider')]
+    public function testRequestMethod(string $method): void
     {
-        $this->markTestIncomplete();
+        $psrResponse = $this->factory->createResponse(200);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+        $spec = new RequestSpecificationImpl($config);
+
+        $spec->params([
+            'foo' => 'bar',
+            'baz' => new Str('qux'),
+        ]);
+
+        // POST handles params differently.
+        if ($method === 'post') {
+            $expectedRequestUrl = 'http://localhost:8000/user/123/foo';
+            $expectedRequestBody = 'foo=bar&baz=qux';
+        } else {
+            $expectedRequestUrl = 'http://localhost:8000/user/123/foo?foo=bar&baz=qux';
+            $expectedRequestBody = '';
+        }
+
+        $response = $spec->{$method}(
+            '/{entity}/{id}/{subId}',
+            [
+                'entity' => 'user',
+                'id' => 123,
+                'subId' => new Str('foo'),
+            ],
+        );
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame(strtoupper($method), (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame($expectedRequestUrl, (string) $response->getPsrRequest()->getUri());
+        $this->assertSame($expectedRequestBody, (string) $response->getPsrRequest()->getBody());
+    }
+
+    /**
+     * @return array<array{method: string}>
+     */
+    public static function requestMethodProvider(): array
+    {
+        return [
+            ['method' => 'delete'],
+            ['method' => 'get'],
+            ['method' => 'head'],
+            ['method' => 'options'],
+            ['method' => 'patch'],
+            ['method' => 'post'],
+            ['method' => 'put'],
+        ];
     }
 
     public function testExpect(): void
     {
-        $this->markTestIncomplete();
+        $responseSpecification = Mockery::mock(ResponseSpecification::class);
+        $this->spec->setResponseSpecification($responseSpecification);
+
+        $this->assertSame($responseSpecification, $this->spec->expect());
+    }
+
+    public function testExpectThrowsExceptionIfResponseSpecificationNotSet(): void
+    {
+        $this->expectException(RequestNotSent::class);
+        $this->expectExceptionMessage(
+            'Cannot call expect() before sending a request or setting a response '
+            . 'specification with setResponseSpecification()',
+        );
+
+        $this->spec->expect();
     }
 
     public function testFormParam(): void
@@ -118,19 +205,9 @@ class RequestSpecificationImplTest extends TestCase
         ]));
     }
 
-    public function testGet(): void
-    {
-        $this->markTestIncomplete();
-    }
-
     public function testGiven(): void
     {
         $this->assertSame($this->spec, $this->spec->given());
-    }
-
-    public function testHead(): void
-    {
-        $this->markTestIncomplete();
     }
 
     public function testHeader(): void
@@ -139,6 +216,7 @@ class RequestSpecificationImplTest extends TestCase
         $this->assertSame($this->spec, $this->spec->header('baz', new Str('qux')));
         $this->assertSame($this->spec, $this->spec->header('quux', 'corge', new Str('grault'), 'garply'));
         $this->assertSame($this->spec, $this->spec->header('foo', 'waldo'));
+        $this->assertSame($this->spec, $this->spec->header('Cookie', 'fred', new Str('plugh')));
     }
 
     public function testHeaders(): void
@@ -147,12 +225,8 @@ class RequestSpecificationImplTest extends TestCase
             'foo' => 'bar',
             'baz' => new Str('qux'),
             'quux' => ['corge', new Str('grault'), 'garply'],
+            'cookie' => ['waldo', new Str('fred')],
         ]));
-    }
-
-    public function testOptions(): void
-    {
-        $this->markTestIncomplete();
     }
 
     public function testParam(): void
@@ -173,11 +247,6 @@ class RequestSpecificationImplTest extends TestCase
             'corge' => 'grault',
             'garply' => '',
         ]));
-    }
-
-    public function testPatch(): void
-    {
-        $this->markTestIncomplete();
     }
 
     public function testPathParam(): void
@@ -201,16 +270,6 @@ class RequestSpecificationImplTest extends TestCase
         $this->assertSame($this->spec, $this->spec->port(8080));
     }
 
-    public function testPost(): void
-    {
-        $this->markTestIncomplete();
-    }
-
-    public function testPut(): void
-    {
-        $this->markTestIncomplete();
-    }
-
     public function testQueryParam(): void
     {
         $this->assertSame($this->spec, $this->spec->queryParam('foo', 'bar'));
@@ -231,24 +290,51 @@ class RequestSpecificationImplTest extends TestCase
         ]));
     }
 
-    public function testRedirects(): void
-    {
-        $this->markTestIncomplete();
-    }
-
     public function testRequest(): void
     {
-        $this->markTestIncomplete();
+        $psrResponse = $this->factory->createResponse(200);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+        $spec = new RequestSpecificationImpl($config);
+
+        $response = $spec->request(
+            Method::GET,
+            '/{entity}/{id}/{subId}',
+            [
+                'entity' => 'user',
+                'id' => 123,
+                'subId' => new Str('foo'),
+            ],
+        );
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame('http://localhost:8000/user/123/foo', (string) $response->getPsrRequest()->getUri());
+        $this->assertSame('GET', (string) $response->getPsrRequest()->getMethod());
     }
 
     public function testResponse(): void
     {
-        $this->markTestIncomplete();
+        $responseSpecification = Mockery::mock(ResponseSpecification::class);
+        $this->spec->setResponseSpecification($responseSpecification);
+
+        $this->assertSame($responseSpecification, $this->spec->response());
+    }
+
+    public function testResponseThrowsExceptionIfResponseSpecificationNotSet(): void
+    {
+        $this->expectException(RequestNotSent::class);
+        $this->expectExceptionMessage(
+            'Cannot call response() before sending a request or setting a response '
+            . 'specification with setResponseSpecification()',
+        );
+
+        $this->spec->response();
     }
 
     public function testSetResponseSpecification(): void
     {
-        $this->markTestIncomplete();
+        $responseSpecification = Mockery::mock(ResponseSpecification::class);
+
+        $this->assertSame($this->spec, $this->spec->setResponseSpecification($responseSpecification));
     }
 
     public function testThat(): void
@@ -258,7 +344,21 @@ class RequestSpecificationImplTest extends TestCase
 
     public function testThen(): void
     {
-        $this->markTestIncomplete();
+        $responseSpecification = Mockery::mock(ResponseSpecification::class);
+        $this->spec->setResponseSpecification($responseSpecification);
+
+        $this->assertSame($responseSpecification, $this->spec->then());
+    }
+
+    public function testThenThrowsExceptionIfResponseSpecificationNotSet(): void
+    {
+        $this->expectException(RequestNotSent::class);
+        $this->expectExceptionMessage(
+            'Cannot call then() before sending a request or setting a response '
+            . 'specification with setResponseSpecification()',
+        );
+
+        $this->spec->then();
     }
 
     public function testWhen(): void
@@ -269,5 +369,238 @@ class RequestSpecificationImplTest extends TestCase
     public function testWith(): void
     {
         $this->assertSame($this->spec, $this->spec->with());
+    }
+
+    public function testApplyPathParamsAndSendRequestWithoutRequestBody(): void
+    {
+        $psrResponse = $this->factory
+            ->createResponse(200)
+            ->withBody($this->factory->createStream('{"foo": "bar"}'))
+            ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Set-Cookie', 'sessionId=0987654321')
+            ->withAddedHeader('set-cookie', 'my-cookie="my cookie value"');
+
+        $httpClient = Mockery::mock(ClientInterface::class, [
+            'sendRequest' => $psrResponse,
+        ]);
+
+        $config = new Config(httpClient: $httpClient);
+        $spec = new RequestSpecificationImpl($config);
+
+        $response = $spec
+            ->given()
+            ->pathParam('entity', 'user')
+            ->param('param1', 'a', new Str('b'), 'c')
+            ->param('param2', new Str('d'))
+            ->queryParam('param2', new Str('e'))
+            ->queryParam('param3', 'f')
+            ->queryParam('param3', 'g', new Str('h'))
+            ->queryParams([
+                'param3' => ['i', new Str('j')],
+                'cheese' => ['Sakura cheese', new Str('feta'), 'höfðingi'],
+                'crackers' => 'yes',
+            ])
+            ->cookie('sessionId', new Str('1234567890'))
+            ->cookie('mmm')
+            ->cookies([
+                'abc' => '765',
+                'def' => new Str('890'),
+                'ghi' => null,
+            ])
+            ->header('X-Data', 'foo bar baz')
+            ->accept('application/json')
+            ->when()
+            ->get('/{entity}/{id}/{subId}', ['id' => 123, 'subId' => new Str('foo')]);
+
+        $response
+            ->then()
+            ->statusCode(200)
+            ->contentType('application/json')
+            ->cookie('sessionId', '0987654321', $this->stringContains('765'))
+            ->cookie('my-cookie')
+            ->body('{"foo": "bar"}');
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame(
+            'http://localhost:8000/user/123/foo?param1=a&param1=b&param1=c&param2=e&param3=f&param3=g&param3=h&param3=i'
+            . '&param3=j&cheese=Sakura%20cheese&cheese=feta&cheese=h%C3%B6f%C3%B0ingi&crackers=yes',
+            (string) $response->getPsrRequest()->getUri(),
+        );
+        $this->assertSame(
+            'sessionId=1234567890; mmm=; abc=765; def=890; ghi=',
+            $response->getPsrRequest()->getHeaderLine('cookie'),
+        );
+        $this->assertSame('foo bar baz', $response->getPsrRequest()->getHeaderLine('x-data'));
+        $this->assertSame('application/json', $response->getPsrRequest()->getHeaderLine('accept'));
+        $this->assertSame('', (string) $response->getPsrRequest()->getBody());
+
+        // After sending the request, we should have a ResponseSpecification that we can get by calling expect().
+        $this->assertInstanceOf(ResponseSpecificationImpl::class, $spec->expect());
+    }
+
+    public function testApplyPathParamsAndSendRequestWithFormUrlencodedBody(): void
+    {
+        $psrResponse = $this->factory
+            ->createResponse(200)
+            ->withBody($this->factory->createStream('{"foo": "bar"}'));
+
+        $httpClient = Mockery::mock(ClientInterface::class, [
+            'sendRequest' => $psrResponse,
+        ]);
+
+        $config = new Config(httpClient: $httpClient);
+        $spec = new RequestSpecificationImpl($config);
+
+        $response = $spec
+            ->given()
+            ->param('param1', 'a', new Str('b'), 'c')
+            ->param('param2', new Str('d'))
+            ->param('param3', 'e')
+            ->queryParam('qs1', 'abc')
+            ->formParam('param3', 'f')
+            ->formParam('param4', 'g', 'h', new Str('i'))
+            ->formParam('param4', 'j')
+            ->formParam('param5', new Str('k'))
+            ->formParams([
+                'param4' => ['l', new Str('m')],
+                'cheese' => ['Sakura cheese', new Str('feta'), 'höfðingi'],
+                'crackers' => 'yes',
+            ])
+            ->when()
+            ->post('/foo');
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame('http://localhost:8000/foo?qs1=abc', (string) $response->getPsrRequest()->getUri());
+        $this->assertSame(
+            'param1=a&param1=b&param1=c&param2=d&param3=f&param4=g&param4=h&param4=i&param4=j&param4=l&param4=m'
+            . '&param5=k&cheese=Sakura+cheese&cheese=feta&cheese=h%C3%B6f%C3%B0ingi&crackers=yes',
+            (string) $response->getPsrRequest()->getBody(),
+        );
+    }
+
+    /**
+     * @param JsonSerializable | SplFileInfo | StreamInterface | Stringable | stdClass | mixed[] | string $body
+     */
+    #[DataProvider('bodyProvider')]
+    public function testApplyPathParamsAndSendRequestWithBody(
+        JsonSerializable | SplFileInfo | StreamInterface | Stringable | stdClass | array | string $body,
+        string $expectedBody,
+        string $expectedContentType,
+    ): void {
+        $psrResponse = $this->factory
+            ->createResponse(200)
+            ->withBody($this->factory->createStream('{"foo": "bar"}'));
+
+        $httpClient = Mockery::mock(ClientInterface::class, [
+            'sendRequest' => $psrResponse,
+        ]);
+
+        $config = new Config(httpClient: $httpClient);
+        $spec = new RequestSpecificationImpl($config);
+
+        $response = $spec
+            ->given()
+            ->body($body)
+            ->when()
+            ->post('/foo');
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame($expectedContentType, $response->getPsrRequest()->getHeaderLine('content-type'));
+        $this->assertSame($expectedBody, (string) $response->getPsrRequest()->getBody());
+    }
+
+    /**
+     * @return array<array{
+     *     body: JsonSerializable | SplFileInfo | StreamInterface | Stringable | stdClass | mixed[] | string,
+     *     expectedBody: string,
+     *     expectedContentType: string,
+     * }>
+     */
+    public static function bodyProvider(): array
+    {
+        return [
+            [
+                'body' => new Json(['foo' => 'bar']),
+                'expectedBody' => '{"foo":"bar"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => ['url' => 'https://example.com/bar', 'feelings' => '😁'],
+                'expectedBody' => '{"url":"https://example.com/bar","feelings":"😁"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => (object) ['baz' => 'qux'],
+                'expectedBody' => '{"baz":"qux"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => (function (): SplFileInfo {
+                    $file = new SplFileObject(tempnam(sys_get_temp_dir(), basename(__FILE__, '.php')), 'w');
+                    $file->fwrite("this is a body created from a file\n");
+                    $file->fwrite("this is another line in that body\n");
+
+                    return $file;
+                })(),
+                'expectedBody' => "this is a body created from a file\nthis is another line in that body\n",
+                'expectedContentType' => 'application/octet-stream',
+            ],
+            [
+                'body' => (new Psr17Factory())->createStream('this is a standard string body'),
+                'expectedBody' => 'this is a standard string body',
+                'expectedContentType' => 'application/octet-stream',
+            ],
+            [
+                'body' => 'this is a standard string body',
+                'expectedBody' => 'this is a standard string body',
+                'expectedContentType' => 'text/plain',
+            ],
+        ];
+    }
+
+    public function testApplyPathParamsAndSendRequestThrowsHttpClientException(): void
+    {
+        $exception = new class ('Something went wrong') extends RuntimeException implements ClientExceptionInterface {
+        };
+
+        $httpClient = Mockery::mock(ClientInterface::class);
+        $httpClient->expects('sendRequest')->andThrows($exception);
+
+        $config = new Config(httpClient: $httpClient);
+        $spec = new RequestSpecificationImpl($config);
+
+        $this->expectException(RequestFailed::class);
+        $this->expectExceptionMessage('The request failed: Something went wrong');
+
+        $spec->get('/foo');
+    }
+
+    public function testApplyPathParamsAndSendRequestWithFormParametersAndBody(): void
+    {
+        $this->spec->formParam('param', 'abc')->body('body content');
+
+        $this->expectException(TooManyBodies::class);
+        $this->expectExceptionMessage('Cannot set both body and form data');
+
+        $this->spec->post('/foo');
+    }
+
+    public function testApplyPathParamsAndSendRequestWithAbsoluteUrl(): void
+    {
+        $psrResponse = $this->factory
+            ->createResponse(200)
+            ->withBody($this->factory->createStream('{"foo": "bar"}'));
+
+        $httpClient = Mockery::mock(ClientInterface::class, [
+            'sendRequest' => $psrResponse,
+        ]);
+
+        $config = new Config(httpClient: $httpClient);
+        $spec = new RequestSpecificationImpl($config);
+
+        $response = $spec->get('https://api.example.com/bar');
+
+        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertSame('https://api.example.com/bar', (string) $response->getPsrRequest()->getUri());
     }
 }

@@ -29,6 +29,7 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use SplFileInfo;
 use Stringable;
+use stdClass;
 
 interface RequestSpecification extends RequestSender
 {
@@ -75,9 +76,13 @@ interface RequestSpecification extends RequestSender
     /**
      * Sets the body value for the request.
      *
+     * @param JsonSerializable | SplFileInfo | StreamInterface | Stringable | stdClass | mixed[] | string $body The body value for the request.
+     *
      * @return $this
      */
-    public function body(JsonSerializable | SplFileInfo | StreamInterface | Stringable | string $body): static;
+    public function body(
+        JsonSerializable | SplFileInfo | StreamInterface | Stringable | stdClass | array | string $body,
+    ): static;
 
     /**
      * Sets the content type for the request.
@@ -226,7 +231,7 @@ interface RequestSpecification extends RequestSender
      * Each parameter may be a single value or an array of values. If the value is an array, each value will be sent in
      * the request with the same name. For example:
      *
-     *     $specification->formParams([
+     *     $specification->params([
      *         'cheese' => ['emmental', 'bergkäse', 'langres'],
      *         'crackers' => 'yes',
      *     ]);
@@ -323,7 +328,7 @@ interface RequestSpecification extends RequestSender
      * Each parameter may be a single value or an array of values. If the value is an array, each value will be sent in
      * the request with the same name. For example:
      *
-     *     $specification->formParams([
+     *     $specification->queryParams([
      *         'cheese' => ['Sakura cheese', 'feta', 'höfðingi'],
      *         'crackers' => 'yes',
      *     ]);
@@ -341,12 +346,6 @@ interface RequestSpecification extends RequestSender
      * @return $this
      */
     public function queryParams(array $parameters): static;
-
-    /**
-     * Returns a {@see RedirectSpecification} instance that may be used to configure redirection handling for the
-     * request.
-     */
-    public function redirects(): RedirectSpecification;
 
     /**
      * Returns the response specification to set expectations on the response.
