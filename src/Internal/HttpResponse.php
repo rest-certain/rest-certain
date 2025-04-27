@@ -37,7 +37,7 @@ use RestCertain\Response\ValidatableResponse;
 use RestCertain\Specification\RequestSpecification;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final readonly class HttpResponse implements Response
 {

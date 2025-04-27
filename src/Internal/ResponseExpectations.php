@@ -39,7 +39,7 @@ use Stringable;
 use function is_array;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final class ResponseExpectations implements ResponseSpecification
 {

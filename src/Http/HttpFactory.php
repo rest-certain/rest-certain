@@ -31,7 +31,7 @@ use Psr\Http\Message;
 use const UPLOAD_ERR_OK;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final readonly class HttpFactory implements
     ClientInterface,

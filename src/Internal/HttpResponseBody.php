@@ -33,7 +33,7 @@ use RestCertain\Response\ResponseBody;
 use const SEEK_SET;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final readonly class HttpResponseBody implements ResponseBody, StreamInterface
 {

@@ -31,7 +31,7 @@ use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final readonly class ResponseValidator implements ValidatableResponse
 {

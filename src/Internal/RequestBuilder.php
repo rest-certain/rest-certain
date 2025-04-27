@@ -66,7 +66,7 @@ use const JSON_UNESCAPED_UNICODE;
 use const PHP_QUERY_RFC1738;
 
 /**
- * @internal
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final class RequestBuilder implements RequestSpecification
 {
