@@ -14,13 +14,14 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Config;
+use RestCertain\Exception\PendingRequest;
+use RestCertain\Exception\RequestFailed;
+use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Method;
-use RestCertain\Http\RequestFailed;
-use RestCertain\Internal\RequestNotSent;
 use RestCertain\Internal\RequestSpecificationImpl;
 use RestCertain\Internal\ResponseImpl;
 use RestCertain\Internal\ResponseSpecificationImpl;
-use RestCertain\Internal\TooManyBodies;
+use RestCertain\Specification\RequestSender;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Json;
 use RestCertain\Test\Str;
@@ -176,10 +177,11 @@ class RequestSpecificationImplTest extends TestCase
 
     public function testExpectThrowsExceptionIfResponseSpecificationNotSet(): void
     {
-        $this->expectException(RequestNotSent::class);
+        $this->expectException(PendingRequest::class);
         $this->expectExceptionMessage(
             'Cannot call expect() before sending a request or setting a response '
-            . 'specification with setResponseSpecification()',
+            . 'specification with setResponseSpecification(); to send a request, call any of the'
+            . RequestSender::class . ' methods',
         );
 
         $this->spec->expect();
@@ -321,10 +323,11 @@ class RequestSpecificationImplTest extends TestCase
 
     public function testResponseThrowsExceptionIfResponseSpecificationNotSet(): void
     {
-        $this->expectException(RequestNotSent::class);
+        $this->expectException(PendingRequest::class);
         $this->expectExceptionMessage(
             'Cannot call response() before sending a request or setting a response '
-            . 'specification with setResponseSpecification()',
+            . 'specification with setResponseSpecification(); to send a request, call any of the'
+            . RequestSender::class . ' methods',
         );
 
         $this->spec->response();
@@ -352,10 +355,11 @@ class RequestSpecificationImplTest extends TestCase
 
     public function testThenThrowsExceptionIfResponseSpecificationNotSet(): void
     {
-        $this->expectException(RequestNotSent::class);
+        $this->expectException(PendingRequest::class);
         $this->expectExceptionMessage(
             'Cannot call then() before sending a request or setting a response '
-            . 'specification with setResponseSpecification()',
+            . 'specification with setResponseSpecification(); to send a request, call any of the'
+            . RequestSender::class . ' methods',
         );
 
         $this->spec->then();

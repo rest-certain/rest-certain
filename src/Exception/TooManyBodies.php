@@ -22,14 +22,13 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Internal;
+namespace RestCertain\Exception;
 
 use LogicException;
-use RestCertain\RestCertainException;
 
 /**
- * The requested feature is not implemented.
+ * The request has more than one body, which is too many.
  */
-class NotImplemented extends LogicException implements RestCertainException
+class TooManyBodies extends LogicException implements RestCertainException
 {
 }

@@ -36,11 +36,14 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use RestCertain\Config;
+use RestCertain\Exception\PendingRequest;
+use RestCertain\Exception\RequestFailed;
+use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Header;
 use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
-use RestCertain\Http\RequestFailed;
 use RestCertain\Response\Response;
+use RestCertain\Specification\RequestSender;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
@@ -178,9 +181,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function expect(): ResponseSpecification
     {
         if (!isset($this->responseSpecification)) {
-            throw new RequestNotSent(
+            throw new PendingRequest(
                 'Cannot call expect() before sending a request or setting a response '
-                . 'specification with setResponseSpecification()',
+                . 'specification with setResponseSpecification(); to send a request, call any of the'
+                . RequestSender::class . ' methods',
             );
         }
 
@@ -405,9 +409,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function response(): ResponseSpecification
     {
         if (!isset($this->responseSpecification)) {
-            throw new RequestNotSent(
+            throw new PendingRequest(
                 'Cannot call response() before sending a request or setting a response '
-                . 'specification with setResponseSpecification()',
+                . 'specification with setResponseSpecification(); to send a request, call any of the'
+                . RequestSender::class . ' methods',
             );
         }
 
@@ -429,9 +434,10 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function then(): ResponseSpecification
     {
         if (!isset($this->responseSpecification)) {
-            throw new RequestNotSent(
+            throw new PendingRequest(
                 'Cannot call then() before sending a request or setting a response '
-                . 'specification with setResponseSpecification()',
+                . 'specification with setResponseSpecification(); to send a request, call any of the'
+                . RequestSender::class . ' methods',
             );
         }
 

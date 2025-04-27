@@ -22,7 +22,7 @@
 
 declare(strict_types=1);
 
-namespace RestCertain;
+namespace RestCertain\Exception;
 
 use Throwable;
 

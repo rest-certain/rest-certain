@@ -22,15 +22,13 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Http;
+namespace RestCertain\Exception;
 
-use Psr\Http\Client\ClientExceptionInterface;
-use RestCertain\RestCertainException;
-use RuntimeException;
+use LogicException;
 
 /**
- * HTTP request failure.
+ * The requested feature is not implemented.
  */
-class RequestFailed extends RuntimeException implements ClientExceptionInterface, RestCertainException
+class NotImplemented extends LogicException implements RestCertainException
 {
 }

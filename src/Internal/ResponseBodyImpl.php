@@ -24,10 +24,10 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
-use LogicException;
 use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RestCertain\Exception\NotImplemented;
 use RestCertain\Response\ResponseBody;
 
 use const SEEK_SET;
@@ -55,7 +55,7 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 
     #[Override] public function asPrettyString(): string
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function asString(): string
@@ -116,12 +116,12 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 
     #[Override] public function path(string $path): mixed
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function prettyPrint(): string
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function print(): string

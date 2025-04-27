@@ -22,14 +22,13 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Internal;
+namespace RestCertain\Exception;
 
 use LogicException;
-use RestCertain\RestCertainException;
 
 /**
  * The operation attempted depends on the request having been sent, but it hasn't been sent yet.
  */
-class RequestNotSent extends LogicException implements RestCertainException
+class PendingRequest extends LogicException implements RestCertainException
 {
 }

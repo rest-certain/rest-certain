@@ -25,7 +25,7 @@ declare(strict_types=1);
 namespace RestCertain\Specification;
 
 use Psr\Http\Message\UriInterface;
-use RestCertain\Http\RequestFailed;
+use RestCertain\Exception\RequestFailed;
 use RestCertain\Response\Response;
 use Stringable;
 

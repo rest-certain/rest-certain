@@ -24,11 +24,11 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
-use LogicException;
 use Override;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
+use RestCertain\Exception\NotImplemented;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Specification\RequestSender;
@@ -77,7 +77,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function contentType(

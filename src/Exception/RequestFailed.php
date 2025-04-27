@@ -22,14 +22,14 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Internal;
+namespace RestCertain\Exception;
 
-use LogicException;
-use RestCertain\RestCertainException;
+use Psr\Http\Client\ClientExceptionInterface;
+use RuntimeException;
 
 /**
- * The request has more than one body, which is too many.
+ * HTTP request failure.
  */
-class TooManyBodies extends LogicException implements RestCertainException
+class RequestFailed extends RuntimeException implements ClientExceptionInterface, RestCertainException
 {
 }

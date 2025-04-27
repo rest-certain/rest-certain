@@ -25,11 +25,11 @@ declare(strict_types=1);
 namespace RestCertain\Internal;
 
 use Dflydev\FigCookies\SetCookies;
-use LogicException;
 use Override;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RestCertain\Exception\NotImplemented;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
@@ -197,7 +197,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function getTime(): int
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function hasHeader(string $name): bool
@@ -225,7 +225,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function path(string $path): mixed
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     #[Override] public function prettyPrint(): string
@@ -260,7 +260,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function time(): int
     {
-        throw new LogicException('Not implemented yet');
+        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
     }
 
     /**
