@@ -82,7 +82,7 @@
         "dev:analyze": [
             "@dev:analyze:phpstan"
         ],
-        "dev:analyze:phpstan": "phpstan analyse --ansi",
+        "dev:analyze:phpstan": "phpstan analyse --ansi --memory-limit 1G",
         "dev:build:clean": "git clean -fX build/",
         "dev:lint": [
             "@dev:lint:syntax",
