@@ -24,8 +24,8 @@ declare(strict_types=1);
 
 namespace RestCertain\Specification;
 
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Framework\ExpectationFailedException;
 use RestCertain\Request\Sender;
 use Stringable;
 
@@ -43,7 +43,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function body(
         Constraint | Stringable | string $expectation,
@@ -57,7 +57,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function bodyPath(
         string $path,
@@ -70,7 +70,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function contentType(
         Constraint | Stringable | string $expectation,
@@ -85,7 +85,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function cookie(
         string $name,
@@ -100,7 +100,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function cookies(array $expectations): static;
 
@@ -121,7 +121,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function header(
         string $name,
@@ -136,7 +136,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function headers(array $expectations): static;
 
@@ -164,7 +164,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function statusCode(Constraint | int $expectation, Constraint | int ...$additionalExpectations): static;
 
@@ -173,7 +173,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function statusLine(
         Constraint | Stringable | string $expectation,
@@ -199,7 +199,7 @@ interface ResponseSpecification
      *
      * @return $this
      *
-     * @throws ExpectationFailedException
+     * @throws AssertionFailedError
      */
     public function time(Constraint $expectation, Constraint ...$additionalExpectations): static;
 
