@@ -42,8 +42,8 @@ use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Header;
 use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
+use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
-use RestCertain\Specification\RequestSender;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
@@ -184,7 +184,7 @@ final class RequestSpecificationImpl implements RequestSpecification
             throw new PendingRequest(
                 'Cannot call expect() before sending a request or setting a response '
                 . 'specification with setResponseSpecification(); to send a request, call any of the'
-                . RequestSender::class . ' methods',
+                . Sender::class . ' methods',
             );
         }
 
@@ -412,7 +412,7 @@ final class RequestSpecificationImpl implements RequestSpecification
             throw new PendingRequest(
                 'Cannot call response() before sending a request or setting a response '
                 . 'specification with setResponseSpecification(); to send a request, call any of the'
-                . RequestSender::class . ' methods',
+                . Sender::class . ' methods',
             );
         }
 
@@ -437,7 +437,7 @@ final class RequestSpecificationImpl implements RequestSpecification
             throw new PendingRequest(
                 'Cannot call then() before sending a request or setting a response '
                 . 'specification with setResponseSpecification(); to send a request, call any of the'
-                . RequestSender::class . ' methods',
+                . Sender::class . ' methods',
             );
         }
 

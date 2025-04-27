@@ -22,14 +22,17 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Specification;
+namespace RestCertain\Request;
 
 use Psr\Http\Message\UriInterface;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Response\Response;
 use Stringable;
 
-interface RequestSender
+/**
+ * Sends HTTP requests.
+ */
+interface Sender
 {
     /**
      * Performs a DELETE request to the given path.

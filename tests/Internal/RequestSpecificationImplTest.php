@@ -21,7 +21,7 @@ use RestCertain\Http\Method;
 use RestCertain\Internal\RequestSpecificationImpl;
 use RestCertain\Internal\ResponseImpl;
 use RestCertain\Internal\ResponseSpecificationImpl;
-use RestCertain\Specification\RequestSender;
+use RestCertain\Request\Sender;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Json;
 use RestCertain\Test\Str;
@@ -181,7 +181,7 @@ class RequestSpecificationImplTest extends TestCase
         $this->expectExceptionMessage(
             'Cannot call expect() before sending a request or setting a response '
             . 'specification with setResponseSpecification(); to send a request, call any of the'
-            . RequestSender::class . ' methods',
+            . Sender::class . ' methods',
         );
 
         $this->spec->expect();
@@ -327,7 +327,7 @@ class RequestSpecificationImplTest extends TestCase
         $this->expectExceptionMessage(
             'Cannot call response() before sending a request or setting a response '
             . 'specification with setResponseSpecification(); to send a request, call any of the'
-            . RequestSender::class . ' methods',
+            . Sender::class . ' methods',
         );
 
         $this->spec->response();
@@ -359,7 +359,7 @@ class RequestSpecificationImplTest extends TestCase
         $this->expectExceptionMessage(
             'Cannot call then() before sending a request or setting a response '
             . 'specification with setResponseSpecification(); to send a request, call any of the'
-            . RequestSender::class . ' methods',
+            . Sender::class . ' methods',
         );
 
         $this->spec->then();

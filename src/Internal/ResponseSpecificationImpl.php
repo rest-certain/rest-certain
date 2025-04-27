@@ -30,8 +30,8 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
 use RestCertain\Exception\NotImplemented;
 use RestCertain\Http\Header;
+use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
-use RestCertain\Specification\RequestSender;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
@@ -233,7 +233,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         return $this;
     }
 
-    #[Override] public function when(): RequestSender
+    #[Override] public function when(): Sender
     {
         return $this->requestSpecification;
     }

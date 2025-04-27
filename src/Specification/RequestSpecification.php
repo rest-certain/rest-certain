@@ -27,11 +27,12 @@ namespace RestCertain\Specification;
 use JsonSerializable;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
+use RestCertain\Request\Sender;
 use SplFileInfo;
 use Stringable;
 use stdClass;
 
-interface RequestSpecification extends RequestSender
+interface RequestSpecification extends Sender
 {
     /**
      * Specifies the Accept header for the request.

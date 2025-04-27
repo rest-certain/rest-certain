@@ -26,6 +26,7 @@ namespace RestCertain\Specification;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
+use RestCertain\Request\Sender;
 use Stringable;
 
 interface ResponseSpecification
@@ -205,7 +206,7 @@ interface ResponseSpecification
     /**
      * Returns the request sender to use in sending the request.
      */
-    public function when(): RequestSender;
+    public function when(): Sender;
 
     /**
      * Returns the request specification to use in defining the properties of the request.
