@@ -31,6 +31,8 @@ use RestCertain\Http\HttpFactory;
 use Stringable;
 
 use function assert;
+use function get_object_vars;
+use function is_object;
 
 /**
  * REST Certain configuration.
@@ -94,6 +96,122 @@ final readonly class Config
         $this->streamFactory = $streamFactory ?? $this->httpFactory();
         $this->uriFactory = $uriFactory ?? $this->httpFactory();
         $this->baseUri = $baseUri instanceof UriInterface ? $baseUri : $this->uriFactory->createUri((string) $baseUri);
+    }
+
+    /**
+     * Returns a new instance of Config with the given base URI.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withBaseUri(Stringable | UriInterface | string $baseUri): self
+    {
+        return new self(...['baseUri' => $baseUri] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given base path.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withBasePath(string $basePath): self
+    {
+        return new self(...['basePath' => $basePath] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given port.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withPort(int $port): self
+    {
+        return new self(...['port' => $port] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given HTTP client.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withHttpClient(ClientInterface $httpClient): self
+    {
+        return new self(...['httpClient' => $httpClient] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given request factory.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withRequestFactory(Message\RequestFactoryInterface $requestFactory): self
+    {
+        return new self(...['requestFactory' => $requestFactory] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given response factory.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withResponseFactory(Message\ResponseFactoryInterface $responseFactory): self
+    {
+        return new self(...['responseFactory' => $responseFactory] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given stream factory.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withStreamFactory(Message\StreamFactoryInterface $streamFactory): self
+    {
+        return new self(...['streamFactory' => $streamFactory] + $this->copyProperties());
+    }
+
+    /**
+     * Returns a new instance of Config with the given URI factory.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withUriFactory(Message\UriFactoryInterface $uriFactory): self
+    {
+        return new self(...['uriFactory' => $uriFactory] + $this->copyProperties());
+    }
+
+    /**
+     * @return array{
+     *     baseUri: UriInterface,
+     *     basePath: string,
+     *     port: int,
+     *     httpClient: ClientInterface,
+     *     requestFactory: Message\RequestFactoryInterface,
+     *     responseFactory: Message\ResponseFactoryInterface,
+     *     streamFactory: Message\StreamFactoryInterface,
+     *     uriFactory: Message\UriFactoryInterface,
+     * }
+     */
+    private function copyProperties(): array
+    {
+        $properties = [];
+
+        foreach (get_object_vars($this) as $name => $value) {
+            if (is_object($value)) {
+                $properties[$name] = clone $value;
+            } else {
+                $properties[$name] = $value;
+            }
+        }
+
+        /** @phpstan-ignore return.type */
+        return $properties;
     }
 
     private function httpFactory(): HttpFactory
