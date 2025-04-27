@@ -8,8 +8,11 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RestCertain\Config;
+use RestCertain\Internal\RequestSpecificationImpl;
 use RestCertain\Internal\ResponseBodyImpl;
 use RestCertain\Internal\ResponseImpl;
 use RestCertain\Internal\ValidatableResponseOptionsImpl;
@@ -18,6 +21,7 @@ class ResponseImplTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private RequestInterface & MockInterface $psrRequest;
     private ResponseInterface & MockInterface $psrResponse;
     private ResponseImpl $response;
     private StreamInterface & MockInterface $stream;
@@ -25,6 +29,7 @@ class ResponseImplTest extends TestCase
     protected function setUp(): void
     {
         $this->stream = Mockery::mock(StreamInterface::class);
+        $this->psrRequest = Mockery::mock(RequestInterface::class);
         $this->psrResponse = Mockery::spy(ResponseInterface::class, [
             'getBody' => $this->stream,
         ]);
@@ -37,7 +42,11 @@ class ResponseImplTest extends TestCase
             '__Host-example=34d8g; SameSite=None; Secure; Path=/; Partitioned;',
         ]);
 
-        $this->response = new ResponseImpl($this->psrResponse);
+        $this->response = new ResponseImpl(
+            new RequestSpecificationImpl(new Config()),
+            $this->psrResponse,
+            $this->psrRequest,
+        );
     }
 
     public function testAndReturn(): void

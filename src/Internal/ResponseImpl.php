@@ -27,12 +27,14 @@ namespace RestCertain\Internal;
 use Dflydev\FigCookies\SetCookies;
 use LogicException;
 use Override;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
 use RestCertain\Response\ValidatableResponseOptions;
+use RestCertain\Specification\RequestSpecification;
 
 /**
  * @internal
@@ -40,15 +42,23 @@ use RestCertain\Response\ValidatableResponseOptions;
 final readonly class ResponseImpl implements Response
 {
     private ResponseBody $body;
+    private ResponseInterface $psrResponse;
+    private RequestInterface $psrRequest;
     private SetCookies $setCookies;
     private ValidatableResponseOptions $validatableResponseOptions;
 
-    public function __construct(private ResponseInterface $psrResponse)
-    {
+    public function __construct(
+        private RequestSpecification $requestSpecification,
+        ResponseInterface $response,
+        RequestInterface $request,
+    ) {
+        $this->psrResponse = $response;
+        $this->psrRequest = $request;
         $this->body = new ResponseBodyImpl($this->psrResponse);
         $this->setCookies = SetCookies::fromResponse($this->psrResponse);
 
         $responseSpec = new ResponseSpecificationImpl($this);
+        $this->requestSpecification->setResponseSpecification($responseSpec);
         $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($responseSpec);
     }
 
@@ -150,6 +160,22 @@ final readonly class ResponseImpl implements Response
         return $this->psrResponse->getProtocolVersion();
     }
 
+    /**
+     * @internal
+     */
+    public function getPsrRequest(): RequestInterface
+    {
+        return $this->psrRequest;
+    }
+
+    /**
+     * @internal
+     */
+    public function getPsrResponse(): ResponseInterface
+    {
+        return $this->psrResponse;
+    }
+
     #[Override] public function getReasonPhrase(): string
     {
         return $this->psrResponse->getReasonPhrase();
@@ -242,12 +268,20 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function withAddedHeader(string $name, $value): Response
     {
-        return new ResponseImpl($this->psrResponse->withAddedHeader($name, $value));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withAddedHeader($name, $value),
+            $this->psrRequest,
+        );
     }
 
     #[Override] public function withBody(StreamInterface $body): Response
     {
-        return new ResponseImpl($this->psrResponse->withBody($body));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withBody($body),
+            $this->psrRequest,
+        );
     }
 
     /**
@@ -255,21 +289,37 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function withHeader(string $name, $value): Response
     {
-        return new ResponseImpl($this->psrResponse->withHeader($name, $value));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withHeader($name, $value),
+            $this->psrRequest,
+        );
     }
 
     #[Override] public function withProtocolVersion(string $version): Response
     {
-        return new ResponseImpl($this->psrResponse->withProtocolVersion($version));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withProtocolVersion($version),
+            $this->psrRequest,
+        );
     }
 
     #[Override] public function withStatus(int $code, string $reasonPhrase = ''): Response
     {
-        return new ResponseImpl($this->psrResponse->withStatus($code, $reasonPhrase));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withStatus($code, $reasonPhrase),
+            $this->psrRequest,
+        );
     }
 
     #[Override] public function withoutHeader(string $name): Response
     {
-        return new ResponseImpl($this->psrResponse->withoutHeader($name));
+        return new ResponseImpl(
+            $this->requestSpecification,
+            $this->psrResponse->withoutHeader($name),
+            $this->psrRequest,
+        );
     }
 }
