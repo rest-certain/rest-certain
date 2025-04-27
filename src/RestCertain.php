@@ -47,7 +47,7 @@ final class RestCertain
      */
     public static function delete(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->delete($path, $pathParams);
+        return self::newRequestSpec()->delete($path, $pathParams);
     }
 
     /**
@@ -57,7 +57,7 @@ final class RestCertain
      */
     public static function get(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->get($path, $pathParams);
+        return self::newRequestSpec()->get($path, $pathParams);
     }
 
     /**
@@ -65,7 +65,7 @@ final class RestCertain
      */
     public static function given(): RequestSpecification
     {
-        return self::getRequestSpec();
+        return self::newRequestSpec();
     }
 
     /**
@@ -75,7 +75,7 @@ final class RestCertain
      */
     public static function head(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->head($path, $pathParams);
+        return self::newRequestSpec()->head($path, $pathParams);
     }
 
     /**
@@ -85,7 +85,7 @@ final class RestCertain
      */
     public static function options(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->options($path, $pathParams);
+        return self::newRequestSpec()->options($path, $pathParams);
     }
 
     /**
@@ -95,7 +95,7 @@ final class RestCertain
      */
     public static function patch(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->patch($path, $pathParams);
+        return self::newRequestSpec()->patch($path, $pathParams);
     }
 
     /**
@@ -105,7 +105,7 @@ final class RestCertain
      */
     public static function post(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->post($path, $pathParams);
+        return self::newRequestSpec()->post($path, $pathParams);
     }
 
     /**
@@ -115,7 +115,7 @@ final class RestCertain
      */
     public static function put(Stringable | UriInterface | string $path, array $pathParams = []): Response
     {
-        return self::getRequestSpec()->put($path, $pathParams);
+        return self::newRequestSpec()->put($path, $pathParams);
     }
 
     /**
@@ -128,7 +128,7 @@ final class RestCertain
         Stringable | UriInterface | string $path,
         array $pathParams = [],
     ): Response {
-        return self::getRequestSpec()->request($method, $path, $pathParams);
+        return self::newRequestSpec()->request($method, $path, $pathParams);
     }
 
     /**
@@ -136,7 +136,7 @@ final class RestCertain
      */
     public static function when(): RequestSpecification
     {
-        return self::getRequestSpec();
+        return self::newRequestSpec();
     }
 
     /**
@@ -144,10 +144,10 @@ final class RestCertain
      */
     public static function with(): RequestSpecification
     {
-        return self::getRequestSpec();
+        return self::newRequestSpec();
     }
 
-    private static function getRequestSpec(): RequestSpecification
+    private static function newRequestSpec(): RequestSpecification
     {
         if (self::$config !== null) {
             return new RequestSpecificationImpl(self::$config);
