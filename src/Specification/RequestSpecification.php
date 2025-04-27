@@ -54,12 +54,6 @@ interface RequestSpecification extends RequestSender
     public function and(): static;
 
     /**
-     * Returns an {@see AuthenticationSpecification} instance that may be used to specify authentication credentials
-     * for the request.
-     */
-    public function auth(): AuthenticationSpecification;
-
-    /**
      * Sets the base path for the request.
      *
      * @return $this

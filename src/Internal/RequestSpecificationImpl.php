@@ -41,7 +41,6 @@ use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
 use RestCertain\Http\RequestFailed;
 use RestCertain\Response\Response;
-use RestCertain\Specification\AuthenticationSpecification;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
@@ -110,11 +109,6 @@ final class RequestSpecificationImpl implements RequestSpecification
     #[Override] public function and(): static
     {
         return $this;
-    }
-
-    #[Override] public function auth(): AuthenticationSpecification
-    {
-        return new AuthenticationSpecificationImpl($this);
     }
 
     #[Override] public function basePath(Stringable | string $basePath): static
