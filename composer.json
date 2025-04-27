@@ -31,6 +31,7 @@
     "require-dev": {
         "captainhook/captainhook": "^5.25",
         "captainhook/plugin-composer": "^5.3",
+        "ciareis/bypass": "^2.1",
         "ergebnis/composer-normalize": "^2.47",
         "mockery/mockery": "^1.6",
         "nyholm/psr7": "^1.8",
