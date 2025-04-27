@@ -37,18 +37,20 @@ use const SEEK_SET;
  */
 final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 {
-    private StreamInterface $stream;
+    private ResponseInterface $psrResponse;
+    private StreamInterface $psrStream;
 
-    public function __construct(private ResponseInterface $response)
+    public function __construct(ResponseInterface $response)
     {
-        $this->stream = $this->response->getBody();
+        $this->psrResponse = $response;
+        $this->psrStream = $this->psrResponse->getBody();
     }
 
     public function __toString(): string
     {
-        $this->stream->rewind();
+        $this->psrStream->rewind();
 
-        return $this->stream->getContents();
+        return $this->psrStream->getContents();
     }
 
     #[Override] public function asPrettyString(): string
@@ -63,7 +65,7 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 
     #[Override] public function close(): void
     {
-        $this->stream->close();
+        $this->psrStream->close();
     }
 
     /**
@@ -71,17 +73,17 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
      */
     #[Override] public function detach()
     {
-        return $this->stream->detach();
+        return $this->psrStream->detach();
     }
 
     #[Override] public function eof(): bool
     {
-        return $this->stream->eof();
+        return $this->psrStream->eof();
     }
 
     #[Override] public function getContents(): string
     {
-        return $this->stream->getContents();
+        return $this->psrStream->getContents();
     }
 
     /**
@@ -89,27 +91,27 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
      */
     #[Override] public function getMetadata(?string $key = null)
     {
-        return $this->stream->getMetadata($key);
+        return $this->psrStream->getMetadata($key);
     }
 
     #[Override] public function getSize(): ?int
     {
-        return $this->stream->getSize();
+        return $this->psrStream->getSize();
     }
 
     #[Override] public function isReadable(): bool
     {
-        return $this->stream->isReadable();
+        return $this->psrStream->isReadable();
     }
 
     #[Override] public function isSeekable(): bool
     {
-        return $this->stream->isSeekable();
+        return $this->psrStream->isSeekable();
     }
 
     #[Override] public function isWritable(): bool
     {
-        return $this->stream->isWritable();
+        return $this->psrStream->isWritable();
     }
 
     #[Override] public function path(string $path): mixed
@@ -132,26 +134,26 @@ final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
 
     #[Override] public function read(int $length): string
     {
-        return $this->stream->read($length);
+        return $this->psrStream->read($length);
     }
 
     #[Override] public function rewind(): void
     {
-        $this->stream->rewind();
+        $this->psrStream->rewind();
     }
 
     #[Override] public function seek(int $offset, int $whence = SEEK_SET): void
     {
-        $this->stream->seek($offset, $whence);
+        $this->psrStream->seek($offset, $whence);
     }
 
     #[Override] public function tell(): int
     {
-        return $this->stream->tell();
+        return $this->psrStream->tell();
     }
 
     #[Override] public function write(string $string): int
     {
-        return $this->stream->write($string);
+        return $this->psrStream->write($string);
     }
 }
