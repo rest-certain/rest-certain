@@ -15,7 +15,7 @@ use RestCertain\Config;
 use RestCertain\Internal\RequestSpecificationImpl;
 use RestCertain\Internal\ResponseBodyImpl;
 use RestCertain\Internal\ResponseImpl;
-use RestCertain\Internal\ValidatableResponseOptionsImpl;
+use RestCertain\Internal\ValidatableResponseImpl;
 
 class ResponseImplTest extends TestCase
 {
@@ -217,7 +217,7 @@ class ResponseImplTest extends TestCase
 
     public function testThen(): void
     {
-        $this->assertInstanceOf(ValidatableResponseOptionsImpl::class, $this->response->then());
+        $this->assertInstanceOf(ValidatableResponseImpl::class, $this->response->then());
     }
 
     public function testThenReturn(): void

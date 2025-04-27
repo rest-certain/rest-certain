@@ -33,7 +33,7 @@ use RestCertain\Exception\NotImplemented;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
-use RestCertain\Response\ValidatableResponseOptions;
+use RestCertain\Response\ValidatableResponse;
 use RestCertain\Specification\RequestSpecification;
 
 /**
@@ -45,7 +45,7 @@ final readonly class ResponseImpl implements Response
     private ResponseInterface $psrResponse;
     private RequestInterface $psrRequest;
     private SetCookies $setCookies;
-    private ValidatableResponseOptions $validatableResponseOptions;
+    private ValidatableResponse $validatableResponseOptions;
 
     public function __construct(
         private RequestSpecification $requestSpecification,
@@ -59,7 +59,7 @@ final readonly class ResponseImpl implements Response
 
         $responseSpec = new ResponseSpecificationImpl($this);
         $this->requestSpecification->setResponseSpecification($responseSpec);
-        $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($responseSpec);
+        $this->validatableResponseOptions = new ValidatableResponseImpl($responseSpec);
     }
 
     #[Override] public function andReturn(): static
@@ -248,7 +248,7 @@ final readonly class ResponseImpl implements Response
         return $this->getStatusLine();
     }
 
-    #[Override] public function then(): ValidatableResponseOptions
+    #[Override] public function then(): ValidatableResponse
     {
         return $this->validatableResponseOptions;
     }

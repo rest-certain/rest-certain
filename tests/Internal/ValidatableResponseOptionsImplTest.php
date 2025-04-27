@@ -14,7 +14,7 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
-use RestCertain\Internal\ValidatableResponseOptionsImpl;
+use RestCertain\Internal\ValidatableResponseImpl;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Str;
 
@@ -23,12 +23,12 @@ class ValidatableResponseOptionsImplTest extends TestCase
     use MockeryPHPUnitIntegration;
 
     private ResponseSpecification & MockInterface $responseSpecification;
-    private ValidatableResponseOptionsImpl $validatableResponseOptions;
+    private ValidatableResponseImpl $validatableResponseOptions;
 
     protected function setUp(): void
     {
         $this->responseSpecification = Mockery::spy(ResponseSpecification::class);
-        $this->validatableResponseOptions = new ValidatableResponseOptionsImpl($this->responseSpecification);
+        $this->validatableResponseOptions = new ValidatableResponseImpl($this->responseSpecification);
     }
 
     public function testAnd(): void

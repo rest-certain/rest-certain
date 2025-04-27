@@ -28,7 +28,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\ExpectationFailedException;
 use Stringable;
 
-interface ValidatableResponseOptions
+interface ValidatableResponse
 {
     /**
      * Syntactic sugar, this returns the same instance.

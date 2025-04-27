@@ -26,14 +26,14 @@ namespace RestCertain\Internal;
 
 use Override;
 use PHPUnit\Framework\Constraint\Constraint;
-use RestCertain\Response\ValidatableResponseOptions;
+use RestCertain\Response\ValidatableResponse;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
 /**
  * @internal
  */
-final readonly class ValidatableResponseOptionsImpl implements ValidatableResponseOptions
+final readonly class ValidatableResponseImpl implements ValidatableResponse
 {
     public function __construct(private ResponseSpecification $responseSpecification)
     {

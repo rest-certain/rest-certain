@@ -27,7 +27,7 @@ namespace RestCertain\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-interface Response extends ResponseBody, ResponseInterface, Validatable
+interface Response extends ResponseBody, ResponseInterface
 {
     /**
      * Syntactic sugar, this returns the same instance.
@@ -166,6 +166,11 @@ interface Response extends ResponseBody, ResponseInterface, Validatable
      * @see self::getStatusLine()
      */
     public function statusLine(): string;
+
+    /**
+     * Returns a validatable response that allows validating the response.
+     */
+    public function then(): ValidatableResponse;
 
     /**
      * Syntactic sugar, this returns the same instance.
