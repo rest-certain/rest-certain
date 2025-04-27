@@ -26,9 +26,9 @@ namespace RestCertain\Internal;
 
 use LogicException;
 use Override;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
-use PHPUnit\Framework\ExpectationFailedException;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Specification\RequestSender;
@@ -66,6 +66,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getBody()->asString(),
             [$expectation, ...$additionalExpectations],
+            'Response body does not match expectations.',
         );
 
         return $this;
@@ -86,6 +87,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getHeaderLine(Header::CONTENT_TYPE),
             [$expectation, ...$additionalExpectations],
+            'Response content type does not match expectations.',
         );
 
         return $this;
@@ -98,7 +100,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
     ): static {
         if ($expectation === null) {
             if ($this->response->getCookie($name) === null) {
-                throw new ExpectationFailedException('Failed asserting that cookie "' . $name . '" is set.');
+                Assert::fail('Failed asserting that cookie "' . $name . '" is set.');
             }
 
             return $this;
@@ -107,6 +109,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getCookie($name),
             [$expectation, ...$additionalExpectations],
+            'Response cookie "' . $name . '" does not match expectations.',
         );
 
         return $this;
@@ -145,6 +148,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getHeaderLine($name),
             [$expectation, ...$additionalExpectations],
+            'Response header "' . $name . '" does not match expectations.',
         );
 
         return $this;
@@ -189,6 +193,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getStatusCode(),
             [$expectation, ...$additionalExpectations],
+            'Response status code does not match expectations.',
         );
 
         return $this;
@@ -201,6 +206,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getStatusLine(),
             [$expectation, ...$additionalExpectations],
+            'Response status line does not match expectations.',
         );
 
         return $this;
@@ -221,6 +227,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
         $this->evaluateExpectations(
             $this->response->getTime(),
             [$expectation, ...$additionalExpectations],
+            'Response time does not match expectations.',
         );
 
         return $this;
@@ -239,7 +246,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
     /**
      * @param array<Constraint | Stringable | int | string> $expectations
      */
-    private function evaluateExpectations(mixed $value, array $expectations): void
+    private function evaluateExpectations(mixed $value, array $expectations, string $message): void
     {
         foreach ($expectations as $expectation) {
             if (!$expectation instanceof Constraint) {
@@ -250,7 +257,7 @@ final class ResponseSpecificationImpl implements ResponseSpecification
                 $expectation = new IsEqual($expectation);
             }
 
-            $expectation->evaluate($value);
+            Assert::assertThat($value, $expectation, $message);
         }
     }
 }

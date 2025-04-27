@@ -7,6 +7,7 @@ namespace RestCertain\Test\Internal;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\GreaterThan;
@@ -16,7 +17,6 @@ use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\Constraint\StringContains;
 use PHPUnit\Framework\Constraint\StringEndsWith;
 use PHPUnit\Framework\Constraint\StringStartsWith;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
@@ -69,7 +69,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->body->shouldReceive('asString')->andReturn($actualValue);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->body(...$testValue);
     }
@@ -98,7 +98,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getHeaderLine')->with('content-type')->andReturn($actualValue);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->contentType(...$testValue);
     }
@@ -125,7 +125,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getCookie')->with('my-cookie')->andReturn($actualValue);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->cookie('my-cookie', ...$testValue);
     }
@@ -141,7 +141,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getCookie')->with('my-cookie')->andReturn(null);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that cookie "my-cookie" is set.');
 
         $this->responseSpecification->cookie('my-cookie');
@@ -174,7 +174,7 @@ class ResponseSpecificationImplTest extends TestCase
         $this->response->shouldReceive('getCookie')->with('aCookie3')->andReturn('foo bar baz');
         $this->response->shouldReceive('getCookie')->with('aCookie4')->andReturn('foo bar baz qux quux corge grault');
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->cookies([
             'aCookie1' => 'foo',
@@ -226,7 +226,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getHeaderLine')->with('my-header')->andReturn($actualValue);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->header('my-header', ...$testValue);
     }
@@ -258,7 +258,7 @@ class ResponseSpecificationImplTest extends TestCase
         $this->response->shouldReceive('getHeaderLine')->with('aHeader3')->andReturn('foo bar baz');
         $this->response->shouldReceive('getHeaderLine')->with('aHeader4')->andReturn('foo bar baz qux quux corge');
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->headers([
             'aHeader1' => 'foo',
@@ -325,7 +325,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getStatusCode')->andReturn(204);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->statusCode(
             new IsType(NativeType::Int),
@@ -357,7 +357,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getStatusLine')->andReturn($actualValue);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->statusLine(...$testValue);
     }
@@ -389,7 +389,7 @@ class ResponseSpecificationImplTest extends TestCase
     {
         $this->response->shouldReceive('getTime')->andReturn(1042);
 
-        $this->expectException(ExpectationFailedException::class);
+        $this->expectException(AssertionFailedError::class);
 
         $this->responseSpecification->time(
             new IsType(NativeType::Int),
