@@ -32,13 +32,43 @@ use Stringable;
 
 use function assert;
 
+/**
+ * REST Certain configuration.
+ */
 final readonly class Config
 {
+    public const string DEFAULT_BASE_URI = 'http://localhost';
+    public const string DEFAULT_BASE_PATH = '/';
+    public const int DEFAULT_PORT = 8000;
+
+    /**
+     * The Base URI used by default in all requests.
+     */
     public UriInterface $baseUri;
+
+    /**
+     * The HTTP client to use for sending requests.
+     */
     public ClientInterface $httpClient;
+
+    /**
+     * The request factory to use for creating requests.
+     */
     public Message\RequestFactoryInterface $requestFactory;
+
+    /**
+     * The response factory to use for creating responses.
+     */
     public Message\ResponseFactoryInterface $responseFactory;
+
+    /**
+     * The stream factory to use for creating body content.
+     */
     public Message\StreamFactoryInterface $streamFactory;
+
+    /**
+     * The URI factory to use for creating URIs.
+     */
     public Message\UriFactoryInterface $uriFactory;
 
     /**
@@ -49,9 +79,9 @@ final readonly class Config
      * @param int $port The port that's used for all requests if a non-fully qualified URI is used in the request.
      */
     public function __construct(
-        Stringable | UriInterface | string $baseUri = 'http://localhost',
-        public string $basePath = '/',
-        public int $port = 8000,
+        Stringable | UriInterface | string $baseUri = self::DEFAULT_BASE_URI,
+        public string $basePath = self::DEFAULT_BASE_PATH,
+        public int $port = self::DEFAULT_PORT,
         ?ClientInterface $httpClient = null,
         ?Message\RequestFactoryInterface $requestFactory = null,
         ?Message\ResponseFactoryInterface $responseFactory = null,

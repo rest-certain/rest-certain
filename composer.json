@@ -52,7 +52,10 @@
     "autoload": {
         "psr-4": {
             "RestCertain\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
