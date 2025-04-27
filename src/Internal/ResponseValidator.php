@@ -33,7 +33,7 @@ use Stringable;
 /**
  * @internal
  */
-final readonly class ValidatableResponseImpl implements ValidatableResponse
+final readonly class ResponseValidator implements ValidatableResponse
 {
     public function __construct(private ResponseSpecification $responseSpecification)
     {

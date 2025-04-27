@@ -12,24 +12,23 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Config;
-use RestCertain\Internal\RequestSpecificationImpl;
-use RestCertain\Internal\ResponseBodyImpl;
-use RestCertain\Internal\ResponseImpl;
-use RestCertain\Internal\ValidatableResponseImpl;
+use RestCertain\Internal\HttpResponse;
+use RestCertain\Internal\HttpResponseBody;
+use RestCertain\Internal\RequestBuilder;
+use RestCertain\Internal\ResponseValidator;
 
-class ResponseImplTest extends TestCase
+class HttpResponseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private RequestInterface & MockInterface $psrRequest;
     private ResponseInterface & MockInterface $psrResponse;
-    private ResponseImpl $response;
+    private HttpResponse $response;
     private StreamInterface & MockInterface $stream;
 
     protected function setUp(): void
     {
         $this->stream = Mockery::mock(StreamInterface::class);
-        $this->psrRequest = Mockery::mock(RequestInterface::class);
+        $psrRequest = Mockery::mock(RequestInterface::class);
         $this->psrResponse = Mockery::spy(ResponseInterface::class, [
             'getBody' => $this->stream,
         ]);
@@ -42,10 +41,10 @@ class ResponseImplTest extends TestCase
             '__Host-example=34d8g; SameSite=None; Secure; Path=/; Partitioned;',
         ]);
 
-        $this->response = new ResponseImpl(
-            new RequestSpecificationImpl(new Config()),
+        $this->response = new HttpResponse(
+            new RequestBuilder(new Config()),
             $this->psrResponse,
-            $this->psrRequest,
+            $psrRequest,
         );
     }
 
@@ -56,7 +55,7 @@ class ResponseImplTest extends TestCase
 
     public function testAsPrettyString(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseImpl::class . '::asPrettyString()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::asPrettyString()');
     }
 
     public function testAsString(): void
@@ -71,7 +70,7 @@ class ResponseImplTest extends TestCase
     {
         $body = $this->response->body();
 
-        $this->assertInstanceOf(ResponseBodyImpl::class, $body);
+        $this->assertInstanceOf(HttpResponseBody::class, $body);
         $this->assertSame($body, $this->response->getBody());
     }
 
@@ -184,7 +183,7 @@ class ResponseImplTest extends TestCase
 
     public function testTime(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseImpl::class . '::time() and getTime()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::time() and getTime()');
     }
 
     public function testHasHeader(): void
@@ -196,12 +195,12 @@ class ResponseImplTest extends TestCase
 
     public function testPath(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseImpl::class . '::path()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::path()');
     }
 
     public function testPrettyPrint(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseImpl::class . '::prettyPrint()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::prettyPrint()');
     }
 
     public function testPrint(): void
@@ -217,7 +216,7 @@ class ResponseImplTest extends TestCase
 
     public function testThen(): void
     {
-        $this->assertInstanceOf(ValidatableResponseImpl::class, $this->response->then());
+        $this->assertInstanceOf(ResponseValidator::class, $this->response->then());
     }
 
     public function testThenReturn(): void

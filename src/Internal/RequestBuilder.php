@@ -68,7 +68,7 @@ use const PHP_QUERY_RFC1738;
 /**
  * @internal
  */
-final class RequestSpecificationImpl implements RequestSpecification
+final class RequestBuilder implements RequestSpecification
 {
     private string $basePath;
     private UriInterface $baseUri;
@@ -471,7 +471,7 @@ final class RequestSpecificationImpl implements RequestSpecification
             throw new RequestFailed(message: "The request failed: {$e->getMessage()}", previous: $e);
         }
 
-        return new ResponseImpl($this, $psrResponse, $psrRequest);
+        return new HttpResponse($this, $psrResponse, $psrRequest);
     }
 
     /**

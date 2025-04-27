@@ -15,8 +15,8 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 use ReflectionFunction;
 use RestCertain\Config;
-use RestCertain\Internal\RequestSpecificationImpl;
-use RestCertain\Internal\ResponseImpl;
+use RestCertain\Internal\HttpResponse;
+use RestCertain\Internal\RequestBuilder;
 use RestCertain\RestCertain;
 use Stringable;
 
@@ -29,8 +29,6 @@ class RestCertainTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private ClientInterface $client;
-
     protected function setUp(): void
     {
         $stream = Mockery::mock(StreamInterface::class);
@@ -40,10 +38,10 @@ class RestCertainTest extends TestCase
         $response->allows('getBody')->andReturns($stream);
         $response->allows('getHeader')->with('Set-Cookie')->andReturns([]);
 
-        $this->client = Mockery::mock(ClientInterface::class);
-        $this->client->allows('sendRequest')->andReturns($response);
+        $client = Mockery::mock(ClientInterface::class);
+        $client->allows('sendRequest')->andReturns($response);
 
-        RestCertain::$config = new Config(basePath: '/foo', httpClient: $this->client);
+        RestCertain::$config = new Config(basePath: '/foo', httpClient: $client);
     }
 
     protected function tearDown(): void
@@ -70,16 +68,16 @@ class RestCertainTest extends TestCase
 
         $response4 = request($method, $uri, $pathParams);
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame($expectedUri, (string) $response->getPsrRequest()->getUri());
 
-        $this->assertInstanceOf(ResponseImpl::class, $response2);
+        $this->assertInstanceOf(HttpResponse::class, $response2);
         $this->assertSame($expectedUri, (string) $response2->getPsrRequest()->getUri());
 
-        $this->assertInstanceOf(ResponseImpl::class, $response3);
+        $this->assertInstanceOf(HttpResponse::class, $response3);
         $this->assertSame($expectedUri, (string) $response3->getPsrRequest()->getUri());
 
-        $this->assertInstanceOf(ResponseImpl::class, $response4);
+        $this->assertInstanceOf(HttpResponse::class, $response4);
         $this->assertSame($expectedUri, (string) $response4->getPsrRequest()->getUri());
     }
 
@@ -227,23 +225,23 @@ class RestCertainTest extends TestCase
     {
         RestCertain::$config = null;
 
-        $this->assertInstanceOf(RequestSpecificationImpl::class, RestCertain::given());
-        $this->assertInstanceOf(RequestSpecificationImpl::class, given());
+        $this->assertInstanceOf(RequestBuilder::class, RestCertain::given());
+        $this->assertInstanceOf(RequestBuilder::class, given());
     }
 
     public function testWhen(): void
     {
         RestCertain::$config = null;
 
-        $this->assertInstanceOf(RequestSpecificationImpl::class, RestCertain::when());
-        $this->assertInstanceOf(RequestSpecificationImpl::class, when());
+        $this->assertInstanceOf(RequestBuilder::class, RestCertain::when());
+        $this->assertInstanceOf(RequestBuilder::class, when());
     }
 
     public function testWith(): void
     {
         RestCertain::$config = null;
 
-        $this->assertInstanceOf(RequestSpecificationImpl::class, RestCertain::with());
-        $this->assertInstanceOf(RequestSpecificationImpl::class, with());
+        $this->assertInstanceOf(RequestBuilder::class, RestCertain::with());
+        $this->assertInstanceOf(RequestBuilder::class, with());
     }
 }

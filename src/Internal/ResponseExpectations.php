@@ -41,7 +41,7 @@ use function is_array;
 /**
  * @internal
  */
-final class ResponseSpecificationImpl implements ResponseSpecification
+final class ResponseExpectations implements ResponseSpecification
 {
     private RequestSpecification $requestSpecification;
 

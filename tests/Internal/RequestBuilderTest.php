@@ -18,9 +18,9 @@ use RestCertain\Exception\PendingRequest;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Method;
-use RestCertain\Internal\RequestSpecificationImpl;
-use RestCertain\Internal\ResponseImpl;
-use RestCertain\Internal\ResponseSpecificationImpl;
+use RestCertain\Internal\HttpResponse;
+use RestCertain\Internal\RequestBuilder;
+use RestCertain\Internal\ResponseExpectations;
 use RestCertain\Request\Sender;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Json;
@@ -37,17 +37,17 @@ use function strtoupper;
 use function sys_get_temp_dir;
 use function tempnam;
 
-class RequestSpecificationImplTest extends TestCase
+class RequestBuilderTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     private Psr17Factory $factory;
-    private RequestSpecificationImpl $spec;
+    private RequestBuilder $spec;
 
     protected function setUp(): void
     {
         $this->factory = new Psr17Factory();
-        $this->spec = new RequestSpecificationImpl(new Config());
+        $this->spec = new RequestBuilder(new Config());
     }
 
     public function testAccept(): void
@@ -120,7 +120,7 @@ class RequestSpecificationImplTest extends TestCase
     {
         $psrResponse = $this->factory->createResponse(200);
         $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $spec->params([
             'foo' => 'bar',
@@ -145,7 +145,7 @@ class RequestSpecificationImplTest extends TestCase
             ],
         );
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame(strtoupper($method), (string) $response->getPsrRequest()->getMethod());
         $this->assertSame($expectedRequestUrl, (string) $response->getPsrRequest()->getUri());
         $this->assertSame($expectedRequestBody, (string) $response->getPsrRequest()->getBody());
@@ -296,7 +296,7 @@ class RequestSpecificationImplTest extends TestCase
     {
         $psrResponse = $this->factory->createResponse(200);
         $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $response = $spec->request(
             Method::GET,
@@ -308,7 +308,7 @@ class RequestSpecificationImplTest extends TestCase
             ],
         );
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame('http://localhost:8000/user/123/foo', (string) $response->getPsrRequest()->getUri());
         $this->assertSame('GET', (string) $response->getPsrRequest()->getMethod());
     }
@@ -389,7 +389,7 @@ class RequestSpecificationImplTest extends TestCase
         ]);
 
         $config = new Config(httpClient: $httpClient);
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $response = $spec
             ->given()
@@ -424,7 +424,7 @@ class RequestSpecificationImplTest extends TestCase
             ->cookie('my-cookie')
             ->body('{"foo": "bar"}');
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame(
             'http://localhost:8000/user/123/foo?param1=a&param1=b&param1=c&param2=e&param3=f&param3=g&param3=h&param3=i'
             . '&param3=j&cheese=Sakura%20cheese&cheese=feta&cheese=h%C3%B6f%C3%B0ingi&crackers=yes',
@@ -439,7 +439,7 @@ class RequestSpecificationImplTest extends TestCase
         $this->assertSame('', (string) $response->getPsrRequest()->getBody());
 
         // After sending the request, we should have a ResponseSpecification that we can get by calling expect().
-        $this->assertInstanceOf(ResponseSpecificationImpl::class, $spec->expect());
+        $this->assertInstanceOf(ResponseExpectations::class, $spec->expect());
     }
 
     public function testApplyPathParamsAndSendRequestWithFormUrlencodedBody(): void
@@ -453,7 +453,7 @@ class RequestSpecificationImplTest extends TestCase
         ]);
 
         $config = new Config(httpClient: $httpClient);
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $response = $spec
             ->given()
@@ -473,7 +473,7 @@ class RequestSpecificationImplTest extends TestCase
             ->when()
             ->post('/foo');
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame('http://localhost:8000/foo?qs1=abc', (string) $response->getPsrRequest()->getUri());
         $this->assertSame(
             'param1=a&param1=b&param1=c&param2=d&param3=f&param4=g&param4=h&param4=i&param4=j&param4=l&param4=m'
@@ -500,7 +500,7 @@ class RequestSpecificationImplTest extends TestCase
         ]);
 
         $config = new Config(httpClient: $httpClient);
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $response = $spec
             ->given()
@@ -508,7 +508,7 @@ class RequestSpecificationImplTest extends TestCase
             ->when()
             ->post('/foo');
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame($expectedContentType, $response->getPsrRequest()->getHeaderLine('content-type'));
         $this->assertSame($expectedBody, (string) $response->getPsrRequest()->getBody());
     }
@@ -571,7 +571,7 @@ class RequestSpecificationImplTest extends TestCase
         $httpClient->expects('sendRequest')->andThrows($exception);
 
         $config = new Config(httpClient: $httpClient);
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $this->expectException(RequestFailed::class);
         $this->expectExceptionMessage('The request failed: Something went wrong');
@@ -600,11 +600,11 @@ class RequestSpecificationImplTest extends TestCase
         ]);
 
         $config = new Config(httpClient: $httpClient);
-        $spec = new RequestSpecificationImpl($config);
+        $spec = new RequestBuilder($config);
 
         $response = $spec->get('https://api.example.com/bar');
 
-        $this->assertInstanceOf(ResponseImpl::class, $response);
+        $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame('https://api.example.com/bar', (string) $response->getPsrRequest()->getUri());
     }
 }

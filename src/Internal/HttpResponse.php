@@ -39,13 +39,13 @@ use RestCertain\Specification\RequestSpecification;
 /**
  * @internal
  */
-final readonly class ResponseImpl implements Response
+final readonly class HttpResponse implements Response
 {
     private ResponseBody $body;
     private ResponseInterface $psrResponse;
     private RequestInterface $psrRequest;
     private SetCookies $setCookies;
-    private ValidatableResponse $validatableResponseOptions;
+    private ValidatableResponse $validatableResponse;
 
     public function __construct(
         private RequestSpecification $requestSpecification,
@@ -54,12 +54,12 @@ final readonly class ResponseImpl implements Response
     ) {
         $this->psrResponse = $response;
         $this->psrRequest = $request;
-        $this->body = new ResponseBodyImpl($this->psrResponse);
+        $this->body = new HttpResponseBody($this->psrResponse);
         $this->setCookies = SetCookies::fromResponse($this->psrResponse);
 
-        $responseSpec = new ResponseSpecificationImpl($this);
+        $responseSpec = new ResponseExpectations($this);
         $this->requestSpecification->setResponseSpecification($responseSpec);
-        $this->validatableResponseOptions = new ValidatableResponseImpl($responseSpec);
+        $this->validatableResponse = new ResponseValidator($responseSpec);
     }
 
     #[Override] public function andReturn(): static
@@ -250,7 +250,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function then(): ValidatableResponse
     {
-        return $this->validatableResponseOptions;
+        return $this->validatableResponse;
     }
 
     #[Override] public function thenReturn(): static
@@ -268,7 +268,7 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function withAddedHeader(string $name, $value): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withAddedHeader($name, $value),
             $this->psrRequest,
@@ -277,7 +277,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function withBody(StreamInterface $body): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withBody($body),
             $this->psrRequest,
@@ -289,7 +289,7 @@ final readonly class ResponseImpl implements Response
      */
     #[Override] public function withHeader(string $name, $value): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withHeader($name, $value),
             $this->psrRequest,
@@ -298,7 +298,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function withProtocolVersion(string $version): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withProtocolVersion($version),
             $this->psrRequest,
@@ -307,7 +307,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function withStatus(int $code, string $reasonPhrase = ''): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withStatus($code, $reasonPhrase),
             $this->psrRequest,
@@ -316,7 +316,7 @@ final readonly class ResponseImpl implements Response
 
     #[Override] public function withoutHeader(string $name): Response
     {
-        return new ResponseImpl(
+        return new HttpResponse(
             $this->requestSpecification,
             $this->psrResponse->withoutHeader($name),
             $this->psrRequest,

@@ -35,7 +35,7 @@ use const SEEK_SET;
 /**
  * @internal
  */
-final readonly class ResponseBodyImpl implements ResponseBody, StreamInterface
+final readonly class HttpResponseBody implements ResponseBody, StreamInterface
 {
     private ResponseInterface $psrResponse;
     private StreamInterface $psrStream;

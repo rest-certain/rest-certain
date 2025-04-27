@@ -25,7 +25,7 @@ declare(strict_types=1);
 namespace RestCertain;
 
 use Psr\Http\Message\UriInterface;
-use RestCertain\Internal\RequestSpecificationImpl;
+use RestCertain\Internal\RequestBuilder;
 use RestCertain\Response\Response;
 use RestCertain\Specification\RequestSpecification;
 use Stringable;
@@ -150,7 +150,7 @@ final class RestCertain
     private static function newRequestSpec(): RequestSpecification
     {
         if (self::$config !== null) {
-            return new RequestSpecificationImpl(self::$config);
+            return new RequestBuilder(self::$config);
         }
 
         // phpcs:disable SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable
@@ -168,7 +168,7 @@ final class RestCertain
             port: (int) $port,
         );
 
-        return new RequestSpecificationImpl(self::$config);
+        return new RequestBuilder(self::$config);
     }
 
     /**

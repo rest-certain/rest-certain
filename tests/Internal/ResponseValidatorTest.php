@@ -14,31 +14,31 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
-use RestCertain\Internal\ValidatableResponseImpl;
+use RestCertain\Internal\ResponseValidator;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Str;
 
-class ValidatableResponseOptionsImplTest extends TestCase
+class ResponseValidatorTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     private ResponseSpecification & MockInterface $responseSpecification;
-    private ValidatableResponseImpl $validatableResponseOptions;
+    private ResponseValidator $validatableResponse;
 
     protected function setUp(): void
     {
         $this->responseSpecification = Mockery::spy(ResponseSpecification::class);
-        $this->validatableResponseOptions = new ValidatableResponseImpl($this->responseSpecification);
+        $this->validatableResponse = new ResponseValidator($this->responseSpecification);
     }
 
     public function testAnd(): void
     {
-        $this->assertSame($this->validatableResponseOptions, $this->validatableResponseOptions->and());
+        $this->assertSame($this->validatableResponse, $this->validatableResponse->and());
     }
 
     public function testAssertThat(): void
     {
-        $this->assertSame($this->validatableResponseOptions, $this->validatableResponseOptions->assertThat());
+        $this->assertSame($this->validatableResponse, $this->validatableResponse->assertThat());
     }
 
     #[DataProvider('singularCaseMethodsProvider')]
@@ -49,8 +49,8 @@ class ValidatableResponseOptionsImplTest extends TestCase
         $value3 = new IsEqualIgnoringCase('FOO');
 
         $this->assertSame(
-            $this->validatableResponseOptions,
-            $this->validatableResponseOptions->{$method}($value1, $value2, $value3),
+            $this->validatableResponse,
+            $this->validatableResponse->{$method}($value1, $value2, $value3),
         );
 
         $this->responseSpecification->shouldHaveReceived($method, [$value1, $value2, $value3]);
@@ -85,8 +85,8 @@ class ValidatableResponseOptionsImplTest extends TestCase
         ];
 
         $this->assertSame(
-            $this->validatableResponseOptions,
-            $this->validatableResponseOptions->{$method}($valuesToCheck),
+            $this->validatableResponse,
+            $this->validatableResponse->{$method}($valuesToCheck),
         );
 
         $this->responseSpecification->shouldHaveReceived($method, [$valuesToCheck]);
@@ -110,8 +110,8 @@ class ValidatableResponseOptionsImplTest extends TestCase
         $value3 = new LessThan(200);
 
         $this->assertSame(
-            $this->validatableResponseOptions,
-            $this->validatableResponseOptions->statusCode($value1, $value2, $value3),
+            $this->validatableResponse,
+            $this->validatableResponse->statusCode($value1, $value2, $value3),
         );
 
         $this->responseSpecification->shouldHaveReceived('statusCode', [$value1, $value2, $value3]);
@@ -124,8 +124,8 @@ class ValidatableResponseOptionsImplTest extends TestCase
         $value3 = new LessThan(1000);
 
         $this->assertSame(
-            $this->validatableResponseOptions,
-            $this->validatableResponseOptions->time($value1, $value2, $value3),
+            $this->validatableResponse,
+            $this->validatableResponse->time($value1, $value2, $value3),
         );
 
         $this->responseSpecification->shouldHaveReceived('time', [$value1, $value2, $value3]);
@@ -133,6 +133,6 @@ class ValidatableResponseOptionsImplTest extends TestCase
 
     public function testUsing(): void
     {
-        $this->assertSame($this->validatableResponseOptions, $this->validatableResponseOptions->using());
+        $this->assertSame($this->validatableResponse, $this->validatableResponse->using());
     }
 }

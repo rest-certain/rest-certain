@@ -10,15 +10,15 @@ use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use RestCertain\Internal\ResponseBodyImpl;
+use RestCertain\Internal\HttpResponseBody;
 
 use const SEEK_SET;
 
-class ResponseBodyImplTest extends TestCase
+class HttpResponseBodyTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private ResponseBodyImpl $responseBody;
+    private HttpResponseBody $responseBody;
     private StreamInterface & MockInterface $stream;
 
     protected function setUp(): void
@@ -26,7 +26,7 @@ class ResponseBodyImplTest extends TestCase
         $this->stream = Mockery::spy(StreamInterface::class, [
             'getContents' => 'Hello, World!',
         ]);
-        $this->responseBody = new ResponseBodyImpl(Mockery::mock(ResponseInterface::class, [
+        $this->responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
             'getBody' => $this->stream,
         ]));
     }
@@ -40,7 +40,7 @@ class ResponseBodyImplTest extends TestCase
 
     public function testAsPrettyString(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseBodyImpl::class . '::asPrettyString()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::asPrettyString()');
     }
 
     public function testAsString(): void
@@ -111,12 +111,12 @@ class ResponseBodyImplTest extends TestCase
 
     public function testPath(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseBodyImpl::class . '::path()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::path()');
     }
 
     public function testPrettyPrint(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseBodyImpl::class . '::prettyPrint()');
+        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::prettyPrint()');
     }
 
     public function testPrint(): void

@@ -20,20 +20,20 @@ use PHPUnit\Framework\Constraint\StringStartsWith;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
-use RestCertain\Internal\ResponseSpecificationImpl;
+use RestCertain\Internal\ResponseExpectations;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Test\Str;
 use Stringable;
 
-class ResponseSpecificationImplTest extends TestCase
+class ResponseExpectationsTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     private ResponseBody & StreamInterface & MockInterface $body;
     private Response & MockInterface $response;
-    private ResponseSpecificationImpl $responseSpecification;
+    private ResponseExpectations $responseSpecification;
 
     protected function setUp(): void
     {
@@ -42,7 +42,7 @@ class ResponseSpecificationImplTest extends TestCase
 
         $this->body = $body;
         $this->response = Mockery::mock(Response::class, ['getBody' => $this->body]);
-        $this->responseSpecification = new ResponseSpecificationImpl($this->response);
+        $this->responseSpecification = new ResponseExpectations($this->response);
     }
 
     public function testAnd(): void
@@ -76,7 +76,7 @@ class ResponseSpecificationImplTest extends TestCase
 
     public function testBodyPath(): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseSpecificationImpl::class . '::bodyPath()');
+        $this->markTestIncomplete('Need to implement ' . ResponseExpectations::class . '::bodyPath()');
     }
 
     /**
@@ -301,7 +301,7 @@ class ResponseSpecificationImplTest extends TestCase
     public function testSetRequestSpecificationOnConstructor(): void
     {
         $requestSpecification = Mockery::mock(RequestSpecification::class);
-        $responseSpecification = new ResponseSpecificationImpl($this->response, $requestSpecification);
+        $responseSpecification = new ResponseExpectations($this->response, $requestSpecification);
 
         $this->assertSame($requestSpecification, $responseSpecification->request());
     }
