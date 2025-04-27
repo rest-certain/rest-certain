@@ -25,6 +25,7 @@ declare(strict_types=1);
 namespace RestCertain\Specification;
 
 use Psr\Http\Message\UriInterface;
+use RestCertain\Http\RequestFailed;
 use RestCertain\Response\Response;
 use Stringable;
 
@@ -34,6 +35,8 @@ interface RequestSender
      * Performs a DELETE request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function delete(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -41,6 +44,8 @@ interface RequestSender
      * Performs a GET request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function get(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -48,6 +53,8 @@ interface RequestSender
      * Performs a HEAD request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function head(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -55,6 +62,8 @@ interface RequestSender
      * Performs an OPTIONS request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function options(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -62,6 +71,8 @@ interface RequestSender
      * Performs a PATCH request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function patch(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -69,6 +80,8 @@ interface RequestSender
      * Performs a POST request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function post(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -76,6 +89,8 @@ interface RequestSender
      * Performs a PUT request to the given path.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function put(Stringable | UriInterface | string $path, array $pathParams = []): Response;
 
@@ -83,6 +98,8 @@ interface RequestSender
      * Performs an HTTP request to the given path using the given method.
      *
      * @param array<string, Stringable | int | string> $pathParams
+     *
+     * @throws RequestFailed
      */
     public function request(
         Stringable | string $method,
