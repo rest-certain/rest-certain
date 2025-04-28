@@ -20,6 +20,7 @@ use PHPUnit\Framework\Constraint\StringStartsWith;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
+use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Internal\ResponseExpectations;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
@@ -74,9 +75,41 @@ class ResponseExpectationsTest extends TestCase
         $this->responseSpecification->body(...$testValue);
     }
 
-    public function testBodyPath(): void
+    /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueSuccessProvider')]
+    public function testBodyPathWithSuccess(string $actualValue, array $testValue): void
     {
-        $this->markTestIncomplete('Need to implement ' . ResponseExpectations::class . '::bodyPath()');
+        $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
+
+        $this->assertSame(
+            $this->responseSpecification,
+            $this->responseSpecification->bodyPath('foo.bar', ...$testValue),
+        );
+    }
+
+    /**
+     * @param array<Constraint | Stringable | string> $testValue
+     */
+    #[DataProvider('generalValueFailureProvider')]
+    public function testBodyPathWithFailure(string $actualValue, array $testValue): void
+    {
+        $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
+
+        $this->expectException(AssertionFailedError::class);
+
+        $this->responseSpecification->bodyPath('foo.bar', ...$testValue);
+    }
+
+    public function testBodyPathWithPathResolutionFailure(): void
+    {
+        $this->response->shouldReceive('path')->with('foo.bar.baz')->andThrow(new PathResolutionFailure());
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('Failed asserting that response body path "foo.bar.baz" exists:');
+
+        $this->responseSpecification->bodyPath('foo.bar.baz', 'foo', 'bar', 'baz');
     }
 
     /**

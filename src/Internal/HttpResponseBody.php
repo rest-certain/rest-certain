@@ -24,26 +24,41 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
+use Jasny\DotKey\DotKey;
+use Jasny\DotKey\ResolveException;
+use JsonException;
+use Loilo\JsonPath\JsonPath;
+use Loilo\JsonPath\SyntaxError;
 use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Exception\NotImplemented;
+use RestCertain\Exception\PathResolutionFailure;
+use RestCertain\Internal\Type\ByteArray;
+use RestCertain\Internal\Type\JsonValue;
+use RestCertain\Internal\Type\ParsedType;
 use RestCertain\Response\ResponseBody;
+use stdClass;
 
+use function json_decode;
+use function str_starts_with;
+
+use const JSON_BIGINT_AS_STRING;
+use const JSON_INVALID_UTF8_SUBSTITUTE;
+use const JSON_THROW_ON_ERROR;
 use const SEEK_SET;
 
 /**
  * @internal This class is not intended for direct use outside of Rest Certain.
  */
-final readonly class HttpResponseBody implements ResponseBody, StreamInterface
+final class HttpResponseBody implements ResponseBody, StreamInterface
 {
-    private ResponseInterface $psrResponse;
-    private StreamInterface $psrStream;
+    private readonly StreamInterface $psrStream;
+    private ParsedType $parsedBody;
 
     public function __construct(ResponseInterface $response)
     {
-        $this->psrResponse = $response;
-        $this->psrStream = $this->psrResponse->getBody();
+        $this->psrStream = $response->getBody();
     }
 
     public function __toString(): string
@@ -116,7 +131,41 @@ final readonly class HttpResponseBody implements ResponseBody, StreamInterface
 
     #[Override] public function path(string $path): mixed
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        $parsedBody = $this->getParsedBody();
+
+        if (!$parsedBody instanceof JsonValue) {
+            throw new PathResolutionFailure(
+                "The response body is not a valid JSON value.\nReceived:\n" . $this->asString(),
+            );
+        }
+
+        if (str_starts_with($path, '$')) {
+            try {
+                $jsonPath = new JsonPath($path);
+
+                return $jsonPath->find($parsedBody->getValue());
+            } catch (SyntaxError $exception) {
+                throw new PathResolutionFailure(
+                    message: 'Unable to parse JSON path: ' . $exception->getMessage(),
+                    previous: $exception,
+                );
+            }
+        }
+
+        if (!$parsedBody->getValue() instanceof stdClass) {
+            throw new PathResolutionFailure('Unable to get path on non-object body');
+        }
+
+        try {
+            $value = $parsedBody->getValue();
+
+            return DotKey::on($value)->get($path);
+        } catch (ResolveException $exception) {
+            throw new PathResolutionFailure(
+                message: $exception->getMessage(),
+                previous: $exception,
+            );
+        }
     }
 
     #[Override] public function prettyPrint(): string
@@ -155,5 +204,25 @@ final readonly class HttpResponseBody implements ResponseBody, StreamInterface
     #[Override] public function write(string $string): int
     {
         return $this->psrStream->write($string);
+    }
+
+    private function getParsedBody(): ParsedType
+    {
+        if (isset($this->parsedBody)) {
+            return $this->parsedBody;
+        }
+
+        try {
+            /** @var stdClass | bool | float | int | mixed[] | string | null $parsedBody */
+            $parsedBody = json_decode(
+                json: $this->asString(),
+                flags: JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR,
+            );
+            $this->parsedBody = new JsonValue($parsedBody);
+        } catch (JsonException) {
+            $this->parsedBody = new ByteArray($this->asString());
+        }
+
+        return $this->parsedBody;
     }
 }

@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Internal\HttpResponseBody;
 
 use const SEEK_SET;
@@ -109,9 +110,117 @@ class HttpResponseBodyTest extends TestCase
         $this->assertTrue($this->responseBody->isWritable());
     }
 
-    public function testPath(): void
+    public function testPathUsingDotNotation(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::path()');
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '{"foo": {"bar": "baz"}}',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $value = $responseBody->path('foo.bar');
+
+        $this->assertSame('baz', $value);
+
+        // Call again to cover the code path where we have already parsed the body.
+        $this->assertSame('baz', $responseBody->path('foo.bar'));
+    }
+
+    public function testPathUsingJsonPath(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '{"foo": {"bar": "baz"}}',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->assertSame(['baz'], $responseBody->path('$.foo.bar'));
+    }
+
+    public function testPathUsingJsonPathThrowsExceptionForSyntaxError(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '"foo bar"',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->expectException(PathResolutionFailure::class);
+        $this->expectExceptionMessage(
+            'Unable to parse JSON path: Expected "*", "_", [\x80-\x{0D7FF}], [\x{0D800}-\x{0DBFF}], '
+            . '[\x{0E000}-\x{0FFFF}] or [a-z] but end of input found',
+        );
+
+        $responseBody->path('$.');
+    }
+
+    public function testPathUsingJsonPathWithRootAndString(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '"foo bar"',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->assertSame(['foo bar'], $responseBody->path('$'));
+    }
+
+    public function testPathUsingDotNotationThrowsExceptionWhenNotAnObject(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '"foo bar"',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->expectException(PathResolutionFailure::class);
+        $this->expectExceptionMessage('Unable to get path on non-object body');
+
+        $responseBody->path('foo.bar');
+    }
+
+    public function testPathThrowsExceptionWhenPathDoesNotExist(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '{"foo": {"bar": "baz"}}',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->expectException(PathResolutionFailure::class);
+        $this->expectExceptionMessage("Unable to get 'foo.bar.qux': 'foo.bar' is of type string");
+
+        $responseBody->path('foo.bar.qux');
+    }
+
+    public function testPathWithInvalidJson(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => 'this is not a JSON string',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $this->expectException(PathResolutionFailure::class);
+        $this->expectExceptionMessage(
+            "The response body is not a valid JSON value.\nReceived:\nthis is not a JSON string",
+        );
+
+        $responseBody->path('foo.bar');
     }
 
     public function testPrettyPrint(): void

@@ -28,7 +28,7 @@ use Override;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
-use RestCertain\Exception\NotImplemented;
+use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Http\Header;
 use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
@@ -77,7 +77,21 @@ final class ResponseExpectations implements ResponseSpecification
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
     ): static {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        try {
+            $value = $this->response->path($path);
+        } catch (PathResolutionFailure $exception) {
+            Assert::fail(
+                'Failed asserting that response body path "' . $path . '" exists: ' . $exception->getMessage(),
+            );
+        }
+
+        $this->evaluateExpectations(
+            $value,
+            [$expectation, ...$additionalExpectations],
+            'Response body path "' . $path . '" does not match expectations.',
+        );
+
+        return $this;
     }
 
     #[Override] public function contentType(

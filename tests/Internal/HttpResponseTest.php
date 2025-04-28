@@ -21,6 +21,7 @@ class HttpResponseTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private RequestInterface & MockInterface $psrRequest;
     private ResponseInterface & MockInterface $psrResponse;
     private HttpResponse $response;
     private StreamInterface & MockInterface $stream;
@@ -28,7 +29,7 @@ class HttpResponseTest extends TestCase
     protected function setUp(): void
     {
         $this->stream = Mockery::mock(StreamInterface::class);
-        $psrRequest = Mockery::mock(RequestInterface::class);
+        $this->psrRequest = Mockery::mock(RequestInterface::class);
         $this->psrResponse = Mockery::spy(ResponseInterface::class, [
             'getBody' => $this->stream,
         ]);
@@ -44,7 +45,7 @@ class HttpResponseTest extends TestCase
         $this->response = new HttpResponse(
             new RequestBuilder(new Config()),
             $this->psrResponse,
-            $psrRequest,
+            $this->psrRequest,
         );
     }
 
@@ -156,6 +157,16 @@ class HttpResponseTest extends TestCase
         $this->assertSame('1.1', $this->response->getProtocolVersion());
     }
 
+    public function testGetPsrRequest(): void
+    {
+        $this->assertSame($this->psrRequest, $this->response->getPsrRequest());
+    }
+
+    public function testGetPsrResponse(): void
+    {
+        $this->assertSame($this->psrResponse, $this->response->getPsrResponse());
+    }
+
     public function testGetReasonPhrase(): void
     {
         $this->psrResponse->allows('getReasonPhrase')->andReturns('Bad Request');
@@ -181,11 +192,6 @@ class HttpResponseTest extends TestCase
         $this->assertSame("HTTP/1.2 418 I'm a teapot", $this->response->statusLine());
     }
 
-    public function testTime(): void
-    {
-        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::time() and getTime()');
-    }
-
     public function testHasHeader(): void
     {
         $this->psrResponse->allows('hasHeader')->with('my-header')->andReturns(true);
@@ -195,7 +201,10 @@ class HttpResponseTest extends TestCase
 
     public function testPath(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::path()');
+        $this->stream->expects('rewind')->once();
+        $this->stream->expects('getContents')->once()->andReturns('{"foo": {"bar": "baz"}}');
+
+        $this->assertSame('baz', $this->response->path('foo.bar'));
     }
 
     public function testPrettyPrint(): void
@@ -222,6 +231,11 @@ class HttpResponseTest extends TestCase
     public function testThenReturn(): void
     {
         $this->assertSame($this->response, $this->response->thenReturn());
+    }
+
+    public function testTime(): void
+    {
+        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::time() and getTime()');
     }
 
     public function testWithAddedHeader(): void

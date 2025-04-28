@@ -18,8 +18,10 @@
     "require": {
         "php": "~8.3.0 || ~8.4.0",
         "dflydev/fig-cookies": "^3.1",
-        "league/uri": "^7.5.1",
-        "league/uri-components": "^7.5.1",
+        "jasny/dotkey": "^2.2",
+        "league/uri": "^7.5",
+        "league/uri-components": "^7.5",
+        "loilo/jsonpath": "^0.2.0",
         "php-http/discovery": "^1.20",
         "phpunit/phpunit": "^12.0",
         "psr/http-client": "^1.0",

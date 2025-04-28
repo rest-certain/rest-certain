@@ -225,7 +225,7 @@ final readonly class HttpResponse implements Response
 
     #[Override] public function path(string $path): mixed
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        return $this->body->path($path);
     }
 
     #[Override] public function prettyPrint(): string
