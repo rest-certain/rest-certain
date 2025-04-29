@@ -110,7 +110,7 @@ class HttpResponseBodyTest extends TestCase
         $this->assertTrue($this->responseBody->isWritable());
     }
 
-    public function testPathUsingDotNotation(): void
+    public function testPathUsingJmesPath(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
             'getContents' => '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}',
@@ -120,8 +120,8 @@ class HttpResponseBodyTest extends TestCase
             'getBody' => $stream,
         ]));
 
-        $this->assertSame([123, 456], $responseBody->path('foo.bar.id'));
-        $this->assertSame(456, $responseBody->path('foo.bar.1.id'));
+        $this->assertSame([123, 456], $responseBody->path('foo.bar[*].id'));
+        $this->assertSame(456, $responseBody->path('foo.bar[1].id'));
     }
 
     public function testPathUsingJsonPath(): void
@@ -169,7 +169,7 @@ class HttpResponseBodyTest extends TestCase
         $this->assertSame(['foo bar'], $responseBody->path('$'));
     }
 
-    public function testPathUsingDotNotationThrowsExceptionWhenNotAnObject(): void
+    public function testPathUsingJmesPathThrowsExceptionWhenNotAnObject(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
             'getContents' => '"foo bar"',
@@ -185,7 +185,7 @@ class HttpResponseBodyTest extends TestCase
         $responseBody->path('foo.bar');
     }
 
-    public function testPathThrowsExceptionWhenPathDoesNotExist(): void
+    public function testPathThrowsExceptionWhenJmesPathExpressionHasASyntaxError(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
             'getContents' => '{"foo": {"bar": "baz"}}',
@@ -196,9 +196,9 @@ class HttpResponseBodyTest extends TestCase
         ]));
 
         $this->expectException(PathResolutionFailure::class);
-        $this->expectExceptionMessage('Unable to find the path "foo.bar.qux" in the JSON value');
+        $this->expectExceptionMessage('Unable to parse JMESPath query: Syntax error at character 8');
 
-        $responseBody->path('foo.bar.qux');
+        $responseBody->path('foo.bar..qux');
     }
 
     public function testPathWithInvalidJson(): void

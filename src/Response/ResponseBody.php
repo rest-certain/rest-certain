@@ -37,9 +37,12 @@ interface ResponseBody
     public function asString(): string;
 
     /**
-     * Returns a value from the response body using JSONPath syntax.
+     * Returns a value from the response body using JSONPath or JMESPath syntax.
      *
      * In the future, this may also support XPath syntax.
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc9535.html JSONPath
+     * @link https://jmespath.org JMESPath
      */
     public function path(string $path): mixed;
 

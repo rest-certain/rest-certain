@@ -6,7 +6,6 @@ namespace Behavior;
 
 use RestCertain\Test\Behavior\BehaviorTestCase;
 
-use function PHPUnit\Framework\equalTo;
 use function RestCertain\get;
 use function RestCertain\when;
 
@@ -34,9 +33,9 @@ class RestAssuredExamplesTest extends BehaviorTestCase
 
         get('/lotto')->
         then()->
-            bodyPath('lotto.lottoId', equalTo(5))->
+            bodyPath('lotto.lottoId', 5)->
             and()->
-            bodyPath('lotto.winners.winnerId', equalTo([23, 54]));
+            bodyPath('lotto.winners[*].winnerId', [54, 23]);
     }
 
     public function testPriceExample(): void
@@ -47,6 +46,19 @@ class RestAssuredExamplesTest extends BehaviorTestCase
         when()->
             get('/price')->
         then()->
-            bodyPath('price', equalTo(12.12));
+            bodyPath('price', 12.12);
+    }
+
+    public function testAnonymousJsonRootValidation(): void
+    {
+        $this->bypass->addRoute(method: 'GET', uri: '/json', body: '[1, 2, 3]');
+
+        when()->
+            get('/json')->
+        then()->
+            // Using a JSONPath expression.
+            bodyPath('$', [[1, 2, 3]])->
+            // Using a JMESPath expression.
+            bodyPath('[]', [1, 2, 3]);
     }
 }

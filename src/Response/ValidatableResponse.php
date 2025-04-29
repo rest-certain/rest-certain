@@ -63,7 +63,10 @@ interface ValidatableResponse
     /**
      * An expectation to validate the given response path in the response body against the given matchers.
      *
-     * @param string $path A body path in JSONPath syntax.
+     * @link https://www.rfc-editor.org/rfc/rfc9535.html JSONPath
+     * @link https://jmespath.org JMESPath
+     *
+     * @param string $path A body path in JSONPath or JMESPath syntax.
      * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $expectation A matcher to validate
      *     the value at the given path.
      * @param Constraint | Stringable | bool | float | int | mixed[] | string | null ...$additionalExpectations

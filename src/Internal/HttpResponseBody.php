@@ -24,6 +24,8 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
+use JmesPath\Env;
+use JmesPath\SyntaxErrorException;
 use Loilo\JsonPath\JsonPath;
 use Loilo\JsonPath\SyntaxError;
 use Override;
@@ -35,8 +37,6 @@ use RestCertain\Internal\Type\ByteArray;
 use RestCertain\Internal\Type\JsonValue;
 use RestCertain\Internal\Type\ParsedType;
 use RestCertain\Response\ResponseBody;
-use RoNoLo\JsonQuery\JsonQuery;
-use RoNoLo\JsonQuery\ValueNotFound;
 use stdClass;
 
 use function is_array;
@@ -157,10 +157,13 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
             throw new PathResolutionFailure('Unable to use a path on a JSON value that is not an object or array');
         }
 
-        $value = JsonQuery::fromValidData($parsedBody->getValue())->query($path);
-
-        if ($value instanceof ValueNotFound) {
-            throw new PathResolutionFailure('Unable to find the path "' . $path . '" in the JSON value');
+        try {
+            $value = Env::search($path, $parsedBody->getValue());
+        } catch (SyntaxErrorException $exception) {
+            throw new PathResolutionFailure(
+                message: 'Unable to parse JMESPath query: ' . $exception->getMessage(),
+                previous: $exception,
+            );
         }
 
         return $value;
