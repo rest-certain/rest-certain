@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\GreaterThan;
 use PHPUnit\Framework\Constraint\IsEqualIgnoringCase;
+use PHPUnit\Framework\Constraint\IsIdentical;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\Constraint\StringContains;
@@ -76,11 +77,14 @@ class ResponseExpectationsTest extends TestCase
     }
 
     /**
-     * @param array<Constraint | Stringable | string> $testValue
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $actualValue
+     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $testValue
      */
-    #[DataProvider('generalValueSuccessProvider')]
-    public function testBodyPathWithSuccess(string $actualValue, array $testValue): void
-    {
+    #[DataProvider('bodyPathSuccessProvider')]
+    public function testBodyPathWithSuccess(
+        Constraint | Stringable | array | bool | float | int | string | null $actualValue,
+        array $testValue,
+    ): void {
         $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
 
         $this->assertSame(
@@ -90,11 +94,14 @@ class ResponseExpectationsTest extends TestCase
     }
 
     /**
-     * @param array<Constraint | Stringable | string> $testValue
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $actualValue
+     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $testValue
      */
-    #[DataProvider('generalValueFailureProvider')]
-    public function testBodyPathWithFailure(string $actualValue, array $testValue): void
-    {
+    #[DataProvider('bodyPathFailureProvider')]
+    public function testBodyPathWithFailure(
+        Constraint | Stringable | array | bool | float | int | string | null $actualValue,
+        array $testValue,
+    ): void {
         $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
 
         $this->expectException(AssertionFailedError::class);
@@ -445,7 +452,7 @@ class ResponseExpectationsTest extends TestCase
 
         $this->responseSpecification->setRequestSpecification($requestSpecification);
 
-        $this->assertSame($requestSpecification, $this->responseSpecification->request());
+        $this->assertSame($requestSpecification, $this->responseSpecification->with());
     }
 
     /**
@@ -506,6 +513,64 @@ class ResponseExpectationsTest extends TestCase
                     new StringContains('baz'), // This is where it should fail.
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array<array{
+     *     actualValue: bool | float | int | mixed[] | string | null,
+     *     testValue: array<Constraint | Stringable | bool | float | int | mixed[] | string | null>,
+     * }>
+     */
+    public static function bodyPathSuccessProvider(): array
+    {
+        return [
+            ['actualValue' => 42.0, 'testValue' => [new IsIdentical(42.0)]],
+            ['actualValue' => 'foo', 'testValue' => [new Str('foo')]],
+            ['actualValue' => true, 'testValue' => [true]],
+            ['actualValue' => false, 'testValue' => [false]],
+            ['actualValue' => 42, 'testValue' => [42]],
+            ['actualValue' => 42, 'testValue' => [42.0]],
+            ['actualValue' => 42.0, 'testValue' => [42]],
+            ['actualValue' => 42.0, 'testValue' => [42.0]],
+            ['actualValue' => '42', 'testValue' => [42]],
+            ['actualValue' => '42', 'testValue' => [42.0]],
+            ['actualValue' => '42.0', 'testValue' => [42]],
+            ['actualValue' => '42.0', 'testValue' => [42.0]],
+            ['actualValue' => 42, 'testValue' => ['42']],
+            ['actualValue' => 42, 'testValue' => ['42.0']],
+            ['actualValue' => 42.0, 'testValue' => ['42']],
+            ['actualValue' => 42.0, 'testValue' => ['42.0']],
+            ['actualValue' => [1, 2, 3, 4, 5], 'testValue' => [[5, 4, 3, 2, 1]]],
+            ['actualValue' => ['a' => 1, 'b' => 3, 'c' => 2], 'testValue' => [['b' => 3, 'a' => 1, 'c' => 2]]],
+            ['actualValue' => 'foo', 'testValue' => ['foo']],
+            ['actualValue' => null, 'testValue' => [null]],
+        ];
+    }
+
+    /**
+     * @return array<array{
+     *     actualValue: bool | float | int | mixed[] | string | null,
+     *     testValue: array<Constraint | Stringable | bool | float | int | mixed[] | string | null>,
+     * }>
+     */
+    public static function bodyPathFailureProvider(): array
+    {
+        return [
+            ['actualValue' => 42.00000000000001, 'testValue' => [new IsIdentical(42.0)]],
+            ['actualValue' => 'bar', 'testValue' => [new Str('foo')]],
+            ['actualValue' => false, 'testValue' => [true]],
+            ['actualValue' => true, 'testValue' => [false]],
+            ['actualValue' => 43, 'testValue' => [42]],
+            ['actualValue' => 42.00000000000001, 'testValue' => [42.0]],
+            ['actualValue' => '43', 'testValue' => [42]],
+            ['actualValue' => '42.00000000000001', 'testValue' => [42.0]],
+            ['actualValue' => 43, 'testValue' => ['42']],
+            ['actualValue' => 42.00000000000001, 'testValue' => ['42.0']],
+            ['actualValue' => [1, 2, 3], 'testValue' => [[5, 4, 3, 2, 1]]],
+            ['actualValue' => ['a' => 1, 'c' => 2], 'testValue' => [['b' => 3, 'a' => 1, 'c' => 2]]],
+            ['actualValue' => 'bar', 'testValue' => ['foo']],
+            ['actualValue' => 123, 'testValue' => [null]],
         ];
     }
 }

@@ -60,8 +60,8 @@ final readonly class ResponseValidator implements ValidatableResponse
 
     #[Override] public function bodyPath(
         string $path,
-        Constraint | Stringable | string $expectation,
-        Constraint | Stringable | string ...$additionalExpectations,
+        Constraint | Stringable | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
     ): static {
         $this->responseSpecification->bodyPath($path, $expectation, ...$additionalExpectations);
 

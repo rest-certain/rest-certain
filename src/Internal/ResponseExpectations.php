@@ -28,6 +28,10 @@ use Override;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\IsEqual;
+use PHPUnit\Framework\Constraint\IsEqualCanonicalizing;
+use PHPUnit\Framework\Constraint\IsFalse;
+use PHPUnit\Framework\Constraint\IsNull;
+use PHPUnit\Framework\Constraint\IsTrue;
 use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Http\Header;
 use RestCertain\Request\Sender;
@@ -37,6 +41,9 @@ use RestCertain\Specification\ResponseSpecification;
 use Stringable;
 
 use function is_array;
+use function is_float;
+use function is_int;
+use function is_string;
 
 /**
  * @internal This class is not intended for direct use outside of Rest Certain.
@@ -74,8 +81,8 @@ final class ResponseExpectations implements ResponseSpecification
 
     #[Override] public function bodyPath(
         string $path,
-        Constraint | Stringable | string $expectation,
-        Constraint | Stringable | string ...$additionalExpectations,
+        Constraint | Stringable | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
     ): static {
         try {
             $value = $this->response->path($path);
@@ -258,18 +265,20 @@ final class ResponseExpectations implements ResponseSpecification
     }
 
     /**
-     * @param array<Constraint | Stringable | int | string> $expectations
+     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $expectations
      */
     private function evaluateExpectations(mixed $value, array $expectations, string $message): void
     {
         foreach ($expectations as $expectation) {
-            if (!$expectation instanceof Constraint) {
-                if ($expectation instanceof Stringable) {
-                    $expectation = (string) $expectation;
-                }
-
-                $expectation = new IsEqual($expectation);
-            }
+            $expectation = match (true) {
+                $expectation === false => new IsFalse(),
+                $expectation === null => new IsNull(),
+                $expectation === true => new IsTrue(),
+                $expectation instanceof Constraint => $expectation,
+                $expectation instanceof Stringable, is_string($expectation) => new IsEqual((string) $expectation),
+                is_float($expectation), is_int($expectation) => new IsEqual($expectation),
+                is_array($expectation) => new IsEqualCanonicalizing($expectation),
+            };
 
             Assert::assertThat($value, $expectation, $message);
         }

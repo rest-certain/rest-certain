@@ -47,6 +47,10 @@ interface ValidatableResponse
     /**
      * An expectation to validate the given response body against the given matchers.
      *
+     * @param Constraint | Stringable | string $expectation A matcher to validate the value of the entire body.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
+     *     of the entire body.
+     *
      * @return $this
      *
      * @throws AssertionFailedError
@@ -60,6 +64,10 @@ interface ValidatableResponse
      * An expectation to validate the given response path in the response body against the given matchers.
      *
      * @param string $path A body path in JSONPath syntax.
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $expectation A matcher to validate
+     *     the value at the given path.
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null ...$additionalExpectations
+     *     Additional matchers to validate the value at the given path.
      *
      * @return $this
      *
@@ -67,12 +75,16 @@ interface ValidatableResponse
      */
     public function bodyPath(
         string $path,
-        Constraint | Stringable | string $expectation,
-        Constraint | Stringable | string ...$additionalExpectations,
+        Constraint | Stringable | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
     ): static;
 
     /**
      * An expectation to validate the given response Content-Type against the given value or matcher.
+     *
+     * @param Constraint | Stringable | string $expectation A matcher to validate the value of the content type header.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
+     *     of the content type header.
      *
      * @return $this
      *
@@ -89,6 +101,10 @@ interface ValidatableResponse
      * If the $expectation is null, this validates whether the cookie exists, instead, and any additional expectations
      * are ignored.
      *
+     * @param Constraint | Stringable | string | null $expectation A matcher to validate the value of the named cookie.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
+     *     of the named cookie.
+     *
      * @return $this
      *
      * @throws AssertionFailedError
@@ -103,6 +119,7 @@ interface ValidatableResponse
      * An expectation to validate the given response cookies against the given values or matchers.
      *
      * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
+     *     Matchers to validate multiple named cookies.
      *
      * @return $this
      *
@@ -112,6 +129,10 @@ interface ValidatableResponse
 
     /**
      * An expectation to validate the given response header against the given value or matcher.
+     *
+     * @param Constraint | Stringable | string $expectation A matcher to validate the value of the named header.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
+     *     of the named header.
      *
      * @return $this
      *
@@ -127,6 +148,7 @@ interface ValidatableResponse
      * An expectation to validate the given response headers against the given values or matchers.
      *
      * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
+     *     Matchers to validate multiple named headers.
      *
      * @return $this
      *
@@ -137,6 +159,9 @@ interface ValidatableResponse
     /**
      * An expectation to validate the given response status code against the given value or matcher.
      *
+     * @param Constraint | int $expectation A matcher to validate the value of the status code.
+     * @param Constraint | int ...$additionalExpectations Additional matchers to validate the value of the status code.
+     *
      * @return $this
      *
      * @throws AssertionFailedError
@@ -145,6 +170,10 @@ interface ValidatableResponse
 
     /**
      * An expectation to validate the given response status line against the given value or matcher.
+     *
+     * @param Constraint | Stringable | string $expectation A matcher to validate the value of the status line.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of
+     *     the status line.
      *
      * @return $this
      *
@@ -157,6 +186,9 @@ interface ValidatableResponse
 
     /**
      * An expectation to validate the given response time against the given matcher.
+     *
+     * @param Constraint $expectation A matcher to validate the value of the response time.
+     * @param Constraint ...$additionalExpectations Additional matchers to validate the value of the response time.
      *
      * @return $this
      *
