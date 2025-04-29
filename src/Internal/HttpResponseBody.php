@@ -26,7 +26,6 @@ namespace RestCertain\Internal;
 
 use Jasny\DotKey\DotKey;
 use Jasny\DotKey\ResolveException;
-use JsonException;
 use Loilo\JsonPath\JsonPath;
 use Loilo\JsonPath\SyntaxError;
 use Override;
@@ -41,11 +40,12 @@ use RestCertain\Response\ResponseBody;
 use stdClass;
 
 use function json_decode;
+use function json_last_error;
 use function str_starts_with;
 
 use const JSON_BIGINT_AS_STRING;
+use const JSON_ERROR_NONE;
 use const JSON_INVALID_UTF8_SUBSTITUTE;
-use const JSON_THROW_ON_ERROR;
 use const SEEK_SET;
 
 /**
@@ -212,15 +212,13 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
             return $this->parsedBody;
         }
 
-        try {
-            /** @var stdClass | bool | float | int | mixed[] | string | null $parsedBody */
-            $parsedBody = json_decode(
-                json: $this->asString(),
-                flags: JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR,
-            );
-            $this->parsedBody = new JsonValue($parsedBody);
-        } catch (JsonException) {
+        /** @var stdClass | bool | float | int | mixed[] | string | null $parsedBody */
+        $parsedBody = json_decode(json: $this->asString(), flags: JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
+
+        if ($parsedBody === null && json_last_error() !== JSON_ERROR_NONE) {
             $this->parsedBody = new ByteArray($this->asString());
+        } else {
+            $this->parsedBody = new JsonValue($parsedBody);
         }
 
         return $this->parsedBody;
