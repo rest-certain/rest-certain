@@ -18,7 +18,6 @@
     "require": {
         "php": "~8.3.0 || ~8.4.0",
         "dflydev/fig-cookies": "^3.1",
-        "jasny/dotkey": "^2.2",
         "league/uri": "^7.5",
         "league/uri-components": "^7.5",
         "loilo/jsonpath": "^0.2.0",
@@ -28,7 +27,8 @@
         "psr/http-client-implementation": "*",
         "psr/http-factory": "^1.1",
         "psr/http-factory-implementation": "*",
-        "psr/http-message": "^2.0"
+        "psr/http-message": "^2.0",
+        "ronolo/json-query": "^1.2"
     },
     "require-dev": {
         "captainhook/captainhook": "^5.25",

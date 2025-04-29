@@ -24,8 +24,6 @@ declare(strict_types=1);
 
 namespace RestCertain\Internal;
 
-use Jasny\DotKey\DotKey;
-use Jasny\DotKey\ResolveException;
 use Loilo\JsonPath\JsonPath;
 use Loilo\JsonPath\SyntaxError;
 use Override;
@@ -37,8 +35,11 @@ use RestCertain\Internal\Type\ByteArray;
 use RestCertain\Internal\Type\JsonValue;
 use RestCertain\Internal\Type\ParsedType;
 use RestCertain\Response\ResponseBody;
+use RoNoLo\JsonQuery\JsonQuery;
+use RoNoLo\JsonQuery\ValueNotFound;
 use stdClass;
 
+use function is_array;
 use function json_decode;
 use function json_last_error;
 use function str_starts_with;
@@ -146,26 +147,23 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
                 return $jsonPath->find($parsedBody->getValue());
             } catch (SyntaxError $exception) {
                 throw new PathResolutionFailure(
-                    message: 'Unable to parse JSON path: ' . $exception->getMessage(),
+                    message: 'Unable to parse JSONPath query: ' . $exception->getMessage(),
                     previous: $exception,
                 );
             }
         }
 
-        if (!$parsedBody->getValue() instanceof stdClass) {
-            throw new PathResolutionFailure('Unable to get path on non-object body');
+        if (!is_array($parsedBody->getValue()) && !$parsedBody->getValue() instanceof stdClass) {
+            throw new PathResolutionFailure('Unable to use a path on a JSON value that is not an object or array');
         }
 
-        try {
-            $value = $parsedBody->getValue();
+        $value = JsonQuery::fromValidData($parsedBody->getValue())->query($path);
 
-            return DotKey::on($value)->get($path);
-        } catch (ResolveException $exception) {
-            throw new PathResolutionFailure(
-                message: $exception->getMessage(),
-                previous: $exception,
-            );
+        if ($value instanceof ValueNotFound) {
+            throw new PathResolutionFailure('Unable to find the path "' . $path . '" in the JSON value');
         }
+
+        return $value;
     }
 
     #[Override] public function prettyPrint(): string

@@ -32,11 +32,11 @@ class RestAssuredExamplesTest extends BehaviorTestCase
 
         $this->bypass->addRoute(method: 'GET', uri: '/lotto', body: $lottoResponse);
 
-        get('/lotto')
-            ->then()
-            ->bodyPath('lotto.lottoId', equalTo(5))
-            ->and()
-            ->bodyPath('$.lotto.winners[*].winnerId', equalTo([23, 54]));
+        get('/lotto')->
+        then()->
+            bodyPath('lotto.lottoId', equalTo(5))->
+            and()->
+            bodyPath('lotto.winners.winnerId', equalTo([23, 54]));
     }
 
     public function testPriceExample(): void

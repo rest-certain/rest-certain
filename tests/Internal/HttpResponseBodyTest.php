@@ -113,19 +113,15 @@ class HttpResponseBodyTest extends TestCase
     public function testPathUsingDotNotation(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            'getContents' => '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
             'getBody' => $stream,
         ]));
 
-        $value = $responseBody->path('foo.bar');
-
-        $this->assertSame('baz', $value);
-
-        // Call again to cover the code path where we have already parsed the body.
-        $this->assertSame('baz', $responseBody->path('foo.bar'));
+        $this->assertSame([123, 456], $responseBody->path('foo.bar.id'));
+        $this->assertSame(456, $responseBody->path('foo.bar.1.id'));
     }
 
     public function testPathUsingJsonPath(): void
@@ -153,7 +149,7 @@ class HttpResponseBodyTest extends TestCase
 
         $this->expectException(PathResolutionFailure::class);
         $this->expectExceptionMessage(
-            'Unable to parse JSON path: Expected "*", "_", [\x80-\x{0D7FF}], [\x{0D800}-\x{0DBFF}], '
+            'Unable to parse JSONPath query: Expected "*", "_", [\x80-\x{0D7FF}], [\x{0D800}-\x{0DBFF}], '
             . '[\x{0E000}-\x{0FFFF}] or [a-z] but end of input found',
         );
 
@@ -184,7 +180,7 @@ class HttpResponseBodyTest extends TestCase
         ]));
 
         $this->expectException(PathResolutionFailure::class);
-        $this->expectExceptionMessage('Unable to get path on non-object body');
+        $this->expectExceptionMessage('Unable to use a path on a JSON value that is not an object or array');
 
         $responseBody->path('foo.bar');
     }
@@ -200,7 +196,7 @@ class HttpResponseBodyTest extends TestCase
         ]));
 
         $this->expectException(PathResolutionFailure::class);
-        $this->expectExceptionMessage("Unable to get 'foo.bar.qux': 'foo.bar' is of type string");
+        $this->expectExceptionMessage('Unable to find the path "foo.bar.qux" in the JSON value');
 
         $responseBody->path('foo.bar.qux');
     }
