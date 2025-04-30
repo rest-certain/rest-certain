@@ -36,6 +36,8 @@ use const JSON_UNESCAPED_UNICODE;
 
 /**
  * A value parsed from a JSON body.
+ *
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 final readonly class JsonValue implements JsonSerializable, ParsedType
 {

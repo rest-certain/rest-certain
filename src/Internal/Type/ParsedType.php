@@ -28,6 +28,8 @@ use Stringable;
 
 /**
  * A data type obtained from parsing a content body.
+ *
+ * @internal This class is not intended for direct use outside of Rest Certain.
  */
 interface ParsedType extends Stringable
 {

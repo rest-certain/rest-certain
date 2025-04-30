@@ -30,7 +30,9 @@ use Override;
 use function strlen;
 
 /**
- * A value parsed from a JSON body.
+ * A value parsed from a response body.
+ *
+ * @internal This class is not intended for direct use outside of Rest Certain.
  *
  * @implements Iterator<int, string>
  */

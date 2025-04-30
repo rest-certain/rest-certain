@@ -42,8 +42,7 @@ interface ResponseSpecification
      * An expectation to validate the given response body against the given matchers.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the entire body.
-     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
-     *     of the entire body.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of the entire body.
      *
      * @return $this
      *
@@ -61,10 +60,8 @@ interface ResponseSpecification
      * @link https://jmespath.org JMESPath
      *
      * @param string $path A body path in JSONPath or JMESPath syntax.
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $expectation A matcher to validate
-     *     the value at the given path.
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null ...$additionalExpectations
-     *     Additional matchers to validate the value at the given path.
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $expectation A matcher to validate the value at the given path.
+     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null ...$additionalExpectations Additional matchers to validate the value at the given path.
      *
      * @return $this
      *
@@ -80,8 +77,7 @@ interface ResponseSpecification
      * An expectation to validate the given response Content-Type against the given value or matcher.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the content type header.
-     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
-     *     of the content type header.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of the content type header.
      *
      * @return $this
      *
@@ -99,8 +95,7 @@ interface ResponseSpecification
      * are ignored.
      *
      * @param Constraint | Stringable | string | null $expectation A matcher to validate the value of the named cookie.
-     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
-     *     of the named cookie.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of the named cookie.
      *
      * @return $this
      *
@@ -115,8 +110,7 @@ interface ResponseSpecification
     /**
      * An expectation to validate the given response cookies against the given values or matchers.
      *
-     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
-     *     Matchers to validate multiple named cookies.
+     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations Matchers to validate multiple named cookies.
      *
      * @return $this
      *
@@ -140,8 +134,7 @@ interface ResponseSpecification
      * An expectation to validate the given response header against the given value or matcher.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the named header.
-     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value
-     *     of the named header.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of the named header.
      *
      * @return $this
      *
@@ -156,8 +149,7 @@ interface ResponseSpecification
     /**
      * An expectation to validate the given response headers against the given values or matchers.
      *
-     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations
-     *     Matchers to validate multiple named headers.
+     * @param array<string, Constraint | Stringable | string | array<Constraint | Stringable | string>> $expectations Matchers to validate multiple named headers.
      *
      * @return $this
      *
@@ -200,8 +192,7 @@ interface ResponseSpecification
      * An expectation to validate the given response status line against the given value or matcher.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the status line.
-     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of
-     *     the status line.
+     * @param Constraint | Stringable | string ...$additionalExpectations Additional matchers to validate the value of the status line.
      *
      * @return $this
      *
