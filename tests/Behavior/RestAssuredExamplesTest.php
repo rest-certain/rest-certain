@@ -31,11 +31,9 @@ class RestAssuredExamplesTest extends BehaviorTestCase
 
         $this->bypass->addRoute(method: 'GET', uri: '/lotto', body: $lottoResponse);
 
-        get('/lotto')->
-        then()->
-            bodyPath('lotto.lottoId', 5)->
-            and()->
-            bodyPath('lotto.winners[*].winnerId', [54, 23]);
+        get('/lotto')
+            ->then()->bodyPath('lotto.lottoId', 5)
+            ->and()->bodyPath('lotto.winners[*].winnerId', [54, 23]);
     }
 
     public function testPriceExample(): void
@@ -43,22 +41,18 @@ class RestAssuredExamplesTest extends BehaviorTestCase
         $priceResponse = '{"price":12.12}';
         $this->bypass->addRoute(method: 'GET', uri: '/price', body: $priceResponse);
 
-        when()->
-            get('/price')->
-        then()->
-            bodyPath('price', 12.12);
+        when()->get('/price')
+            ->then()->bodyPath('price', 12.12);
     }
 
     public function testAnonymousJsonRootValidation(): void
     {
         $this->bypass->addRoute(method: 'GET', uri: '/json', body: '[1, 2, 3]');
 
-        when()->
-            get('/json')->
-        then()->
+        when()->get('/json')
             // Using a JSONPath expression.
-            bodyPath('$', [[1, 2, 3]])->
+            ->then()->bodyPath('$', [[1, 2, 3]])
             // Using a JMESPath expression.
-            bodyPath('[]', [1, 2, 3]);
+            ->and()->bodyPath('[]', [1, 2, 3]);
     }
 }

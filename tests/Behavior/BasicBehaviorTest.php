@@ -25,8 +25,7 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'DELETE', uri: '/users/1', status: 204);
 
         delete('/users/{id}', ['id' => 1])
-            ->then()
-            ->statusCode(204);
+            ->then()->statusCode(204);
     }
 
     public function testGet(): void
@@ -34,9 +33,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'GET', uri: '/users/2', body: '{"id": 2, "name": "John"}');
 
         get('/users/{id}', ['id' => new Str('2')])
-            ->then()
-            ->statusCode(200)
-            ->body('{"id": 2, "name": "John"}');
+            ->then()->statusCode(200)
+            ->and()->body('{"id": 2, "name": "John"}');
     }
 
     public function testGiven(): void
@@ -47,12 +45,9 @@ final class BasicBehaviorTest extends BehaviorTestCase
             body: '{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}',
         );
 
-        given()->
-            body('{"name": "John Jacob Jingleheimer Schmidt"}')->
-        when()->
-            post('/users')->
-        then()->
-            body('{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}');
+        given()->body('{"name": "John Jacob Jingleheimer Schmidt"}')
+            ->when()->post('/users')
+            ->then()->body('{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}');
     }
 
     public function testHead(): void
@@ -60,10 +55,9 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'HEAD', uri: '/users/3', headers: ['Content-Length' => '10']);
 
         head('/users/{id}', ['id' => '3'])
-            ->then()
-            ->statusCode(200)
-            ->header('content-length', '10')
-            ->body('');
+            ->then()->statusCode(200)
+            ->and()->header('content-length', '10')
+            ->and()->body('');
     }
 
     public function testOptions(): void
@@ -71,10 +65,9 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'OPTIONS', uri: '/users/4', headers: ['X-Foo' => '123']);
 
         options('/users/{id}', ['id' => '4'])
-            ->then()
-            ->statusCode(200)
-            ->header('x-foo', '123')
-            ->body('');
+            ->then()->statusCode(200)
+            ->and()->header('x-foo', '123')
+            ->and()->body('');
     }
 
     public function testPatch(): void
@@ -82,9 +75,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'PATCH', uri: '/users/5', status: 202, body: '{"id": 5, "name": "Jane"}');
 
         patch('/users/{id}', ['id' => '5'])
-            ->then()
-            ->statusCode(202)
-            ->body('{"id": 5, "name": "Jane"}');
+            ->then()->statusCode(202)
+            ->and()->body('{"id": 5, "name": "Jane"}');
     }
 
     public function testPost(): void
@@ -92,9 +84,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'POST', uri: '/users', status: 201, body: '{"id": 6, "name": "Jill"}');
 
         post('/users')
-            ->then()
-            ->statusCode(201)
-            ->body('{"id": 6, "name": "Jill"}');
+            ->then()->statusCode(201)
+            ->and()->body('{"id": 6, "name": "Jill"}');
     }
 
     public function testPut(): void
@@ -102,9 +93,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'PUT', uri: '/users/7', status: 200, body: '{"id": 7, "name": "Jack"}');
 
         put('/users/{id}', ['id' => '7'])
-            ->then()
-            ->statusCode(200)
-            ->body('{"id": 7, "name": "Jack"}');
+            ->then()->statusCode(200)
+            ->and()->body('{"id": 7, "name": "Jack"}');
     }
 
     public function testRequest(): void
@@ -112,9 +102,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         $this->bypass->addRoute(method: 'get', uri: '/users', status: 303, body: 'See these other links');
 
         request('get', '/users')
-            ->then()
-            ->statusCode(303)
-            ->body('See these other links');
+            ->then()->statusCode(303)
+            ->and()->body('See these other links');
     }
 
     public function testWhen(): void
@@ -126,18 +115,12 @@ final class BasicBehaviorTest extends BehaviorTestCase
             headers: ['Set-Cookie' => 'abc=123', 'Content-Type' => 'application/json'],
         );
 
-        when()->
-            header('X-Foo', '123')->
-        and()->
-            get('/users/{id}', ['id' => '8'])->
-        then()->
-            statusCode(200)->
-            and()->
-            cookie('abc', '123')->
-            and()->
-            contentType('application/json')->
-            and()->
-            body('{"id": 8, "name": "Jane"}');
+        when()->header('X-Foo', '123')
+            ->and()->get('/users/{id}', ['id' => '8'])
+            ->then()->statusCode(200)
+            ->and()->cookie('abc', '123')
+            ->and()->contentType('application/json')
+            ->and()->body('{"id": 8, "name": "Jane"}');
     }
 
     public function testWith(): void
@@ -148,9 +131,7 @@ final class BasicBehaviorTest extends BehaviorTestCase
             body: '{"id": 9, "name": "Jake"}',
         );
 
-        with()->
-            get('/users/{id}', ['id' => '9'])->
-        then()->
-            body('{"id": 9, "name": "Jake"}');
+        with()->get('/users/{id}', ['id' => '9'])
+            ->then()->body('{"id": 9, "name": "Jake"}');
     }
 }
