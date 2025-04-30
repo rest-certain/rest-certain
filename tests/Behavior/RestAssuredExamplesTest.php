@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Behavior;
 
+use PHPUnit\Framework\Constraint\GreaterThan;
 use RestCertain\Test\Behavior\BehaviorTestCase;
 
 use function RestCertain\get;

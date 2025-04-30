@@ -39,6 +39,7 @@ use RestCertain\Response\Response;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
+use stdClass;
 
 use function is_array;
 use function is_float;
@@ -81,8 +82,8 @@ final class ResponseExpectations implements ResponseSpecification
 
     #[Override] public function bodyPath(
         string $path,
-        Constraint | Stringable | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
     ): static {
         try {
             $value = $this->response->path($path);
@@ -265,7 +266,7 @@ final class ResponseExpectations implements ResponseSpecification
     }
 
     /**
-     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $expectations
+     * @param array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null> $expectations
      */
     private function evaluateExpectations(mixed $value, array $expectations, string $message): void
     {
@@ -276,7 +277,8 @@ final class ResponseExpectations implements ResponseSpecification
                 $expectation === true => new IsTrue(),
                 $expectation instanceof Constraint => $expectation,
                 $expectation instanceof Stringable, is_string($expectation) => new IsEqual((string) $expectation),
-                is_float($expectation), is_int($expectation) => new IsEqual($expectation),
+                $expectation instanceof stdClass, is_float($expectation),
+                    is_int($expectation) => new IsEqual($expectation),
                 is_array($expectation) => new IsEqualCanonicalizing($expectation),
             };
 

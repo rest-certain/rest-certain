@@ -28,6 +28,7 @@ use RestCertain\Response\ResponseBody;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Test\Str;
 use Stringable;
+use stdClass;
 
 class ResponseExpectationsTest extends TestCase
 {
@@ -77,12 +78,12 @@ class ResponseExpectationsTest extends TestCase
     }
 
     /**
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $actualValue
-     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $testValue
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $actualValue
+     * @param array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null> $testValue
      */
     #[DataProvider('bodyPathSuccessProvider')]
     public function testBodyPathWithSuccess(
-        Constraint | Stringable | array | bool | float | int | string | null $actualValue,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $actualValue,
         array $testValue,
     ): void {
         $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
@@ -94,12 +95,12 @@ class ResponseExpectationsTest extends TestCase
     }
 
     /**
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $actualValue
-     * @param array<Constraint | Stringable | bool | float | int | mixed[] | string | null> $testValue
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $actualValue
+     * @param array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null> $testValue
      */
     #[DataProvider('bodyPathFailureProvider')]
     public function testBodyPathWithFailure(
-        Constraint | Stringable | array | bool | float | int | string | null $actualValue,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $actualValue,
         array $testValue,
     ): void {
         $this->response->shouldReceive('path')->with('foo.bar')->andReturn($actualValue);
@@ -518,8 +519,8 @@ class ResponseExpectationsTest extends TestCase
 
     /**
      * @return array<array{
-     *     actualValue: bool | float | int | mixed[] | string | null,
-     *     testValue: array<Constraint | Stringable | bool | float | int | mixed[] | string | null>,
+     *     actualValue: stdClass | array<mixed> | bool | float | int | string | null,
+     *     testValue: array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null>,
      * }>
      */
     public static function bodyPathSuccessProvider(): array
@@ -545,13 +546,17 @@ class ResponseExpectationsTest extends TestCase
             ['actualValue' => ['a' => 1, 'b' => 3, 'c' => 2], 'testValue' => [['b' => 3, 'a' => 1, 'c' => 2]]],
             ['actualValue' => 'foo', 'testValue' => ['foo']],
             ['actualValue' => null, 'testValue' => [null]],
+            [
+                'actualValue' => (object) ['foo' => 'bar', 'baz' => 'quux'],
+                'testValue' => [(object) ['baz' => 'quux', 'foo' => 'bar']],
+            ],
         ];
     }
 
     /**
      * @return array<array{
-     *     actualValue: bool | float | int | mixed[] | string | null,
-     *     testValue: array<Constraint | Stringable | bool | float | int | mixed[] | string | null>,
+     *     actualValue: stdClass | array<mixed> | bool | float | int | string | null,
+     *     testValue: array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null>,
      * }>
      */
     public static function bodyPathFailureProvider(): array
@@ -571,6 +576,10 @@ class ResponseExpectationsTest extends TestCase
             ['actualValue' => ['a' => 1, 'c' => 2], 'testValue' => [['b' => 3, 'a' => 1, 'c' => 2]]],
             ['actualValue' => 'bar', 'testValue' => ['foo']],
             ['actualValue' => 123, 'testValue' => [null]],
+            [
+                'actualValue' => (object) ['foo' => 'bar', 'baz' => 'qux'],
+                'testValue' => [(object) ['baz' => 'quux', 'foo' => 'bar']],
+            ],
         ];
     }
 }

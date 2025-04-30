@@ -29,6 +29,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 use RestCertain\Response\ValidatableResponse;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
+use stdClass;
 
 /**
  * @internal This class is not intended for direct use outside of Rest Certain.
@@ -60,8 +61,8 @@ final readonly class ResponseValidator implements ValidatableResponse
 
     #[Override] public function bodyPath(
         string $path,
-        Constraint | Stringable | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
     ): static {
         $this->responseSpecification->bodyPath($path, $expectation, ...$additionalExpectations);
 

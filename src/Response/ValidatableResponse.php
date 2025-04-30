@@ -27,6 +27,7 @@ namespace RestCertain\Response;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Constraint\Constraint;
 use Stringable;
+use stdClass;
 
 interface ValidatableResponse
 {
@@ -66,8 +67,8 @@ interface ValidatableResponse
      * @link https://jmespath.org JMESPath
      *
      * @param string $path A body path in JSONPath or JMESPath syntax.
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null $expectation A matcher to validate the value at the given path.
-     * @param Constraint | Stringable | bool | float | int | mixed[] | string | null ...$additionalExpectations Additional matchers to validate the value at the given path.
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $expectation A matcher to validate the value at the given path.
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null ...$additionalExpectations Additional matchers to validate the value at the given path.
      *
      * @return $this
      *
@@ -75,8 +76,8 @@ interface ValidatableResponse
      */
     public function bodyPath(
         string $path,
-        Constraint | Stringable | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | array | bool | float | int | string | null ...$additionalExpectations,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
     ): static;
 
     /**
