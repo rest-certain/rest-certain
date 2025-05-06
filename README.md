@@ -72,7 +72,7 @@ get('/lotto')->then()->assertThat()
 > REST Certain supports both [JMESPath](https://jmespath.org) and
 > [JSONPath](https://www.rfc-editor.org/rfc/rfc9535). If the path query begins
 > with a dollar symbol (`$`), REST Certain assumes the query syntax is JSONPath.
-> Otherwise, it assume the query syntax is JMESPath.
+> Otherwise, it assumes the query syntax is JMESPath.
 
 We can also get a lot more complex and expressive with the HTTP requests and
 assertions we make. For example:
