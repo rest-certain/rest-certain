@@ -28,7 +28,8 @@
         "psr/http-client-implementation": "*",
         "psr/http-factory": "^1.1",
         "psr/http-factory-implementation": "*",
-        "psr/http-message": "^2.0"
+        "psr/http-message": "^2.0",
+        "rest-certain/hamcrest-phpunit": "^0.1.0"
     },
     "require-dev": {
         "captainhook/captainhook": "^5.25",

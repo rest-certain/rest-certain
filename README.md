@@ -15,11 +15,9 @@
 
 ## About
 
-<!--
-TODO: Use this space to provide more details about your package. Try to be
-      concise. This is the introduction to your package. Let others know what
-      your package does and how it can help them build applications.
--->
+REST Certain is a port of [REST Assured](https://github.com/rest-assured/rest-assured)
+to the PHP programming language. It provides a DSL that aims to simplify and ease
+the testing of REST services.
 
 This project adheres to a [code of conduct](CODE_OF_CONDUCT.md).
 By participating in this project and its community, you are expected to
@@ -33,20 +31,69 @@ Install this package as a development dependency using [Composer](https://getcom
 composer require --dev rest-certain/rest-certain
 ```
 
-<!--
 ## Usage
 
-Provide a brief description or short example of how to use this library.
-If you need to provide more detailed examples, use the `docs/` directory
-and provide a link here to the documentation.
+Borrowing from the REST Assured project's examples, here's an example of how to
+use REST Certain to make a `GET` request and validate a JSON response.
+
+Given the following JSON response body:
+
+``` json
+{
+  "lotto":{
+    "lottoId": 5,
+    "winning-numbers": [2, 45, 34, 23, 7, 5, 3],
+    "winners":[{
+      "winnerId": 23,
+      "numbers": [2, 45, 34, 23, 3, 5]
+    },{
+      "winnerId": 54,
+      "numbers": [52, 3, 12, 11, 18, 22]
+    }]
+  }
+}
+```
+
+We can use [JMESPath query language](https://jmespath.org) syntax to assert that
+`lottoId` is equal to `5`:
 
 ``` php
-use RestCertain\Example;
-
-$example = new Example();
-echo $example->greet('fellow human');
+get('/lotto')->then()->assertThat()->bodyPath('lotto.lottoId', is(equalTo(5)));
 ```
--->
+
+We can also verify all the winner IDs:
+
+``` php
+get('/lotto')->then()->assertThat()
+    ->bodyPath('lotto.winners[*].winnerId', hasItems(54, 23));
+```
+
+> [!TIP]
+> REST Certain supports both [JMESPath](https://jmespath.org) and
+> [JSONPath](https://www.rfc-editor.org/rfc/rfc9535). If the path query begins
+> with a dollar symbol (`$`), REST Certain assumes the query syntax is JSONPath.
+> Otherwise, it assume the query syntax is JMESPath.
+
+We can also get a lot more complex and expressive with the HTTP requests and
+assertions we make. For example:
+
+```php
+given()
+    ->accept('application/json')
+    ->queryParam('foo', 'bar')
+    ->and()->body(['name' => 'Something Cool'])
+->when()
+    ->put('/something/{id}', ['id' => 123])
+->then()
+    ->statusCode(200)
+    ->and()->header('content-type', 'application/json')
+    ->and()->cookie('baz', 'qux')
+    ->and()->bodyPath('id', 123);
+```
+
+REST Certain supports any HTTP method but has explicit support for `POST`, `GET`,
+`PUT`, `DELETE`, `OPTIONS`, `PATCH`, and `HEAD` and includes specifying and
+validating parameters, headers, cookies, and body easily.
 
 ## Contributing
 
