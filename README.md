@@ -8,7 +8,7 @@
     <a href="https://github.com/rest-certain/rest-certain"><img src="https://img.shields.io/badge/source-rest--certain/rest--certain-blue.svg?style=flat-square" alt="Source Code"></a>
     <a href="https://packagist.org/packages/rest-certain/rest-certain"><img src="https://img.shields.io/packagist/v/rest-certain/rest-certain.svg?style=flat-square&label=release" alt="Download Package"></a>
     <a href="https://php.net"><img src="https://img.shields.io/packagist/php-v/rest-certain/rest-certain.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
-    <a href="https://github.com/rest-certain/rest-certain/blob/main/NOTICE"><img src="https://img.shields.io/packagist/l/rest-certain/rest-certain.svg?style=flat-square&colorB=darkcyan" alt="Read License"></a>
+    <a href="https://github.com/rest-certain/rest-certain/blob/main/NOTICE"><img src="https://img.shields.io/packagist/l/rest-certain/rest-certain.svg?style=flat-square&colorB=purple" alt="Read License"></a>
     <a href="https://github.com/rest-certain/rest-certain/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/rest-certain/rest-certain/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
     <a href="https://codecov.io/gh/rest-certain/rest-certain"><img src="https://img.shields.io/codecov/c/gh/rest-certain/rest-certain?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
 </p>
