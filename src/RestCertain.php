@@ -36,6 +36,11 @@ use Stringable;
 final class RestCertain
 {
     /**
+     * Default user agent string for REST Certain requests.
+     */
+    public const string USER_AGENT = 'RESTCertain (https://github.com/rest-certain/rest-certain)';
+
+    /**
      * REST Certain configuration.
      */
     public static ?Config $config = null;

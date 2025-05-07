@@ -17,11 +17,13 @@ use RestCertain\Config;
 use RestCertain\Exception\PendingRequest;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\TooManyBodies;
+use RestCertain\Http\Header;
 use RestCertain\Http\Method;
 use RestCertain\Internal\HttpResponse;
 use RestCertain\Internal\RequestBuilder;
 use RestCertain\Internal\ResponseExpectations;
 use RestCertain\Request\Sender;
+use RestCertain\RestCertain;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Json;
 use RestCertain\Test\Str;
@@ -149,6 +151,8 @@ class RequestBuilderTest extends TestCase
         $this->assertSame(strtoupper($method), (string) $response->getPsrRequest()->getMethod());
         $this->assertSame($expectedRequestUrl, (string) $response->getPsrRequest()->getUri());
         $this->assertSame($expectedRequestBody, (string) $response->getPsrRequest()->getBody());
+        $this->assertTrue($response->getPsrRequest()->hasHeader(Header::USER_AGENT));
+        $this->assertSame(RestCertain::USER_AGENT, $response->getPsrRequest()->getHeaderLine(Header::USER_AGENT));
     }
 
     /**
@@ -606,5 +610,20 @@ class RequestBuilderTest extends TestCase
 
         $this->assertInstanceOf(HttpResponse::class, $response);
         $this->assertSame('https://api.example.com/bar', (string) $response->getPsrRequest()->getUri());
+    }
+
+    public function testCustomUserAgent(): void
+    {
+        $psrResponse = $this->factory->createResponse(200);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+        $spec = new RequestBuilder($config);
+
+        $spec->header('User-Agent', 'MyUserAgent/1234');
+
+        $response = $spec->get('/entity/1234');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertTrue($response->getPsrRequest()->hasHeader(Header::USER_AGENT));
+        $this->assertSame('MyUserAgent/1234', $response->getPsrRequest()->getHeaderLine(Header::USER_AGENT));
     }
 }

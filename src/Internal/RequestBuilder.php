@@ -44,6 +44,7 @@ use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
 use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
+use RestCertain\RestCertain;
 use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
@@ -570,6 +571,8 @@ final class RequestBuilder implements RequestSpecification
             $request = $this->cookies->renderIntoCookieHeader($request);
         }
 
+        $request = $this->maybeApplyDefaultUserAgent($request);
+
         return $this->maybeAttachRequestBody($method, $request);
     }
 
@@ -620,6 +623,16 @@ final class RequestBuilder implements RequestSpecification
         }
 
         return $formData->encodeQuery(PHP_QUERY_RFC1738)->getUri()->getQuery();
+    }
+
+    private function maybeApplyDefaultUserAgent(RequestInterface $request): RequestInterface
+    {
+        // Add the default user agent header for REST Certain if no user agent header is set.
+        if (!$request->hasHeader(Header::USER_AGENT)) {
+            $request = $request->withHeader(Header::USER_AGENT, RestCertain::USER_AGENT);
+        }
+
+        return $request;
     }
 
     private function maybeAttachRequestBody(string $method, RequestInterface $request): RequestInterface
