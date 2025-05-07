@@ -29,6 +29,6 @@ use LogicException;
 /**
  * The request has more than one body, which is too many.
  */
-class TooManyBodies extends LogicException implements RestCertainException
+final class TooManyBodies extends LogicException implements RestCertainException
 {
 }

@@ -29,6 +29,6 @@ use RuntimeException;
 /**
  * An error occurred while attempting to resolve the content path.
  */
-class PathResolutionFailure extends RuntimeException implements RestCertainException
+final class PathResolutionFailure extends RuntimeException implements RestCertainException
 {
 }

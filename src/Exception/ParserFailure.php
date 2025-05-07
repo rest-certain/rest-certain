@@ -29,6 +29,6 @@ use RuntimeException;
 /**
  * An error occurred while attempting to parse data.
  */
-class ParserFailure extends RuntimeException implements RestCertainException
+final class ParserFailure extends RuntimeException implements RestCertainException
 {
 }

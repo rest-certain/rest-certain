@@ -30,6 +30,6 @@ use RuntimeException;
 /**
  * HTTP request failure.
  */
-class RequestFailed extends RuntimeException implements ClientExceptionInterface, RestCertainException
+final class RequestFailed extends RuntimeException implements ClientExceptionInterface, RestCertainException
 {
 }

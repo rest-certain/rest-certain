@@ -29,6 +29,6 @@ use LogicException;
 /**
  * The requested feature is not implemented.
  */
-class NotImplemented extends LogicException implements RestCertainException
+final class NotImplemented extends LogicException implements RestCertainException
 {
 }

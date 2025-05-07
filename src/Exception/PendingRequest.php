@@ -29,6 +29,6 @@ use LogicException;
 /**
  * The operation attempted depends on the request having been sent, but it hasn't been sent yet.
  */
-class PendingRequest extends LogicException implements RestCertainException
+final class PendingRequest extends LogicException implements RestCertainException
 {
 }
