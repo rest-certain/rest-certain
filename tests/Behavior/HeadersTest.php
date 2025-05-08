@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Behavior;
 
+use PHPUnit\Framework\TestCase;
+use RestCertain\Test\MockWebServer;
+
 use function RestCertain\given;
 
-class HeadersTest extends BehaviorTestCase
+class HeadersTest extends TestCase
 {
+    use MockWebServer;
+
     public function testHeadersCookiesStatusEtc(): void
     {
         $this->bypass->addRoute(method: 'PUT', uri: '/something/123?foo=bar', body: [

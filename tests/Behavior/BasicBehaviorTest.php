@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Behavior;
 
+use PHPUnit\Framework\TestCase;
+use RestCertain\Test\MockWebServer;
 use RestCertain\Test\Str;
 
 use function RestCertain\Hamcrest\greaterThan;
@@ -20,8 +22,10 @@ use function RestCertain\request;
 use function RestCertain\when;
 use function RestCertain\with;
 
-final class BasicBehaviorTest extends BehaviorTestCase
+final class BasicBehaviorTest extends TestCase
 {
+    use MockWebServer;
+
     public function testDelete(): void
     {
         $this->bypass->addRoute(method: 'DELETE', uri: '/users/1', status: 204);

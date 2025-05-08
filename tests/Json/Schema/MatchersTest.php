@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace RestCertain\Test\Json\Schema;
 
 use Nyholm\Psr7\Uri;
-use RestCertain\Test\Behavior\BehaviorTestCase;
+use PHPUnit\Framework\TestCase;
+use RestCertain\Test\MockWebServer;
 use RestCertain\Test\Str;
 
 use function RestCertain\Hamcrest\assertThat;
@@ -19,11 +20,13 @@ use function is_array;
 use function is_object;
 use function json_decode;
 
-class MatchersTest extends BehaviorTestCase
+class MatchersTest extends TestCase
 {
+    use MockWebServer;
+
     public function testMatchesJsonSchema(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchema($schema));
@@ -31,7 +34,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaUsingStringable(): void
     {
-        $contents = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $contents = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $schema = new Str($contents);
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
@@ -40,7 +43,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaDataAsObject(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         /** @var array<string, mixed> $schemaData */
@@ -52,7 +55,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaDataAsArray(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         /** @var array<string, mixed> $schemaData */
@@ -64,7 +67,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaFromFile(): void
     {
-        $filename = __DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json';
+        $filename = __DIR__ . '/fixtures/minimum.json';
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchemaFromFile($filename));
@@ -72,7 +75,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaFromFileUsingStringable(): void
     {
-        $filename = new Str(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $filename = new Str(__DIR__ . '/fixtures/minimum.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchemaFromFile($filename));
@@ -80,7 +83,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaFromUri(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $url = new Uri($this->bypass->getBaseUrl() . '/schema.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
@@ -91,7 +94,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaFromUriUsingString(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $url = $this->bypass->getBaseUrl() . '/schema.json';
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
@@ -102,7 +105,7 @@ class MatchersTest extends BehaviorTestCase
 
     public function testMatchesJsonSchemaFromUriUsingStringable(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/../../Constraint/Json/fixtures/typical-minimum.json');
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $url = new Str($this->bypass->getBaseUrl() . '/schema.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 

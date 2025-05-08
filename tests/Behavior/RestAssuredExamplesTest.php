@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Behavior;
+namespace RestCertain\Test\Behavior;
 
-use RestCertain\Test\Behavior\BehaviorTestCase;
+use PHPUnit\Framework\TestCase;
+use RestCertain\Test\MockWebServer;
 
 use function RestCertain\Hamcrest\equalTo;
 use function RestCertain\Hamcrest\greaterThan;
@@ -13,8 +14,10 @@ use function RestCertain\Hamcrest\is;
 use function RestCertain\get;
 use function RestCertain\when;
 
-class RestAssuredExamplesTest extends BehaviorTestCase
+class RestAssuredExamplesTest extends TestCase
 {
+    use MockWebServer;
+
     public function testLottoExample(): void
     {
         $lottoResponse = <<<'JSON'

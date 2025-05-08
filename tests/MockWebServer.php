@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace RestCertain\Test\Behavior;
+namespace RestCertain\Test;
 
 use Ciareis\Bypass\Bypass;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
-use PHPUnit\Framework\TestCase;
 use RestCertain\Config;
 use RestCertain\RestCertain;
 
 use const PHP_INT_MAX;
 
-abstract class BehaviorTestCase extends TestCase
+trait MockWebServer
 {
     protected Bypass $bypass;
 

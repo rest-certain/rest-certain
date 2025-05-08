@@ -8,6 +8,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -17,7 +18,7 @@ use RestCertain\Exception\MissingConfiguration;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\UnableToReadJsonSchema;
 use RestCertain\RestCertain;
-use RestCertain\Test\Behavior\BehaviorTestCase;
+use RestCertain\Test\MockWebServer;
 use RuntimeException;
 
 use function assert;
@@ -26,9 +27,10 @@ use function is_array;
 use function is_object;
 use function json_decode;
 
-class MatchesJsonSchemaTest extends BehaviorTestCase
+class MatchesJsonSchemaTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
+    use MockWebServer;
 
     public function testMatchesJsonSchemaFromString(): void
     {
