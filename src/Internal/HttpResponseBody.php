@@ -33,20 +33,17 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use RestCertain\Exception\NotImplemented;
 use RestCertain\Exception\PathResolutionFailure;
+use RestCertain\Exception\UnableToDecodeJson;
 use RestCertain\Internal\Type\ByteArray;
 use RestCertain\Internal\Type\JsonValue;
 use RestCertain\Internal\Type\ParsedType;
+use RestCertain\Json\Json;
 use RestCertain\Response\ResponseBody;
 use stdClass;
 
 use function is_array;
-use function json_decode;
-use function json_last_error;
 use function str_starts_with;
 
-use const JSON_BIGINT_AS_STRING;
-use const JSON_ERROR_NONE;
-use const JSON_INVALID_UTF8_SUBSTITUTE;
 use const SEEK_SET;
 
 /**
@@ -213,13 +210,10 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
             return $this->parsedBody;
         }
 
-        /** @var stdClass | bool | float | int | mixed[] | string | null $parsedBody */
-        $parsedBody = json_decode(json: $this->asString(), flags: JSON_BIGINT_AS_STRING | JSON_INVALID_UTF8_SUBSTITUTE);
-
-        if ($parsedBody === null && json_last_error() !== JSON_ERROR_NONE) {
+        try {
+            $this->parsedBody = new JsonValue(Json::decode($this->asString()));
+        } catch (UnableToDecodeJson) {
             $this->parsedBody = new ByteArray($this->asString());
-        } else {
-            $this->parsedBody = new JsonValue($parsedBody);
         }
 
         return $this->parsedBody;

@@ -7,9 +7,8 @@ namespace RestCertain\Test\Internal\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RestCertain\Internal\Type\JsonValue;
+use RestCertain\Json\Json;
 use stdClass;
-
-use function json_encode;
 
 class JsonValueTest extends TestCase
 {
@@ -32,8 +31,8 @@ class JsonValueTest extends TestCase
     {
         $jsonValue = new JsonValue($value);
 
-        $this->assertSame(json_encode($value), (string) $jsonValue);
-        $this->assertSame(json_encode($value), json_encode($jsonValue));
+        $this->assertJsonStringEqualsJsonString(Json::encode($value), (string) $jsonValue);
+        $this->assertJsonStringEqualsJsonString(Json::encode($value), Json::encode($jsonValue));
     }
 
     /**

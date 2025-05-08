@@ -38,6 +38,7 @@ use Psr\Http\Message\UriInterface;
 use RestCertain\Exception\MissingConfiguration;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\UnableToReadJsonSchema;
+use RestCertain\Json\Json;
 use RestCertain\RestCertain;
 use Stringable;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -45,11 +46,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use function assert;
 use function implode;
-use function json_encode;
-
-use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 
 final class MatchesJsonSchema extends Constraint
 {
@@ -119,9 +115,7 @@ final class MatchesJsonSchema extends Constraint
      */
     public static function fromData(array | object $data): self
     {
-        $json = (string) json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-        return self::fromString($json);
+        return self::fromString(Json::encode($data));
     }
 
     /**

@@ -26,13 +26,8 @@ namespace RestCertain\Internal\Type;
 
 use JsonSerializable;
 use Override;
+use RestCertain\Json\Json;
 use stdClass;
-
-use function json_encode;
-
-use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 
 /**
  * A value parsed from a JSON body.
@@ -50,7 +45,7 @@ final readonly class JsonValue implements JsonSerializable, ParsedType
 
     #[Override] public function __toString(): string
     {
-        return json_encode($this, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return Json::encode($this);
     }
 
     /**

@@ -42,6 +42,7 @@ use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Header;
 use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
+use RestCertain\Json\Json;
 use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
 use RestCertain\RestCertain;
@@ -57,13 +58,9 @@ use function array_pop;
 use function assert;
 use function is_array;
 use function is_string;
-use function json_encode;
 use function strtolower;
 use function strtoupper;
 
-use const JSON_THROW_ON_ERROR;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
 use const PHP_QUERY_RFC1738;
 
 /**
@@ -484,12 +481,7 @@ final class RequestBuilder implements RequestSpecification
             $this->contentType(MediaType::APPLICATION_JSON);
         }
 
-        return $this->config->streamFactory->createStream(
-            (string) json_encode(
-                $body,
-                JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
-            ),
-        );
+        return $this->config->streamFactory->createStream(Json::encode($body));
     }
 
     private function buildBodyStreamForSplFileInfo(SplFileInfo $body): StreamInterface
