@@ -27,8 +27,8 @@ namespace RestCertain\Exception;
 use RuntimeException;
 
 /**
- * The JSON Schema file you attempted to read does not exist, or you do not have permission to read it.
+ * Encountered an issue while attempting to read or validate a JSON Schema.
  */
-final class UnableToReadJsonSchema extends RuntimeException implements RestCertainException
+final class JsonSchemaFailure extends RuntimeException implements RestCertainException
 {
 }

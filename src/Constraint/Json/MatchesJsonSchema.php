@@ -35,9 +35,9 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
+use RestCertain\Exception\JsonSchemaFailure;
 use RestCertain\Exception\MissingConfiguration;
 use RestCertain\Exception\RequestFailed;
-use RestCertain\Exception\UnableToReadJsonSchema;
 use RestCertain\Json\Json;
 use RestCertain\RestCertain;
 use Stringable;
@@ -129,7 +129,7 @@ final class MatchesJsonSchema extends Constraint
             try {
                 return (new Filesystem())->readFile((string) $path);
             } catch (IOException $exception) {
-                throw new UnableToReadJsonSchema(message: $exception->getMessage(), previous: $exception);
+                throw new JsonSchemaFailure(message: $exception->getMessage(), previous: $exception);
             }
         };
 

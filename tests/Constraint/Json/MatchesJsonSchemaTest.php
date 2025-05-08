@@ -14,9 +14,9 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use RestCertain\Constraint\Json\MatchesJsonSchema;
+use RestCertain\Exception\JsonSchemaFailure;
 use RestCertain\Exception\MissingConfiguration;
 use RestCertain\Exception\RequestFailed;
-use RestCertain\Exception\UnableToReadJsonSchema;
 use RestCertain\RestCertain;
 use RestCertain\Test\MockWebServer;
 use RuntimeException;
@@ -135,7 +135,7 @@ class MatchesJsonSchemaTest extends TestCase
 
     public function testFromFileThrowsWhenFileNotFound(): void
     {
-        $this->expectException(UnableToReadJsonSchema::class);
+        $this->expectException(JsonSchemaFailure::class);
         $this->expectExceptionMessage('Failed to read file');
 
         $this->assertThat('foo', MatchesJsonSchema::fromFile(__DIR__ . '/this-file-does-not-exist.json'));
