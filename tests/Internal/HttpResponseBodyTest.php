@@ -41,7 +41,28 @@ class HttpResponseBodyTest extends TestCase
 
     public function testAsPrettyString(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::asPrettyString()');
+        $this->assertSame('Hello, World!', $this->responseBody->asPrettyString());
+    }
+
+    public function testAsPrettyStringJson(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '{"foo": {"bar": "baz"}}',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $expected = <<<'JSON'
+            {
+                "foo": {
+                    "bar": "baz"
+                }
+            }
+            JSON;
+
+        $this->assertSame($expected, $responseBody->asPrettyString());
     }
 
     public function testAsString(): void
@@ -221,7 +242,34 @@ class HttpResponseBodyTest extends TestCase
 
     public function testPrettyPrint(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponseBody::class . '::prettyPrint()');
+        $this->expectOutputString('Hello, World!');
+
+        // It returns as well as echoes the contents of the stream.
+        $this->assertSame('Hello, World!', $this->responseBody->prettyPrint());
+    }
+
+    public function testPrettyPrintJson(): void
+    {
+        $stream = Mockery::spy(StreamInterface::class, [
+            'getContents' => '{"foo": {"bar": "baz"}}',
+        ]);
+
+        $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
+            'getBody' => $stream,
+        ]));
+
+        $expected = <<<'JSON'
+            {
+                "foo": {
+                    "bar": "baz"
+                }
+            }
+            JSON;
+
+        $this->expectOutputString($expected);
+
+        // It returns as well as echoes the contents of the stream.
+        $this->assertSame($expected, $responseBody->prettyPrint());
     }
 
     public function testPrint(): void

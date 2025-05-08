@@ -56,7 +56,12 @@ class HttpResponseTest extends TestCase
 
     public function testAsPrettyString(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::asPrettyString()');
+        // The SUT calls these methods twice, but we should figure out a way to
+        // ensure they're only called once during the asPrettyString() code path.
+        $this->stream->expects('rewind')->twice();
+        $this->stream->expects('getContents')->twice()->andReturns('Hello, World!');
+
+        $this->assertSame('Hello, World!', $this->response->asPrettyString());
     }
 
     public function testAsString(): void
@@ -209,7 +214,15 @@ class HttpResponseTest extends TestCase
 
     public function testPrettyPrint(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::prettyPrint()');
+        // The SUT calls these methods twice, but we should figure out a way to
+        // ensure they're only called once during the prettyPrint() code path.
+        $this->stream->expects('rewind')->twice();
+        $this->stream->expects('getContents')->twice()->andReturns('Hello, Goodbye!');
+
+        $this->expectOutputString('Hello, Goodbye!');
+
+        // It returns as well as echoes the contents of the stream.
+        $this->assertSame('Hello, Goodbye!', $this->response->prettyPrint());
     }
 
     public function testPrint(): void

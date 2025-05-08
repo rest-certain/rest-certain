@@ -31,12 +31,10 @@ use Loilo\JsonPath\SyntaxError;
 use Override;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use RestCertain\Exception\NotImplemented;
 use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Exception\UnableToDecodeJson;
 use RestCertain\Internal\Type\ByteArray;
 use RestCertain\Internal\Type\JsonValue;
-use RestCertain\Internal\Type\ParsedType;
 use RestCertain\Json\Json;
 use RestCertain\Response\ResponseBody;
 use stdClass;
@@ -52,7 +50,7 @@ use const SEEK_SET;
 final class HttpResponseBody implements ResponseBody, StreamInterface
 {
     private readonly StreamInterface $psrStream;
-    private ParsedType $parsedBody;
+    private ByteArray | JsonValue $parsedBody;
 
     public function __construct(ResponseInterface $response)
     {
@@ -68,7 +66,12 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
 
     #[Override] public function asPrettyString(): string
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        $parsedBody = $this->getParsedBody();
+
+        return match (true) {
+            $parsedBody instanceof ByteArray => (string) $parsedBody,
+            $parsedBody instanceof JsonValue => Json::encode($parsedBody->getValue(), true),
+        };
     }
 
     #[Override] public function asString(): string
@@ -168,7 +171,10 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
 
     #[Override] public function prettyPrint(): string
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        $body = $this->asPrettyString();
+        echo $body;
+
+        return $body;
     }
 
     #[Override] public function print(): string
@@ -204,7 +210,7 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
         return $this->psrStream->write($string);
     }
 
-    private function getParsedBody(): ParsedType
+    private function getParsedBody(): ByteArray | JsonValue
     {
         if (isset($this->parsedBody)) {
             return $this->parsedBody;
