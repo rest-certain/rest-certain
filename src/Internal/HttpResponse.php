@@ -29,7 +29,6 @@ use Override;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use RestCertain\Exception\NotImplemented;
 use RestCertain\Http\Header;
 use RestCertain\Response\Response;
 use RestCertain\Response\ResponseBody;
@@ -47,10 +46,14 @@ final readonly class HttpResponse implements Response
     private SetCookies $setCookies;
     private ValidatableResponse $validatableResponse;
 
+    /**
+     * @param int $time The time in milliseconds that the request took to complete, or -1 if the time is not known.
+     */
     public function __construct(
         private RequestSpecification $requestSpecification,
         ResponseInterface $response,
         RequestInterface $request,
+        private int $time = -1,
     ) {
         $this->psrResponse = $response;
         $this->psrRequest = $request;
@@ -197,7 +200,7 @@ final readonly class HttpResponse implements Response
 
     #[Override] public function getTime(): int
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        return $this->time;
     }
 
     #[Override] public function hasHeader(string $name): bool
@@ -260,7 +263,7 @@ final readonly class HttpResponse implements Response
 
     #[Override] public function time(): int
     {
-        throw new NotImplemented(__METHOD__ . ' is not yet implemented');
+        return $this->time;
     }
 
     /**

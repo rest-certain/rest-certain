@@ -197,6 +197,23 @@ class HttpResponseTest extends TestCase
         $this->assertSame("HTTP/1.2 418 I'm a teapot", $this->response->statusLine());
     }
 
+    public function testGetTime(): void
+    {
+        $this->assertSame(-1, $this->response->getTime());
+    }
+
+    public function testGetTimeWithPassedTime(): void
+    {
+        $response = new HttpResponse(
+            new RequestBuilder(new Config()),
+            $this->psrResponse,
+            Mockery::mock(RequestInterface::class),
+            456,
+        );
+
+        $this->assertSame(456, $response->getTime());
+    }
+
     public function testHasHeader(): void
     {
         $this->psrResponse->allows('hasHeader')->with('my-header')->andReturns(true);
@@ -248,7 +265,19 @@ class HttpResponseTest extends TestCase
 
     public function testTime(): void
     {
-        $this->markTestIncomplete('Need to implement ' . HttpResponse::class . '::time() and getTime()');
+        $this->assertSame(-1, $this->response->time());
+    }
+
+    public function testTimeWithPassedTime(): void
+    {
+        $response = new HttpResponse(
+            new RequestBuilder(new Config()),
+            $this->psrResponse,
+            Mockery::mock(RequestInterface::class),
+            789,
+        );
+
+        $this->assertSame(789, $response->getTime());
     }
 
     public function testWithAddedHeader(): void

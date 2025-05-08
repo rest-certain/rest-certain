@@ -63,11 +63,6 @@ class RequestBuilderTest extends TestCase
         $this->assertSame($this->spec, $this->spec->and());
     }
 
-    public function testAuth(): void
-    {
-        $this->markTestIncomplete();
-    }
-
     public function testBasePath(): void
     {
         $this->assertSame($this->spec, $this->spec->basePath('/foo'));

@@ -6,6 +6,8 @@ namespace RestCertain\Test\Behavior;
 
 use RestCertain\Test\Str;
 
+use function RestCertain\Hamcrest\greaterThan;
+use function RestCertain\Hamcrest\lessThan;
 use function RestCertain\delete;
 use function RestCertain\get;
 use function RestCertain\given;
@@ -34,7 +36,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         get('/users/{id}', ['id' => new Str('2')])
             ->then()->statusCode(200)
-            ->and()->body('{"id": 2, "name": "John"}');
+            ->and()->body('{"id": 2, "name": "John"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testGiven(): void
@@ -47,7 +50,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         given()->body('{"name": "John Jacob Jingleheimer Schmidt"}')
             ->when()->post('/users')
-            ->then()->body('{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}');
+            ->then()->body('{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testHead(): void
@@ -57,7 +61,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         head('/users/{id}', ['id' => '3'])
             ->then()->statusCode(200)
             ->and()->header('content-length', '10')
-            ->and()->body('');
+            ->and()->body('')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testOptions(): void
@@ -67,7 +72,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
         options('/users/{id}', ['id' => '4'])
             ->then()->statusCode(200)
             ->and()->header('x-foo', '123')
-            ->and()->body('');
+            ->and()->body('')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testPatch(): void
@@ -76,7 +82,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         patch('/users/{id}', ['id' => '5'])
             ->then()->statusCode(202)
-            ->and()->body('{"id": 5, "name": "Jane"}');
+            ->and()->body('{"id": 5, "name": "Jane"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testPost(): void
@@ -85,7 +92,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         post('/users')
             ->then()->statusCode(201)
-            ->and()->body('{"id": 6, "name": "Jill"}');
+            ->and()->body('{"id": 6, "name": "Jill"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testPut(): void
@@ -94,7 +102,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         put('/users/{id}', ['id' => '7'])
             ->then()->statusCode(200)
-            ->and()->body('{"id": 7, "name": "Jack"}');
+            ->and()->body('{"id": 7, "name": "Jack"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testRequest(): void
@@ -103,7 +112,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
 
         request('get', '/users')
             ->then()->statusCode(303)
-            ->and()->body('See these other links');
+            ->and()->body('See these other links')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testWhen(): void
@@ -120,7 +130,8 @@ final class BasicBehaviorTest extends BehaviorTestCase
             ->then()->statusCode(200)
             ->and()->cookie('abc', '123')
             ->and()->contentType('application/json')
-            ->and()->body('{"id": 8, "name": "Jane"}');
+            ->and()->body('{"id": 8, "name": "Jane"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 
     public function testWith(): void
@@ -132,6 +143,7 @@ final class BasicBehaviorTest extends BehaviorTestCase
         );
 
         with()->get('/users/{id}', ['id' => '9'])
-            ->then()->body('{"id": 9, "name": "Jake"}');
+            ->then()->body('{"id": 9, "name": "Jake"}')
+            ->and()->time(greaterThan(0), lessThan(1000));
     }
 }

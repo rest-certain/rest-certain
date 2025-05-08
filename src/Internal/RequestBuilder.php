@@ -56,8 +56,10 @@ use function array_map;
 use function array_merge;
 use function array_pop;
 use function assert;
+use function hrtime;
 use function is_array;
 use function is_string;
+use function round;
 use function strtolower;
 use function strtoupper;
 
@@ -464,12 +466,17 @@ final class RequestBuilder implements RequestSpecification
         $psrRequest = $this->buildRequest($method, $this->buildUri($method, $path, $pathParams));
 
         try {
+            $requestStart = hrtime(true);
             $psrResponse = $this->config->httpClient->sendRequest($psrRequest);
+            $requestEnd = hrtime(true);
         } catch (ClientExceptionInterface $e) {
             throw new RequestFailed(message: "The request failed: {$e->getMessage()}", previous: $e);
         }
 
-        return new HttpResponse($this, $psrResponse, $psrRequest);
+        // Convert nanoseconds to milliseconds.
+        $responseTime = (int) round(($requestEnd - $requestStart) / 1_000_000);
+
+        return new HttpResponse($this, $psrResponse, $psrRequest, $responseTime);
     }
 
     /**
