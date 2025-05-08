@@ -25,7 +25,10 @@ declare(strict_types=1);
 namespace RestCertain;
 
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RestCertain\Http\HttpFactory;
 use Stringable;
@@ -56,22 +59,22 @@ final readonly class Config
     /**
      * The request factory to use for creating requests.
      */
-    public Message\RequestFactoryInterface $requestFactory;
+    public RequestFactoryInterface $requestFactory;
 
     /**
      * The response factory to use for creating responses.
      */
-    public Message\ResponseFactoryInterface $responseFactory;
+    public ResponseFactoryInterface $responseFactory;
 
     /**
      * The stream factory to use for creating body content.
      */
-    public Message\StreamFactoryInterface $streamFactory;
+    public StreamFactoryInterface $streamFactory;
 
     /**
      * The URI factory to use for creating URIs.
      */
-    public Message\UriFactoryInterface $uriFactory;
+    public UriFactoryInterface $uriFactory;
 
     /**
      * @param Stringable | UriInterface | string $baseUri The base URI that's used for all requests if a non-fully
@@ -85,10 +88,10 @@ final readonly class Config
         public string $basePath = self::DEFAULT_BASE_PATH,
         public int $port = self::DEFAULT_PORT,
         ?ClientInterface $httpClient = null,
-        ?Message\RequestFactoryInterface $requestFactory = null,
-        ?Message\ResponseFactoryInterface $responseFactory = null,
-        ?Message\StreamFactoryInterface $streamFactory = null,
-        ?Message\UriFactoryInterface $uriFactory = null,
+        ?RequestFactoryInterface $requestFactory = null,
+        ?ResponseFactoryInterface $responseFactory = null,
+        ?StreamFactoryInterface $streamFactory = null,
+        ?UriFactoryInterface $uriFactory = null,
     ) {
         $this->httpClient = $httpClient ?? $this->httpFactory();
         $this->requestFactory = $requestFactory ?? $this->httpFactory();
@@ -148,7 +151,7 @@ final readonly class Config
      * This clones all config properties, creating new instances that no longer
      * hold references to the original config properties.
      */
-    public function withRequestFactory(Message\RequestFactoryInterface $requestFactory): self
+    public function withRequestFactory(RequestFactoryInterface $requestFactory): self
     {
         return new self(...['requestFactory' => $requestFactory] + $this->copyProperties());
     }
@@ -159,7 +162,7 @@ final readonly class Config
      * This clones all config properties, creating new instances that no longer
      * hold references to the original config properties.
      */
-    public function withResponseFactory(Message\ResponseFactoryInterface $responseFactory): self
+    public function withResponseFactory(ResponseFactoryInterface $responseFactory): self
     {
         return new self(...['responseFactory' => $responseFactory] + $this->copyProperties());
     }
@@ -170,7 +173,7 @@ final readonly class Config
      * This clones all config properties, creating new instances that no longer
      * hold references to the original config properties.
      */
-    public function withStreamFactory(Message\StreamFactoryInterface $streamFactory): self
+    public function withStreamFactory(StreamFactoryInterface $streamFactory): self
     {
         return new self(...['streamFactory' => $streamFactory] + $this->copyProperties());
     }
@@ -181,7 +184,7 @@ final readonly class Config
      * This clones all config properties, creating new instances that no longer
      * hold references to the original config properties.
      */
-    public function withUriFactory(Message\UriFactoryInterface $uriFactory): self
+    public function withUriFactory(UriFactoryInterface $uriFactory): self
     {
         return new self(...['uriFactory' => $uriFactory] + $this->copyProperties());
     }
@@ -192,10 +195,10 @@ final readonly class Config
      *     basePath: string,
      *     port: int,
      *     httpClient: ClientInterface,
-     *     requestFactory: Message\RequestFactoryInterface,
-     *     responseFactory: Message\ResponseFactoryInterface,
-     *     streamFactory: Message\StreamFactoryInterface,
-     *     uriFactory: Message\UriFactoryInterface,
+     *     requestFactory: RequestFactoryInterface,
+     *     responseFactory: ResponseFactoryInterface,
+     *     streamFactory: StreamFactoryInterface,
+     *     uriFactory: UriFactoryInterface,
      * }
      */
     private function copyProperties(): array
