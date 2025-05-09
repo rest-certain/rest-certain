@@ -33,14 +33,10 @@ use Psr\Http\Message\UriInterface;
 use RestCertain\Http\HttpFactory;
 use Stringable;
 
-use function assert;
-use function get_object_vars;
-use function is_object;
-
 /**
  * REST Certain configuration.
  */
-final readonly class Config
+final class Config
 {
     public const string DEFAULT_BASE_URI = 'http://localhost';
     public const string DEFAULT_BASE_PATH = '/';
@@ -49,32 +45,39 @@ final readonly class Config
     /**
      * The Base URI used by default in all requests.
      */
-    public UriInterface $baseUri;
+    public readonly UriInterface $baseUri;
 
     /**
      * The HTTP client to use for sending requests.
      */
-    public ClientInterface $httpClient;
+    public readonly ClientInterface $httpClient;
 
     /**
      * The request factory to use for creating requests.
      */
-    public RequestFactoryInterface $requestFactory;
+    public readonly RequestFactoryInterface $requestFactory;
 
     /**
      * The response factory to use for creating responses.
      */
-    public ResponseFactoryInterface $responseFactory;
+    public readonly ResponseFactoryInterface $responseFactory;
 
     /**
      * The stream factory to use for creating body content.
      */
-    public StreamFactoryInterface $streamFactory;
+    public readonly StreamFactoryInterface $streamFactory;
 
     /**
      * The URI factory to use for creating URIs.
      */
-    public UriFactoryInterface $uriFactory;
+    public readonly UriFactoryInterface $uriFactory;
+
+    /**
+     * A default HTTP factory to use for creating HTTP components.
+     *
+     * If all components are provided via the constructor, then this remains `null`.
+     */
+    private ?HttpFactory $httpFactory = null;
 
     /**
      * @param Stringable | UriInterface | string $baseUri The base URI that's used for all requests if a non-fully
@@ -85,8 +88,8 @@ final readonly class Config
      */
     public function __construct(
         Stringable | UriInterface | string $baseUri = self::DEFAULT_BASE_URI,
-        public string $basePath = self::DEFAULT_BASE_PATH,
-        public int $port = self::DEFAULT_PORT,
+        public readonly string $basePath = self::DEFAULT_BASE_PATH,
+        public readonly int $port = self::DEFAULT_PORT,
         ?ClientInterface $httpClient = null,
         ?RequestFactoryInterface $requestFactory = null,
         ?ResponseFactoryInterface $responseFactory = null,
@@ -203,30 +206,24 @@ final readonly class Config
      */
     private function copyProperties(): array
     {
-        $properties = [];
-
-        foreach (get_object_vars($this) as $name => $value) {
-            if (is_object($value)) {
-                $properties[$name] = clone $value;
-            } else {
-                $properties[$name] = $value;
-            }
-        }
-
-        /** @phpstan-ignore return.type */
-        return $properties;
+        return [
+            'baseUri' => clone $this->baseUri,
+            'basePath' => $this->basePath,
+            'port' => $this->port,
+            'httpClient' => clone $this->httpClient,
+            'requestFactory' => clone $this->requestFactory,
+            'responseFactory' => clone $this->responseFactory,
+            'streamFactory' => clone $this->streamFactory,
+            'uriFactory' => clone $this->uriFactory,
+        ];
     }
 
     private function httpFactory(): HttpFactory
     {
-        static $httpFactory = null;
-
-        if ($httpFactory === null) {
-            $httpFactory = new HttpFactory();
+        if ($this->httpFactory === null) {
+            $this->httpFactory = new HttpFactory();
         }
 
-        assert($httpFactory instanceof HttpFactory);
-
-        return $httpFactory;
+        return $this->httpFactory;
     }
 }
