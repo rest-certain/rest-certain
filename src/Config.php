@@ -31,6 +31,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RestCertain\Http\HttpFactory;
+use RestCertain\Json\Schema\Config as JsonSchemaConfig;
 use Stringable;
 
 /**
@@ -73,6 +74,11 @@ final class Config
     public readonly UriFactoryInterface $uriFactory;
 
     /**
+     * The JSON Schema configuration to use for requesting and handling JSON Schemas.
+     */
+    public readonly JsonSchemaConfig $jsonSchemaConfig;
+
+    /**
      * A default HTTP factory to use for creating HTTP components.
      *
      * If all components are provided via the constructor, then this remains `null`.
@@ -95,6 +101,7 @@ final class Config
         ?ResponseFactoryInterface $responseFactory = null,
         ?StreamFactoryInterface $streamFactory = null,
         ?UriFactoryInterface $uriFactory = null,
+        ?JsonSchemaConfig $jsonSchemaConfig = null,
     ) {
         $this->httpClient = $httpClient ?? $this->httpFactory();
         $this->requestFactory = $requestFactory ?? $this->httpFactory();
@@ -102,6 +109,7 @@ final class Config
         $this->streamFactory = $streamFactory ?? $this->httpFactory();
         $this->uriFactory = $uriFactory ?? $this->httpFactory();
         $this->baseUri = $baseUri instanceof UriInterface ? $baseUri : $this->uriFactory->createUri((string) $baseUri);
+        $this->jsonSchemaConfig = $jsonSchemaConfig ?? new JsonSchemaConfig($this);
     }
 
     /**
@@ -193,6 +201,17 @@ final class Config
     }
 
     /**
+     * Returns a new instance of Config with the given JSON Schema configuration.
+     *
+     * This clones all config properties, creating new instances that no longer
+     * hold references to the original config properties.
+     */
+    public function withJsonSchemaConfig(JsonSchemaConfig $jsonSchemaConfig): self
+    {
+        return new self(...['jsonSchemaConfig' => $jsonSchemaConfig] + $this->copyProperties());
+    }
+
+    /**
      * @return array{
      *     baseUri: UriInterface,
      *     basePath: string,
@@ -202,6 +221,7 @@ final class Config
      *     responseFactory: ResponseFactoryInterface,
      *     streamFactory: StreamFactoryInterface,
      *     uriFactory: UriFactoryInterface,
+     *     jsonSchemaConfig: JsonSchemaConfig,
      * }
      */
     private function copyProperties(): array
@@ -215,6 +235,7 @@ final class Config
             'responseFactory' => clone $this->responseFactory,
             'streamFactory' => clone $this->streamFactory,
             'uriFactory' => clone $this->uriFactory,
+            'jsonSchemaConfig' => clone $this->jsonSchemaConfig,
         ];
     }
 

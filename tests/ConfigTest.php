@@ -14,6 +14,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message;
 use RestCertain\Config;
 use RestCertain\Http\HttpFactory;
+use RestCertain\Json\Schema\Config as JsonSchemaConfig;
 use Stringable;
 
 use function assert;
@@ -38,6 +39,7 @@ class ConfigTest extends TestCase
         $this->assertInstanceOf(HttpFactory::class, $config->responseFactory);
         $this->assertInstanceOf(HttpFactory::class, $config->streamFactory);
         $this->assertInstanceOf(HttpFactory::class, $config->uriFactory);
+        $this->assertSame($config, $config->jsonSchemaConfig->config);
     }
 
     public function testConfigWithCustomValues(): void
@@ -67,6 +69,7 @@ class ConfigTest extends TestCase
         $this->assertSame($responseFactory, $config->responseFactory);
         $this->assertSame($streamFactory, $config->streamFactory);
         $this->assertSame($uriFactory, $config->uriFactory);
+        $this->assertSame($config, $config->jsonSchemaConfig->config);
     }
 
     #[DataProvider('witherProvider')]
@@ -136,6 +139,10 @@ class ConfigTest extends TestCase
                 'property' => 'uriFactory',
                 'value' => Mockery::mock(Message\UriFactoryInterface::class),
             ],
+            [
+                'property' => 'jsonSchemaConfig',
+                'value' => new JsonSchemaConfig(new Config()),
+            ],
         ];
     }
 
@@ -155,6 +162,6 @@ class ConfigTest extends TestCase
         }
 
         // Let's ensure that we actually looped over and tested the properties.
-        $this->assertSame(7, $propertiesAsserted);
+        $this->assertSame(8, $propertiesAsserted);
     }
 }
