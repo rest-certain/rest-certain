@@ -4,22 +4,14 @@ declare(strict_types=1);
 
 namespace RestCertain\Test\Constraint\Json;
 
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
-use Psr\Http\Message\RequestInterface;
 use RestCertain\Constraint\Json\MatchesJsonSchema;
 use RestCertain\Exception\JsonSchemaFailure;
 use RestCertain\Exception\MissingConfiguration;
-use RestCertain\Exception\RequestFailed;
 use RestCertain\RestCertain;
 use RestCertain\Test\MockWebServer;
-use RuntimeException;
 
 use function assert;
 use function file_get_contents;
@@ -29,7 +21,6 @@ use function json_decode;
 
 class MatchesJsonSchemaTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
     use MockWebServer;
 
     public function testMatchesJsonSchemaFromString(): void
@@ -113,22 +104,26 @@ class MatchesJsonSchemaTest extends TestCase
             'hobbies' => ['reading', 'running'],
         ];
 
-        $this->assertThat($testValue, MatchesJsonSchema::fromUri($baseUrl . '/schema.json'));
+        $this->assertThat($testValue, MatchesJsonSchema::fromUri($baseUrl . '/complex-object.schema.json'));
     }
 
     public function testMatchesJsonSchemaFromUriObject(): void
     {
-        $schema = (string) file_get_contents(__DIR__ . '/fixtures/complex-object.json');
-        $baseUrl = $this->bypass->getBaseUrl();
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/conditional-validation-dependentRequired.json');
+        $baseUrl = $this->server()->getBaseUrl();
 
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
+        $this->server()->addRoute(
+            method: 'GET',
+            uri: '/conditional-validation-dependentRequired.schema.json',
+            body: $schema,
+        );
 
         $testValue = [
-            'name' => 'John Doe',
-            'age' => 25,
+            'foo' => true,
+            'bar' => 'Hello World',
         ];
 
-        $uri = new Uri($baseUrl . '/schema.json');
+        $uri = new Uri($baseUrl . '/conditional-validation-dependentRequired.schema.json');
 
         $this->assertThat($testValue, MatchesJsonSchema::fromUri($uri));
     }
@@ -141,78 +136,12 @@ class MatchesJsonSchemaTest extends TestCase
         $this->assertThat('foo', MatchesJsonSchema::fromFile(__DIR__ . '/this-file-does-not-exist.json'));
     }
 
-    public function testFromUriWhenHttpClientOrRequestFactoryNotSet(): void
+    public function testFromUriWhenUriIsInvalid(): void
     {
-        RestCertain::$config = null;
+        $this->expectException(JsonSchemaFailure::class);
+        $this->expectExceptionMessage('Invalid JSON Schema URI: foo bar');
 
-        $this->expectException(MissingConfiguration::class);
-        $this->expectExceptionMessage(
-            'Unable to create a JSON Schema matcher from a URI without an HTTP client or request factory. Set the HTTP '
-            . 'client and request factory on RestCertain::$config or pass them to this method.',
-        );
-
-        MatchesJsonSchema::fromUri('https://example.com/schema.json');
-    }
-
-    public function testFromUriWhenHttpClientThrowsAnException(): void
-    {
-        $httpClient = Mockery::mock(ClientInterface::class);
-        $requestFactory = Mockery::mock(RequestFactoryInterface::class);
-        $request = Mockery::mock(RequestInterface::class);
-        $uri = new Uri('https://example.com/schema.json');
-
-        $exception = new class extends RuntimeException implements ClientExceptionInterface {
-            /** @var string */
-            // phpcs:ignore SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-            protected $message = 'HTTP was naughty. Bad HTTP!';
-        };
-
-        $requestFactory
-            ->expects('createRequest')
-            ->with('GET', $uri)
-            ->andReturns($request);
-
-        $httpClient
-            ->expects('sendRequest')
-            ->with($request)
-            ->andThrows($exception);
-
-        $constraint = MatchesJsonSchema::fromUri(
-            uri: $uri,
-            httpClient: $httpClient,
-            requestFactory: $requestFactory,
-        );
-
-        $this->expectException(RequestFailed::class);
-        $this->expectExceptionMessage('HTTP was naughty. Bad HTTP!');
-
-        $this->assertThat('foo', $constraint);
-    }
-
-    public function testMatchesJsonSchemaFromUriWhenResponseIsNotOk(): void
-    {
-        $baseUrl = $this->bypass->getBaseUrl();
-
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', status: 400, body: 'You made a bad request!');
-
-        $this->expectException(RequestFailed::class);
-        $this->expectExceptionMessage(
-            "HTTP request failed with status code '400' and response body:\n\nYou made a bad request!\n",
-        );
-
-        $this->assertThat('foo', MatchesJsonSchema::fromUri($baseUrl . '/schema.json'));
-    }
-
-    public function testMatchesJsonSchemaFromUriWhenResponseHasNoBody(): void
-    {
-        $baseUrl = $this->bypass->getBaseUrl();
-
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: '');
-
-        $this->expectException(RequestFailed::class);
-        $this->expectExceptionMessage("HTTP request failed with status code '200' and no response body");
-
-        $this->assertThat('foo', MatchesJsonSchema::fromUri($baseUrl . '/schema.json'));
+        MatchesJsonSchema::fromUri('foo bar');
     }
 
     public function testMatchesJsonSchemaWithConditionalIfElse(): void
@@ -278,5 +207,17 @@ class MatchesJsonSchemaTest extends TestCase
         $this->expectExceptionMessage('The data (string) must match the type: array');
 
         $this->assertThat($testValue, MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/complex-object.json'));
+    }
+
+    public function testMatchesJsonSchemaThrowsExceptionWhenConfigNotSet(): void
+    {
+        $schema = (string) file_get_contents(__DIR__ . '/fixtures/typical-minimum.json');
+        $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
+        RestCertain::$config = null;
+
+        $this->expectException(MissingConfiguration::class);
+        $this->expectExceptionMessage('No JSON Schema validator found. Please configure a JSON Schema validator.');
+
+        $this->assertThat($testValue, MatchesJsonSchema::fromString($schema));
     }
 }

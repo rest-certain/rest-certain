@@ -25,20 +25,16 @@ declare(strict_types=1);
 namespace RestCertain\Constraint\Json;
 
 use Closure;
-use Opis\JsonSchema\CompliantValidator;
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Helper;
-use Opis\JsonSchema\Validator;
+use Opis\JsonSchema\Uri as JsonSchemaUri;
 use Override;
 use PHPUnit\Framework\Constraint\Constraint;
-use Psr\Http\Client\ClientExceptionInterface;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RestCertain\Exception\JsonSchemaFailure;
 use RestCertain\Exception\MissingConfiguration;
-use RestCertain\Exception\RequestFailed;
 use RestCertain\Json\Json;
+use RestCertain\Json\Schema\Config;
 use RestCertain\RestCertain;
 use Stringable;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -54,16 +50,17 @@ final class MatchesJsonSchema extends Constraint
      */
     private array $errors = [];
 
-    private ?string $schema = null;
+    private JsonSchemaUri | string | null $schema = null;
+
+    private ?Config $config;
 
     /**
-     * @param Closure(): string $schemaLoader A closure that returns the schema contents
+     * @param Closure(): (JsonSchemaUri | string) $schemaLoader A closure that returns the schema contents
      *     at evaluation time, deferring any file or URI loading until then.
      */
-    public function __construct(
-        private readonly Closure $schemaLoader,
-        private readonly Validator $validator = new CompliantValidator(max_errors: 10, stop_at_first_error: false),
-    ) {
+    private function __construct(private readonly Closure $schemaLoader)
+    {
+        $this->config = RestCertain::$config?->jsonSchemaConfig;
     }
 
     #[Override] public function toString(): string
@@ -83,16 +80,18 @@ final class MatchesJsonSchema extends Constraint
 
     #[Override] protected function matches(mixed $other): bool
     {
+        // Reset the errors in case there are any remaining from a previous match attempt.
+        $this->errors = [];
+
         if ($this->schema === null) {
             $this->schema = ($this->schemaLoader)();
         }
 
-        assert($this->schema !== null);
+        $result = $this->config?->validator->validate(Helper::toJSON($other), $this->schema);
 
-        $result = $this->validator->validate(Helper::toJSON($other), $this->schema);
-
-        // Reset the errors in case there are any remaining from a previous match attempt.
-        $this->errors = [];
+        if ($result === null) {
+            throw new MissingConfiguration('No JSON Schema validator found. Please configure a JSON Schema validator.');
+        }
 
         if (!$result->isValid()) {
             $errorResult = $result->error();
@@ -150,42 +149,15 @@ final class MatchesJsonSchema extends Constraint
      * Creates a JSON Schema matcher for the JSON Schema at the given URI.
      *
      * @param Stringable | UriInterface | string $uri The URI of the JSON Schema file.
-     * @param ClientInterface | null $httpClient An HTTP client to use when fetching the JSON Schema file.
-     *     Defaults to the HTTP Client set on {@see \RestCertain\RestCertain::$config}.
      */
-    public static function fromUri(
-        Stringable | UriInterface | string $uri,
-        ?ClientInterface $httpClient = null,
-        ?RequestFactoryInterface $requestFactory = null,
-    ): self {
-        $httpClient = $httpClient ?? RestCertain::$config?->httpClient;
-        $requestFactory = $requestFactory ?? RestCertain::$config?->requestFactory;
-        $uri = $uri instanceof UriInterface ? $uri : (string) $uri;
+    public static function fromUri(Stringable | UriInterface | string $uri): self
+    {
+        $jsonSchemaUri = JsonSchemaUri::create((string) $uri);
 
-        if ($httpClient === null || $requestFactory === null) {
-            throw new MissingConfiguration(
-                'Unable to create a JSON Schema matcher from a URI without an HTTP client or request factory. '
-                . 'Set the HTTP client and request factory on RestCertain::$config or pass them to this method.',
-            );
+        if (!$jsonSchemaUri instanceof JsonSchemaUri) {
+            throw new JsonSchemaFailure("Invalid JSON Schema URI: $uri");
         }
 
-        return new self(function () use ($uri, $httpClient, $requestFactory): string {
-            try {
-                $response = $httpClient->sendRequest($requestFactory->createRequest('GET', $uri));
-            } catch (ClientExceptionInterface $exception) {
-                throw new RequestFailed(message: $exception->getMessage(), previous: $exception);
-            }
-
-            $body = $response->getBody()->getContents();
-
-            if ($response->getStatusCode() === 200 && $body !== '') {
-                return $body;
-            }
-
-            throw new RequestFailed(
-                "HTTP request failed with status code '{$response->getStatusCode()}' and "
-                . ($body !== '' ? "response body:\n\n$body\n" : 'no response body.'),
-            );
-        });
+        return new self(fn (): JsonSchemaUri => $jsonSchemaUri);
     }
 }

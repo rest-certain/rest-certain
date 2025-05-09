@@ -25,8 +25,10 @@ declare(strict_types=1);
 namespace RestCertain\Json\Schema;
 
 use Closure;
+use Opis\JsonSchema\CompliantValidator;
 use Opis\JsonSchema\Resolvers\SchemaResolver;
 use Opis\JsonSchema\Uri as JsonSchemaUri;
+use Opis\JsonSchema\Validator;
 use PHPUnit\Util\Exporter;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
@@ -47,10 +49,18 @@ use function sprintf;
  */
 final readonly class Config
 {
+    public const int DEFAULT_MAX_ERRORS = 10;
+    public const bool DEFAULT_STOP_ON_FIRST_ERROR = false;
+
     /**
      * @internal This property is not intended for direct use outside of Rest Certain. It may change without notice.
      */
     public SchemaResolver $resolver;
+
+    /**
+     * @internal This property is not intended for direct use outside of Rest Certain. It may change without notice.
+     */
+    public Validator $validator;
 
     /**
      * @param array<string, Closure(UriInterface $uri): stdClass> $protocolResolvers Closures to use for resolving JSON
@@ -65,6 +75,8 @@ final readonly class Config
         public RestCertainConfig $config,
         array $protocolResolvers = [],
         array $prefixResolvers = [],
+        public int $maxErrors = self::DEFAULT_MAX_ERRORS,
+        public bool $stopOnFirstError = self::DEFAULT_STOP_ON_FIRST_ERROR,
     ) {
         $this->resolver = new SchemaResolver();
 
@@ -83,6 +95,11 @@ final readonly class Config
         if (!isset($protocolResolvers['https'])) {
             $this->resolver->registerProtocol('https', $this->defaultHttpResolver());
         }
+
+        $this->validator = (new CompliantValidator())
+            ->setMaxErrors($this->maxErrors)
+            ->setStopAtFirstError($this->stopOnFirstError)
+            ->setResolver($this->resolver);
     }
 
     /**

@@ -96,21 +96,21 @@ class MatchersTest extends TestCase
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $url = $this->server()->getBaseUrl() . '/schema.json';
-        $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         $this->server()->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
 
-        assertThat($testValue, matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
     }
 
     public function testMatchesJsonSchemaFromUriUsingStringable(): void
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
         $url = new Str($this->server()->getBaseUrl() . '/schema.json');
-        $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         $this->server()->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
 
-        assertThat($testValue, matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
     }
 }
