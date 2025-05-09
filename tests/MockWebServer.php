@@ -14,30 +14,41 @@ use const PHP_INT_MAX;
 
 trait MockWebServer
 {
-    protected Bypass $bypass;
+    /**
+     * The mock web server.
+     */
+    private Bypass $server;
 
     #[Before(PHP_INT_MAX)]
     protected function startBypass(): void
     {
-        $this->bypass = Bypass::open();
+        $this->server = Bypass::open();
     }
 
     #[Before(PHP_INT_MAX - 10)]
     protected function configureRestCertain(): void
     {
-        $config = new Config(port: $this->bypass->getPort());
+        $config = new Config(port: $this->server->getPort());
         RestCertain::$config = $config;
     }
 
     #[After]
     protected function stopBypass(): void
     {
-        $this->bypass->stop();
+        $this->server->stop();
     }
 
     #[After]
     protected function unconfigureRestCertain(): void
     {
         RestCertain::$config = null;
+    }
+
+    /**
+     * Returns the mock web server.
+     */
+    private function server(): Bypass
+    {
+        return $this->server;
     }
 }

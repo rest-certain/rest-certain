@@ -97,9 +97,9 @@ class MatchesJsonSchemaTest extends TestCase
     public function testMatchesJsonSchemaFromUriString(): void
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/complex-object.json');
-        $baseUrl = $this->bypass->getBaseUrl();
+        $baseUrl = $this->server()->getBaseUrl();
 
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
+        $this->server()->addRoute(method: 'GET', uri: '/complex-object.schema.json', body: $schema);
 
         $testValue = [
             'name' => 'John Doe',

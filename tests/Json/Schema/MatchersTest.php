@@ -84,21 +84,21 @@ class MatchersTest extends TestCase
     public function testMatchesJsonSchemaFromUri(): void
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
-        $url = new Uri($this->bypass->getBaseUrl() . '/schema.json');
-        $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
+        $url = new Uri($this->server()->getBaseUrl() . '/schema.json');
 
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
+        $this->server()->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
 
-        assertThat($testValue, matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
+        assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
     }
 
     public function testMatchesJsonSchemaFromUriUsingString(): void
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
-        $url = $this->bypass->getBaseUrl() . '/schema.json';
+        $url = $this->server()->getBaseUrl() . '/schema.json';
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
+        $this->server()->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
 
         assertThat($testValue, matchesJsonSchemaFromUri($url));
     }
@@ -106,10 +106,10 @@ class MatchersTest extends TestCase
     public function testMatchesJsonSchemaFromUriUsingStringable(): void
     {
         $schema = (string) file_get_contents(__DIR__ . '/fixtures/minimum.json');
-        $url = new Str($this->bypass->getBaseUrl() . '/schema.json');
+        $url = new Str($this->server()->getBaseUrl() . '/schema.json');
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
-        $this->bypass->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
+        $this->server()->addRoute(method: 'GET', uri: '/schema.json', body: $schema);
 
         assertThat($testValue, matchesJsonSchemaFromUri($url));
     }

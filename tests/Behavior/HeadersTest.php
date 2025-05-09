@@ -15,7 +15,7 @@ class HeadersTest extends TestCase
 
     public function testHeadersCookiesStatusEtc(): void
     {
-        $this->bypass->addRoute(method: 'PUT', uri: '/something/123?foo=bar', body: [
+        $this->server()->addRoute(method: 'PUT', uri: '/something/123?foo=bar', body: [
             'id' => 123,
             'name' => 'Something Cool',
         ], headers: [

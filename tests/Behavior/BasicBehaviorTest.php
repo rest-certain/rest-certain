@@ -28,7 +28,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testDelete(): void
     {
-        $this->bypass->addRoute(method: 'DELETE', uri: '/users/1', status: 204);
+        $this->server()->addRoute(method: 'DELETE', uri: '/users/1', status: 204);
 
         delete('/users/{id}', ['id' => 1])
             ->then()->statusCode(204);
@@ -36,7 +36,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testGet(): void
     {
-        $this->bypass->addRoute(method: 'GET', uri: '/users/2', body: '{"id": 2, "name": "John"}');
+        $this->server()->addRoute(method: 'GET', uri: '/users/2', body: '{"id": 2, "name": "John"}');
 
         get('/users/{id}', ['id' => new Str('2')])
             ->then()->statusCode(200)
@@ -46,7 +46,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testGiven(): void
     {
-        $this->bypass->addRoute(
+        $this->server()->addRoute(
             method: 'POST',
             uri: '/users',
             body: '{"id": 211, "name": "John Jacob Jingleheimer Schmidt"}',
@@ -60,7 +60,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testHead(): void
     {
-        $this->bypass->addRoute(method: 'HEAD', uri: '/users/3', headers: ['Content-Length' => '10']);
+        $this->server()->addRoute(method: 'HEAD', uri: '/users/3', headers: ['Content-Length' => '10']);
 
         head('/users/{id}', ['id' => '3'])
             ->then()->statusCode(200)
@@ -71,7 +71,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testOptions(): void
     {
-        $this->bypass->addRoute(method: 'OPTIONS', uri: '/users/4', headers: ['X-Foo' => '123']);
+        $this->server()->addRoute(method: 'OPTIONS', uri: '/users/4', headers: ['X-Foo' => '123']);
 
         options('/users/{id}', ['id' => '4'])
             ->then()->statusCode(200)
@@ -82,7 +82,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testPatch(): void
     {
-        $this->bypass->addRoute(method: 'PATCH', uri: '/users/5', status: 202, body: '{"id": 5, "name": "Jane"}');
+        $this->server()->addRoute(method: 'PATCH', uri: '/users/5', status: 202, body: '{"id": 5, "name": "Jane"}');
 
         patch('/users/{id}', ['id' => '5'])
             ->then()->statusCode(202)
@@ -92,7 +92,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testPost(): void
     {
-        $this->bypass->addRoute(method: 'POST', uri: '/users', status: 201, body: '{"id": 6, "name": "Jill"}');
+        $this->server()->addRoute(method: 'POST', uri: '/users', status: 201, body: '{"id": 6, "name": "Jill"}');
 
         post('/users')
             ->then()->statusCode(201)
@@ -102,7 +102,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testPut(): void
     {
-        $this->bypass->addRoute(method: 'PUT', uri: '/users/7', status: 200, body: '{"id": 7, "name": "Jack"}');
+        $this->server()->addRoute(method: 'PUT', uri: '/users/7', status: 200, body: '{"id": 7, "name": "Jack"}');
 
         put('/users/{id}', ['id' => '7'])
             ->then()->statusCode(200)
@@ -112,7 +112,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testRequest(): void
     {
-        $this->bypass->addRoute(method: 'get', uri: '/users', status: 303, body: 'See these other links');
+        $this->server()->addRoute(method: 'get', uri: '/users', status: 303, body: 'See these other links');
 
         request('get', '/users')
             ->then()->statusCode(303)
@@ -122,7 +122,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testWhen(): void
     {
-        $this->bypass->addRoute(
+        $this->server()->addRoute(
             method: 'GET',
             uri: '/users/8',
             body: '{"id": 8, "name": "Jane"}',
@@ -140,7 +140,7 @@ final class BasicBehaviorTest extends TestCase
 
     public function testWith(): void
     {
-        $this->bypass->addRoute(
+        $this->server()->addRoute(
             method: 'GET',
             uri: '/users/9',
             body: '{"id": 9, "name": "Jake"}',

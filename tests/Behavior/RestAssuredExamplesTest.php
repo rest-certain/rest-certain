@@ -36,7 +36,7 @@ class RestAssuredExamplesTest extends TestCase
             }
             JSON;
 
-        $this->bypass->addRoute(method: 'GET', uri: '/lotto', body: $lottoResponse);
+        $this->server()->addRoute(method: 'GET', uri: '/lotto', body: $lottoResponse);
 
         get('/lotto')->then()
             ->assertThat()->bodyPath('lotto.lottoId', is(equalTo(5)))
@@ -46,7 +46,7 @@ class RestAssuredExamplesTest extends TestCase
     public function testPriceExample(): void
     {
         $priceResponse = '{"price":12.12}';
-        $this->bypass->addRoute(method: 'GET', uri: '/price', body: $priceResponse);
+        $this->server()->addRoute(method: 'GET', uri: '/price', body: $priceResponse);
 
         when()->get('/price')
             ->then()->bodyPath('price', is(12.12));
@@ -54,7 +54,7 @@ class RestAssuredExamplesTest extends TestCase
 
     public function testAnonymousJsonRootValidation(): void
     {
-        $this->bypass->addRoute(method: 'GET', uri: '/json', body: '[1, 2, 3]');
+        $this->server()->addRoute(method: 'GET', uri: '/json', body: '[1, 2, 3]');
 
         when()->get('/json')
             // Using a JSONPath expression.
@@ -100,7 +100,7 @@ class RestAssuredExamplesTest extends TestCase
             }
             JSON;
 
-        $this->bypass->addRoute(method: 'GET', uri: '/store', body: $storeResponse);
+        $this->server()->addRoute(method: 'GET', uri: '/store', body: $storeResponse);
 
         when()->get('/store')
             ->then()->bodyPath('store.book[?price < `10`].title', hasItems('Sayings of the Century', 'Moby Dick'))
