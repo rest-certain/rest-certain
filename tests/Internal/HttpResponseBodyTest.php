@@ -13,6 +13,8 @@ use Psr\Http\Message\StreamInterface;
 use RestCertain\Exception\PathResolutionFailure;
 use RestCertain\Internal\HttpResponseBody;
 
+use function json_decode;
+
 use const SEEK_SET;
 
 class HttpResponseBodyTest extends TestCase
@@ -133,8 +135,10 @@ class HttpResponseBodyTest extends TestCase
 
     public function testPathUsingJmesPath(): void
     {
+        $value = '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}';
+
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}',
+            'getContents' => $value,
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -143,6 +147,7 @@ class HttpResponseBodyTest extends TestCase
 
         $this->assertSame([123, 456], $responseBody->path('foo.bar[*].id'));
         $this->assertSame(456, $responseBody->path('foo.bar[1].id'));
+        $this->assertEquals(json_decode($value), $responseBody->path('@'));
     }
 
     public function testPathUsingJsonPath(): void
