@@ -126,6 +126,11 @@ interface ValidatableResponse
     public function cookies(array $expectations): static;
 
     /**
+     * Extract values from the response or return the response itself.
+     */
+    public function extract(): ExtractableResponse;
+
+    /**
      * An expectation to validate the given response header against the given value or matcher.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the named header.

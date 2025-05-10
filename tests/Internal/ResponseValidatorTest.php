@@ -14,7 +14,10 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\Constraint\LessThan;
 use PHPUnit\Framework\NativeType;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 use RestCertain\Internal\ResponseValidator;
+use RestCertain\Response\Response;
+use RestCertain\Response\ResponseBody;
 use RestCertain\Specification\ResponseSpecification;
 use RestCertain\Test\Str;
 
@@ -27,8 +30,11 @@ class ResponseValidatorTest extends TestCase
 
     protected function setUp(): void
     {
+        $response = Mockery::mock(Response::class, [
+            'body' => Mockery::mock(ResponseBody::class . ',' . StreamInterface::class),
+        ]);
         $this->responseSpecification = Mockery::spy(ResponseSpecification::class);
-        $this->validatableResponse = new ResponseValidator($this->responseSpecification);
+        $this->validatableResponse = new ResponseValidator($response, $this->responseSpecification);
     }
 
     public function testAnd(): void

@@ -26,6 +26,8 @@ namespace RestCertain\Internal;
 
 use Override;
 use PHPUnit\Framework\Constraint\Constraint;
+use RestCertain\Response\ExtractableResponse;
+use RestCertain\Response\Response;
 use RestCertain\Response\ValidatableResponse;
 use RestCertain\Specification\ResponseSpecification;
 use Stringable;
@@ -36,8 +38,11 @@ use stdClass;
  */
 final readonly class ResponseValidator implements ValidatableResponse
 {
-    public function __construct(private ResponseSpecification $responseSpecification)
+    private ExtractableResponse $extractableResponse;
+
+    public function __construct(private Response $response, private ResponseSpecification $responseSpecification)
     {
+        $this->extractableResponse = new ResponseExtractor($this->response);
     }
 
     #[Override] public function and(): static
@@ -96,6 +101,11 @@ final readonly class ResponseValidator implements ValidatableResponse
         $this->responseSpecification->cookies($expectations);
 
         return $this;
+    }
+
+    #[Override] public function extract(): ExtractableResponse
+    {
+        return $this->extractableResponse;
     }
 
     #[Override] public function header(

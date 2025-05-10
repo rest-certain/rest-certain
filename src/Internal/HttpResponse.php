@@ -62,7 +62,7 @@ final readonly class HttpResponse implements Response
 
         $responseSpec = new ResponseExpectations($this);
         $this->requestSpecification->setResponseSpecification($responseSpec);
-        $this->validatableResponse = new ResponseValidator($responseSpec);
+        $this->validatableResponse = new ResponseValidator($this, $responseSpec);
     }
 
     #[Override] public function andReturn(): static
