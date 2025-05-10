@@ -39,6 +39,7 @@ use RestCertain\Config;
 use RestCertain\Exception\PendingRequest;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\TooManyBodies;
+use RestCertain\Exception\UnableToDecodeJson;
 use RestCertain\Http\Header;
 use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
@@ -493,10 +494,6 @@ final class RequestBuilder implements RequestSpecification
 
     private function buildBodyStreamForSplFileInfo(SplFileInfo $body): StreamInterface
     {
-        if (!isset($this->headers[Header::CONTENT_TYPE])) {
-            $this->contentType(MediaType::APPLICATION_OCTET_STREAM);
-        }
-
         $file = $body->openFile('r');
         $fileContents = '';
 
@@ -507,23 +504,21 @@ final class RequestBuilder implements RequestSpecification
             $file->next();
         }
 
+        $this->setContentTypeBasedOnValue($fileContents, MediaType::APPLICATION_OCTET_STREAM);
+
         return $this->config->streamFactory->createStream($fileContents);
     }
 
     private function buildBodyStreamForStreamInterface(StreamInterface $body): StreamInterface
     {
-        if (!isset($this->headers[Header::CONTENT_TYPE])) {
-            $this->contentType(MediaType::APPLICATION_OCTET_STREAM);
-        }
+        $this->setContentTypeBasedOnValue($body, MediaType::APPLICATION_OCTET_STREAM);
 
         return $body;
     }
 
     private function buildBodyStreamForString(Stringable | string $body): StreamInterface
     {
-        if (!isset($this->headers[Header::CONTENT_TYPE])) {
-            $this->contentType(MediaType::TEXT_PLAIN);
-        }
+        $this->setContentTypeBasedOnValue($body, MediaType::TEXT_PLAIN);
 
         return $this->config->streamFactory->createStream((string) $body);
     }
@@ -655,5 +650,29 @@ final class RequestBuilder implements RequestSpecification
         }
 
         return $request;
+    }
+
+    /**
+     * @param MediaType::* $fallbackContentType
+     */
+    private function setContentTypeBasedOnValue(
+        StreamInterface | Stringable | string $body,
+        string $fallbackContentType,
+    ): void {
+        if (isset($this->headers[Header::CONTENT_TYPE])) {
+            return;
+        }
+
+        if ($body instanceof StreamInterface) {
+            $body->rewind();
+            $body = $body->getContents();
+        }
+
+        try {
+            Json::decode((string) $body);
+            $this->contentType(MediaType::APPLICATION_JSON);
+        } catch (UnableToDecodeJson) {
+            $this->contentType($fallbackContentType);
+        }
     }
 }

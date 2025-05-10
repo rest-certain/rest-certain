@@ -18,6 +18,7 @@ use RestCertain\Exception\PendingRequest;
 use RestCertain\Exception\RequestFailed;
 use RestCertain\Exception\TooManyBodies;
 use RestCertain\Http\Header;
+use RestCertain\Http\MediaType;
 use RestCertain\Http\Method;
 use RestCertain\Internal\HttpResponse;
 use RestCertain\Internal\RequestBuilder;
@@ -110,6 +111,87 @@ class RequestBuilderTest extends TestCase
             'quux' => '',
             'corge' => null,
         ]));
+    }
+
+    public function testPostAutomaticallySetsContentTypeHeaderForFormUrlencoded(): void
+    {
+        $psrResponse = $this->factory->createResponse(201);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+
+        $spec = (new RequestBuilder($config))
+            ->params([
+                'foo' => 'bar',
+                'baz' => new Str('qux'),
+            ]);
+
+        $response = $spec->post('/entity');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertSame('POST', (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame('foo=bar&baz=qux', (string) $response->getPsrRequest()->getBody());
+        $this->assertSame(
+            [MediaType::APPLICATION_X_WWW_FORM_URLENCODED],
+            $response->getPsrRequest()->getHeader('content-type'),
+        );
+    }
+
+    public function testPostWithUserProvidedContentTypeHeader(): void
+    {
+        $psrResponse = $this->factory->createResponse(201);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+
+        $spec = (new RequestBuilder($config))
+            ->params([
+                'foo' => 'bar',
+                'baz' => new Str('qux'),
+            ])
+            ->contentType('application/vnd.something');
+
+        $response = $spec->post('/entity');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertSame('POST', (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame('foo=bar&baz=qux', (string) $response->getPsrRequest()->getBody());
+        $this->assertSame(
+            ['application/vnd.something'],
+            $response->getPsrRequest()->getHeader('content-type'),
+        );
+    }
+
+    public function testContentTypeSetBasedOnBodyValue(): void
+    {
+        $psrResponse = $this->factory->createResponse(201);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+
+        $spec = (new RequestBuilder($config))->body('{"foo":"bar"}');
+
+        $response = $spec->post('/entity');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertSame('POST', (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame('{"foo":"bar"}', (string) $response->getPsrRequest()->getBody());
+        $this->assertSame(
+            ['application/json'],
+            $response->getPsrRequest()->getHeader('content-type'),
+        );
+    }
+
+    public function testStringBodyUsesTextContentTypeEvenIfFormattedLikeUrlencodedFormParams(): void
+    {
+        $psrResponse = $this->factory->createResponse(201);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+
+        $spec = (new RequestBuilder($config))->body('foo=bar&baz=qux');
+
+        $response = $spec->post('/entity');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertSame('POST', (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame('foo=bar&baz=qux', (string) $response->getPsrRequest()->getBody());
+        $this->assertSame(
+            ['text/plain'],
+            $response->getPsrRequest()->getHeader('content-type'),
+        );
     }
 
     #[DataProvider('requestMethodProvider')]
@@ -557,6 +639,36 @@ class RequestBuilderTest extends TestCase
                 'body' => 'this is a standard string body',
                 'expectedBody' => 'this is a standard string body',
                 'expectedContentType' => 'text/plain',
+            ],
+            [
+                'body' => '{"foo":"bar"}',
+                'expectedBody' => '{"foo":"bar"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => (new Psr17Factory())->createStream('{"foo":"bar"}'),
+                'expectedBody' => '{"foo":"bar"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => (function (): SplFileInfo {
+                    $file = new SplFileObject(tempnam(sys_get_temp_dir(), basename(__FILE__, '.php')), 'w');
+                    $file->fwrite('{"foo":"bar"}');
+
+                    return $file;
+                })(),
+                'expectedBody' => '{"foo":"bar"}',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => '1001',
+                'expectedBody' => '1001',
+                'expectedContentType' => 'application/json',
+            ],
+            [
+                'body' => 'false',
+                'expectedBody' => 'false',
+                'expectedContentType' => 'application/json',
             ],
         ];
     }
