@@ -133,9 +133,10 @@ class RequestBuilderTest extends TestCase
             [MediaType::APPLICATION_X_WWW_FORM_URLENCODED],
             $response->getPsrRequest()->getHeader('content-type'),
         );
+        $this->assertSame(['15'], $response->getPsrRequest()->getHeader('content-length'));
     }
 
-    public function testPostWithUserProvidedContentTypeHeader(): void
+    public function testPostWithUserProvidedContentTypeAndContentLengthHeaders(): void
     {
         $psrResponse = $this->factory->createResponse(201);
         $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
@@ -145,7 +146,8 @@ class RequestBuilderTest extends TestCase
                 'foo' => 'bar',
                 'baz' => new Str('qux'),
             ])
-            ->contentType('application/vnd.something');
+            ->contentType('application/vnd.something')
+            ->header(Header::CONTENT_LENGTH, '42');
 
         $response = $spec->post('/entity');
 
@@ -156,6 +158,7 @@ class RequestBuilderTest extends TestCase
             ['application/vnd.something'],
             $response->getPsrRequest()->getHeader('content-type'),
         );
+        $this->assertSame(['42'], $response->getPsrRequest()->getHeader('content-length'));
     }
 
     public function testCannotSetMoreThanOneContentTypeHeader(): void
@@ -179,6 +182,7 @@ class RequestBuilderTest extends TestCase
             ['application/vnd.something.v4+json'],
             $response->getPsrRequest()->getHeader('content-type'),
         );
+        $this->assertSame(['13'], $response->getPsrRequest()->getHeader('content-length'));
     }
 
     public function testContentTypeSetBasedOnBodyValue(): void
@@ -197,6 +201,7 @@ class RequestBuilderTest extends TestCase
             ['application/json'],
             $response->getPsrRequest()->getHeader('content-type'),
         );
+        $this->assertSame(['13'], $response->getPsrRequest()->getHeader('content-length'));
     }
 
     public function testStringBodyUsesTextContentTypeEvenIfFormattedLikeUrlencodedFormParams(): void
@@ -215,6 +220,7 @@ class RequestBuilderTest extends TestCase
             ['text/plain'],
             $response->getPsrRequest()->getHeader('content-type'),
         );
+        $this->assertSame(['15'], $response->getPsrRequest()->getHeader('content-length'));
     }
 
     #[DataProvider('requestMethodProvider')]

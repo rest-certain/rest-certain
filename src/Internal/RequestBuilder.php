@@ -638,24 +638,31 @@ final class RequestBuilder implements RequestSpecification
     private function maybeAttachRequestBody(string $method, RequestInterface $request): RequestInterface
     {
         $formData = $this->buildUrlencodedFormData($method);
+        $body = $this->body;
 
-        if ($formData !== null && $this->body !== null) {
+        if ($formData === null && $body === null) {
+            return $request;
+        }
+
+        if ($formData !== null && $body !== null) {
             throw new TooManyBodies('Cannot set both body and form data');
         }
 
         if ($formData !== null) {
-            $request = $request->withBody($this->config->streamFactory->createStream($formData));
+            $body = $this->config->streamFactory->createStream($formData);
 
-            // If the user has already set a content-type, use it.
-            // Otherwise, use the default for HTML form data.
             if (!$request->hasHeader(Header::CONTENT_TYPE)) {
                 $request = $request->withHeader(Header::CONTENT_TYPE, MediaType::APPLICATION_X_WWW_FORM_URLENCODED);
             }
-        } elseif ($this->body !== null) {
-            $request = $request->withBody($this->body);
         }
 
-        return $request;
+        assert($body !== null);
+
+        if (!$request->hasHeader(Header::CONTENT_LENGTH) && $body->getSize() !== null) {
+            $request = $request->withHeader(Header::CONTENT_LENGTH, (string) $body->getSize());
+        }
+
+        return $request->withBody($body);
     }
 
     /**
