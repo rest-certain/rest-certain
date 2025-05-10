@@ -30,7 +30,7 @@
         "psr/http-factory": "^1.1",
         "psr/http-factory-implementation": "*",
         "psr/http-message": "^2.0",
-        "rest-certain/hamcrest-phpunit": "^0.1.0",
+        "rest-certain/hamcrest-phpunit": "^0.2.0",
         "symfony/filesystem": "^7.2"
     },
     "require-dev": {
