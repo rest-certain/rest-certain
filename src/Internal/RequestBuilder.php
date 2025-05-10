@@ -58,6 +58,7 @@ use function array_merge;
 use function array_pop;
 use function assert;
 use function hrtime;
+use function in_array;
 use function is_array;
 use function is_string;
 use function round;
@@ -254,7 +255,12 @@ final class RequestBuilder implements RequestSpecification
             return $this->cookie($name, array_pop($values));
         }
 
-        $headerValues = $this->headers[$name] ?? [];
+        if (in_array($name, Header::SINGLETON_HEADERS)) {
+            $values = [array_pop($values)];
+            $headerValues = [];
+        } else {
+            $headerValues = $this->headers[$name] ?? [];
+        }
 
         foreach ($values as $v) {
             $headerValues[] = (string) $v;

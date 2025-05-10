@@ -71,9 +71,11 @@ final class Header
     public const string LINK = 'link';
     public const string LINK_TEMPLATE = 'link-template';
     public const string LOCATION = 'location';
+    public const string MAX_FORWARDS = 'max-forwards';
     public const string ORIGIN = 'origin';
     public const string PREFER = 'prefer';
     public const string PREFERENCE_APPLIED = 'preference-applied';
+    public const string PROXY_AUTHORIZATION = 'proxy-authorization';
     public const string RANGE = 'range';
     public const string REFERER = 'referer';
     public const string REPR_DIGEST = 'repr-digest';
@@ -89,6 +91,48 @@ final class Header
     public const string WANT_CONTENT_DIGEST = 'want-content-digest';
     public const string WANT_REPR_DIGEST = 'want-repr-digest';
     public const string WWW_AUTHENTICATE = 'www-authenticate';
+
+    /**
+     * Headers defined as singleton fields.
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc9110.html#section-5.5-6 RFC 9110, 5.5. Field Values
+     * @link https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.1 RFC 9110, 5.6.1. Lists (#rule ABNF Extension)
+     * @link https://www.rfc-editor.org/rfc/rfc9110.html#appendix-A RFC 9110, Appendix A
+     * @link https://www.rfc-editor.org/rfc/rfc9111.html#appendix-A RFC 9111, Appendix A
+     * @link https://www.rfc-editor.org/rfc/rfc9745.html#section-2 RFC 9745, 2. The Deprecation HTTP Response Header Field
+     * @link https://www.rfc-editor.org/rfc/rfc6454.html#section-7 RFC 6454, 7. The HTTP Origin Header Field
+     * @link https://www.rfc-editor.org/rfc/rfc8594.html#section-3 RFC 8594, 3. The Sunset HTTP Response Header Field
+     */
+    public const array SINGLETON_HEADERS = [
+        self::ACCEPT_RANGES,
+        self::AGE,
+        self::AUTHORIZATION,
+        self::CONTENT_DISPOSITION,
+        self::CONTENT_LENGTH,
+        self::CONTENT_LOCATION,
+        self::CONTENT_RANGE,
+        self::CONTENT_TYPE,
+        self::DATE,
+        self::DEPRECATION,
+        self::ETAG,
+        self::EXPIRES,
+        self::FROM,
+        self::HOST,
+        self::IF_MODIFIED_SINCE,
+        self::IF_RANGE,
+        self::IF_UNMODIFIED_SINCE,
+        self::LAST_MODIFIED,
+        self::LOCATION,
+        self::MAX_FORWARDS,
+        self::ORIGIN,
+        self::PROXY_AUTHORIZATION,
+        self::RANGE,
+        self::REFERER,
+        self::RETRY_AFTER,
+        self::SERVER,
+        self::SUNSET,
+        self::USER_AGENT,
+    ];
 
     /**
      * Disable public instantiation.

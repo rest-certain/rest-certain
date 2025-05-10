@@ -158,6 +158,29 @@ class RequestBuilderTest extends TestCase
         );
     }
 
+    public function testCannotSetMoreThanOneContentTypeHeader(): void
+    {
+        $psrResponse = $this->factory->createResponse(201);
+        $config = new Config(httpClient: Mockery::mock(ClientInterface::class, ['sendRequest' => $psrResponse]));
+
+        $spec = (new RequestBuilder($config))
+            ->body('{"foo":"bar"}')
+            ->contentType('application/vnd.something.v1+json')
+            ->contentType('application/vnd.something.v2+json')
+            ->contentType('application/vnd.something.v3+json')
+            ->contentType('application/vnd.something.v4+json');
+
+        $response = $spec->post('/entity');
+
+        $this->assertInstanceOf(HttpResponse::class, $response);
+        $this->assertSame('POST', (string) $response->getPsrRequest()->getMethod());
+        $this->assertSame('{"foo":"bar"}', (string) $response->getPsrRequest()->getBody());
+        $this->assertSame(
+            ['application/vnd.something.v4+json'],
+            $response->getPsrRequest()->getHeader('content-type'),
+        );
+    }
+
     public function testContentTypeSetBasedOnBodyValue(): void
     {
         $psrResponse = $this->factory->createResponse(201);
