@@ -33,7 +33,9 @@ use PHPUnit\Framework\Constraint\IsFalse;
 use PHPUnit\Framework\Constraint\IsNull;
 use PHPUnit\Framework\Constraint\IsTrue;
 use RestCertain\Exception\PathResolutionFailure;
+use RestCertain\Hamcrest\Constraint\AdditionallyDescribedConstraint;
 use RestCertain\Http\Header;
+use RestCertain\Http\HttpExchangeFormatter;
 use RestCertain\Request\Sender;
 use RestCertain\Response\Response;
 use RestCertain\Specification\RequestSpecification;
@@ -51,6 +53,7 @@ use function is_string;
  */
 final class ResponseExpectations implements ResponseSpecification
 {
+    private HttpExchangeFormatter $httpExchangeFormatter;
     private RequestSpecification $requestSpecification;
 
     public function __construct(
@@ -60,6 +63,8 @@ final class ResponseExpectations implements ResponseSpecification
         if ($requestSpecification !== null) {
             $this->setRequestSpecification($requestSpecification);
         }
+
+        $this->httpExchangeFormatter = new HttpExchangeFormatter();
     }
 
     #[Override] public function and(): static
@@ -282,7 +287,21 @@ final class ResponseExpectations implements ResponseSpecification
                 is_array($expectation) => new IsEqualCanonicalizing($expectation),
             };
 
-            Assert::assertThat($value, $expectation, $message);
+            Assert::assertThat($value, $this->describeHttpExchange($expectation), $message);
         }
+    }
+
+    private function describeHttpExchange(Constraint $constraint): Constraint
+    {
+        if (!$this->response instanceof HttpResponse) {
+            return $constraint;
+        }
+
+        $formatted = $this->httpExchangeFormatter->format(
+            $this->response->getPsrRequest(),
+            $this->response->getPsrResponse(),
+        );
+
+        return new AdditionallyDescribedConstraint("\n" . $formatted, $constraint);
     }
 }
