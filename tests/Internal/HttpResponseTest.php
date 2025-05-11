@@ -56,18 +56,16 @@ class HttpResponseTest extends TestCase
 
     public function testAsPrettyString(): void
     {
-        // The SUT calls these methods twice, but we should figure out a way to
+        // The SUT calls this method twice, but we should figure out a way to
         // ensure they're only called once during the asPrettyString() code path.
-        $this->stream->expects('rewind')->twice();
-        $this->stream->expects('getContents')->twice()->andReturns('Hello, World!');
+        $this->stream->expects('__toString')->twice()->andReturns('Hello, World!');
 
         $this->assertSame('Hello, World!', $this->response->asPrettyString());
     }
 
     public function testAsString(): void
     {
-        $this->stream->expects('rewind')->once();
-        $this->stream->expects('getContents')->once()->andReturns('Hello, World!');
+        $this->stream->expects('__toString')->once()->andReturns('Hello, World!');
 
         $this->assertSame('Hello, World!', $this->response->asString());
     }
@@ -223,18 +221,16 @@ class HttpResponseTest extends TestCase
 
     public function testPath(): void
     {
-        $this->stream->expects('rewind')->once();
-        $this->stream->expects('getContents')->once()->andReturns('{"foo": {"bar": "baz"}}');
+        $this->stream->expects('__toString')->once()->andReturns('{"foo": {"bar": "baz"}}');
 
         $this->assertSame('baz', $this->response->path('foo.bar'));
     }
 
     public function testPrettyPrint(): void
     {
-        // The SUT calls these methods twice, but we should figure out a way to
+        // The SUT calls this method twice, but we should figure out a way to
         // ensure they're only called once during the prettyPrint() code path.
-        $this->stream->expects('rewind')->twice();
-        $this->stream->expects('getContents')->twice()->andReturns('Hello, Goodbye!');
+        $this->stream->expects('__toString')->twice()->andReturns('Hello, Goodbye!');
 
         $this->expectOutputString('Hello, Goodbye!');
 
@@ -244,8 +240,7 @@ class HttpResponseTest extends TestCase
 
     public function testPrint(): void
     {
-        $this->stream->expects('rewind')->once();
-        $this->stream->expects('getContents')->once()->andReturns('Hello, Goodbye!');
+        $this->stream->expects('__toString')->once()->andReturns('Hello, Goodbye!');
 
         $this->expectOutputString('Hello, Goodbye!');
 

@@ -141,8 +141,7 @@ final class ExtractionTest extends TestCase
             ->and()->time(greaterThan(0), lessThan(1000))
             ->extract()->body()->asPsrStream();
 
-        $extracted->rewind();
-        $this->assertSame('{"id": 7, "name": "Jack"}', $extracted->getContents());
+        $this->assertSame('{"id": 7, "name": "Jack"}', (string) $extracted);
     }
 
     public function testRequest(): void

@@ -59,9 +59,7 @@ final class HttpResponseBody implements ResponseBody, StreamInterface
 
     public function __toString(): string
     {
-        $this->psrStream->rewind();
-
-        return $this->psrStream->getContents();
+        return (string) $this->psrStream;
     }
 
     #[Override] public function asPrettyString(): string

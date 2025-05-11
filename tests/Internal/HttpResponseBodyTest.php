@@ -27,6 +27,7 @@ class HttpResponseBodyTest extends TestCase
     protected function setUp(): void
     {
         $this->stream = Mockery::spy(StreamInterface::class, [
+            '__toString' => 'Hello, World!',
             'getContents' => 'Hello, World!',
         ]);
         $this->responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -38,7 +39,7 @@ class HttpResponseBodyTest extends TestCase
     {
         $this->assertSame('Hello, World!', (string) $this->responseBody);
 
-        $this->stream->shouldHaveReceived('rewind');
+        $this->stream->shouldHaveReceived('__toString');
     }
 
     public function testAsPrettyString(): void
@@ -49,7 +50,7 @@ class HttpResponseBodyTest extends TestCase
     public function testAsPrettyStringJson(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            '__toString' => '{"foo": {"bar": "baz"}}',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -138,7 +139,7 @@ class HttpResponseBodyTest extends TestCase
         $value = '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}';
 
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => $value,
+            '__toString' => $value,
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -153,7 +154,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathUsingJsonPath(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            '__toString' => '{"foo": {"bar": "baz"}}',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -166,7 +167,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathUsingJsonPathThrowsExceptionForSyntaxError(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '"foo bar"',
+            '__toString' => '"foo bar"',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -185,7 +186,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathUsingJsonPathWithRootAndString(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '"foo bar"',
+            '__toString' => '"foo bar"',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -198,7 +199,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathUsingJmesPathThrowsExceptionWhenNotAnObject(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '"foo bar"',
+            '__toString' => '"foo bar"',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -214,7 +215,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathThrowsExceptionWhenJmesPathExpressionHasASyntaxError(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            '__toString' => '{"foo": {"bar": "baz"}}',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -230,7 +231,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPathWithInvalidJson(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => 'this is not a JSON string',
+            '__toString' => 'this is not a JSON string',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -256,7 +257,7 @@ class HttpResponseBodyTest extends TestCase
     public function testPrettyPrintJson(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            '__toString' => '{"foo": {"bar": "baz"}}',
         ]);
 
         $responseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [

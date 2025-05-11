@@ -676,11 +676,6 @@ final class RequestBuilder implements RequestSpecification
             return;
         }
 
-        if ($body instanceof StreamInterface) {
-            $body->rewind();
-            $body = $body->getContents();
-        }
-
         try {
             Json::decode((string) $body);
             $this->contentType(MediaType::APPLICATION_JSON);

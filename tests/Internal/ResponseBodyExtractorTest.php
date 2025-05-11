@@ -24,7 +24,7 @@ class ResponseBodyExtractorTest extends TestCase
     protected function setUp(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => 'Hello, World!',
+            '__toString' => 'Hello, World!',
         ]);
 
         $this->httpResponseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -42,7 +42,7 @@ class ResponseBodyExtractorTest extends TestCase
     public function testAsPrettyStringJson(): void
     {
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => '{"foo": {"bar": "baz"}}',
+            '__toString' => '{"foo": {"bar": "baz"}}',
         ]);
 
         $httpResponseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
@@ -77,7 +77,7 @@ class ResponseBodyExtractorTest extends TestCase
         $value = '{"foo": {"bar": [{"id": 123}, {"id": 456}]}}';
 
         $stream = Mockery::spy(StreamInterface::class, [
-            'getContents' => $value,
+            '__toString' => $value,
         ]);
 
         $httpResponseBody = new HttpResponseBody(Mockery::mock(ResponseInterface::class, [
