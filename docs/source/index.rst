@@ -22,6 +22,5 @@ Contents
 .. toctree::
 
    usage
-   matchers
    conduct
    copyright

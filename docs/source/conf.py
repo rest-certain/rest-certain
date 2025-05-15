@@ -79,6 +79,7 @@ html_context = {
     'github_version': version,
     'conf_py_path': '/docs/source/',
 }
+html_logo = 'sleepy-elephpant.svg'
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'

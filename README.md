@@ -1,4 +1,10 @@
-<h1 align="center">REST Certain</h1>
+<p align="center" style="margin-bottom: 0; padding-bottom: 0;">
+    <img src="./docs/source/sleepy-elephpant.svg" alt="elePHPant sleeping on a globe" width="250">
+</p>
+
+<h1 align="center" style="margin-top: -25px; padding-top: 0;">
+    REST Certain
+</h1>
 
 <p align="center">
     <strong>PHP DSL for easy testing of REST services, with a nod to the Java DSL, REST Assured</strong>
