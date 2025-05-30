@@ -112,6 +112,9 @@ jobs:
           - "8.4"
         os:
           - "ubuntu-latest"
+        dependency-versions:
+          - "lowest"
+          - "highest"
 
     steps:
       - name: "Checkout repository"
@@ -125,6 +128,8 @@ jobs:
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@v3"
+        with:
+          dependency-versions: "${{ matrix.dependency-versions }}"
 
       - name: "Run unit tests (PHPUnit)"
         run: "composer dev:test:unit"
