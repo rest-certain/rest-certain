@@ -18,7 +18,7 @@
     "require": {
         "php": "~8.3.0 || ~8.4.0",
         "dflydev/fig-cookies": "^3.1",
-        "league/uri": "^7.5",
+        "league/uri": "^7.5.1",
         "league/uri-components": "^7.5",
         "loilo/jsonpath": "^0.2.0",
         "mtdowling/jmespath.php": "^2.8",
@@ -37,7 +37,7 @@
     "require-dev": {
         "captainhook/captainhook": "^5.25",
         "captainhook/plugin-composer": "^5.3",
-        "ciareis/bypass": "^2.1.1",
+        "ciareis/bypass": "^2.1.2",
         "ergebnis/composer-normalize": "^2.47",
         "laminas/laminas-diactoros": "^3.6",
         "mockery/mockery": "^1.6",
