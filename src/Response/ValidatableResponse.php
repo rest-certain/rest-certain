@@ -61,26 +61,6 @@ interface ValidatableResponse
     ): static;
 
     /**
-     * An expectation to validate the given response path in the response body against the given matchers.
-     *
-     * @link https://www.rfc-editor.org/rfc/rfc9535.html JSONPath
-     * @link https://jmespath.org JMESPath
-     *
-     * @param string $path A body path in JSONPath or JMESPath syntax.
-     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $expectation A matcher to validate the value at the given path.
-     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null ...$additionalExpectations Additional matchers to validate the value at the given path.
-     *
-     * @return $this
-     *
-     * @throws AssertionFailedError
-     */
-    public function bodyPath(
-        string $path,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
-    ): static;
-
-    /**
      * An expectation to validate the given response Content-Type against the given value or matcher.
      *
      * @param Constraint | Stringable | string $expectation A matcher to validate the value of the content type header.
@@ -156,6 +136,26 @@ interface ValidatableResponse
      * @throws AssertionFailedError
      */
     public function headers(array $expectations): static;
+
+    /**
+     * An expectation to validate the given path in the response body against the given matchers.
+     *
+     * @link https://www.rfc-editor.org/rfc/rfc9535.html JSONPath
+     * @link https://jmespath.org JMESPath
+     *
+     * @param string $path A body path in JSONPath or JMESPath syntax.
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $expectation A matcher to validate the value at the given path.
+     * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null ...$additionalExpectations Additional matchers to validate the value at the given path.
+     *
+     * @return $this
+     *
+     * @throws AssertionFailedError
+     */
+    public function path(
+        string $path,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
+    ): static;
 
     /**
      * An expectation to validate the given response status code against the given value or matcher.

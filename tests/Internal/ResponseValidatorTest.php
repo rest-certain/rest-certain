@@ -69,10 +69,10 @@ class ResponseValidatorTest extends TestCase
     {
         return [
             ['method' => 'body'],
-            ['method' => 'bodyPath'],
             ['method' => 'contentType'],
             ['method' => 'cookie'],
             ['method' => 'header'],
+            ['method' => 'path'],
             ['method' => 'statusLine'],
         ];
     }

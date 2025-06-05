@@ -81,8 +81,8 @@ class ResponseExpectationsTest extends TestCase
      * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $actualValue
      * @param array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null> $testValue
      */
-    #[DataProvider('bodyPathSuccessProvider')]
-    public function testBodyPathWithSuccess(
+    #[DataProvider('pathSuccessProvider')]
+    public function testPathWithSuccess(
         Constraint | Stringable | stdClass | array | bool | float | int | string | null $actualValue,
         array $testValue,
     ): void {
@@ -90,7 +90,7 @@ class ResponseExpectationsTest extends TestCase
 
         $this->assertSame(
             $this->responseSpecification,
-            $this->responseSpecification->bodyPath('foo.bar', ...$testValue),
+            $this->responseSpecification->path('foo.bar', ...$testValue),
         );
     }
 
@@ -98,8 +98,8 @@ class ResponseExpectationsTest extends TestCase
      * @param Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null $actualValue
      * @param array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null> $testValue
      */
-    #[DataProvider('bodyPathFailureProvider')]
-    public function testBodyPathWithFailure(
+    #[DataProvider('pathFailureProvider')]
+    public function testPathWithFailure(
         Constraint | Stringable | stdClass | array | bool | float | int | string | null $actualValue,
         array $testValue,
     ): void {
@@ -107,17 +107,17 @@ class ResponseExpectationsTest extends TestCase
 
         $this->expectException(AssertionFailedError::class);
 
-        $this->responseSpecification->bodyPath('foo.bar', ...$testValue);
+        $this->responseSpecification->path('foo.bar', ...$testValue);
     }
 
-    public function testBodyPathWithPathResolutionFailure(): void
+    public function testPathWithPathResolutionFailure(): void
     {
         $this->response->shouldReceive('path')->with('foo.bar.baz')->andThrow(new PathResolutionFailure());
 
         $this->expectException(AssertionFailedError::class);
         $this->expectExceptionMessage('Failed asserting that response body path "foo.bar.baz" exists:');
 
-        $this->responseSpecification->bodyPath('foo.bar.baz', 'foo', 'bar', 'baz');
+        $this->responseSpecification->path('foo.bar.baz', 'foo', 'bar', 'baz');
     }
 
     /**
@@ -523,7 +523,7 @@ class ResponseExpectationsTest extends TestCase
      *     testValue: array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null>,
      * }>
      */
-    public static function bodyPathSuccessProvider(): array
+    public static function pathSuccessProvider(): array
     {
         return [
             ['actualValue' => 42.0, 'testValue' => [new IsIdentical(42.0)]],
@@ -559,7 +559,7 @@ class ResponseExpectationsTest extends TestCase
      *     testValue: array<Constraint | Stringable | stdClass | array<mixed> | bool | float | int | string | null>,
      * }>
      */
-    public static function bodyPathFailureProvider(): array
+    public static function pathFailureProvider(): array
     {
         return [
             ['actualValue' => 42.00000000000001, 'testValue' => [new IsIdentical(42.0)]],

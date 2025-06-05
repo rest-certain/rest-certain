@@ -39,8 +39,8 @@ class RestAssuredExamplesTest extends TestCase
         $this->server()->addRoute(method: 'GET', uri: '/lotto', body: $lottoResponse);
 
         get('/lotto')->then()
-            ->assertThat()->bodyPath('lotto.lottoId', is(equalTo(5)))
-            ->and()->bodyPath('lotto.winners[*].winnerId', hasItems(54, 23));
+            ->assertThat()->path('lotto.lottoId', is(equalTo(5)))
+            ->and()->path('lotto.winners[*].winnerId', hasItems(54, 23));
     }
 
     public function testPriceExample(): void
@@ -49,7 +49,7 @@ class RestAssuredExamplesTest extends TestCase
         $this->server()->addRoute(method: 'GET', uri: '/price', body: $priceResponse);
 
         when()->get('/price')
-            ->then()->bodyPath('price', is(12.12));
+            ->then()->path('price', is(12.12));
     }
 
     public function testAnonymousJsonRootValidation(): void
@@ -58,9 +58,9 @@ class RestAssuredExamplesTest extends TestCase
 
         when()->get('/json')
             // Using a JSONPath expression.
-            ->then()->bodyPath('$', [[1, 2, 3]])
+            ->then()->path('$', [[1, 2, 3]])
             // Using a JMESPath expression.
-            ->and()->bodyPath('[]', [1, 2, 3]);
+            ->and()->path('[]', [1, 2, 3]);
     }
 
     public function testStoreExample(): void
@@ -103,7 +103,7 @@ class RestAssuredExamplesTest extends TestCase
         $this->server()->addRoute(method: 'GET', uri: '/store', body: $storeResponse);
 
         when()->get('/store')
-            ->then()->bodyPath('store.book[?price < `10`].title', hasItems('Sayings of the Century', 'Moby Dick'))
-            ->and()->bodyPath('sum(map(&length(@), store.book[].author))', is(greaterThan(50)));
+            ->then()->path('store.book[?price < `10`].title', hasItems('Sayings of the Century', 'Moby Dick'))
+            ->and()->path('sum(map(&length(@), store.book[].author))', is(greaterThan(50)));
     }
 }

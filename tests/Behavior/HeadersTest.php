@@ -35,6 +35,6 @@ class HeadersTest extends TestCase
             ->and()->cookie('foo', 'bar')
             ->and()->cookie('baz', 'qux')
             ->and()->statusLine('HTTP/1.1 200 OK')
-            ->and()->bodyPath('id', 123);
+            ->and()->path('id', 123);
     }
 }

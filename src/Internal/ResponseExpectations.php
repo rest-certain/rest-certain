@@ -85,28 +85,6 @@ final class ResponseExpectations implements ResponseSpecification
         return $this;
     }
 
-    #[Override] public function bodyPath(
-        string $path,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
-    ): static {
-        try {
-            $value = $this->response->path($path);
-        } catch (PathResolutionFailure $exception) {
-            Assert::fail(
-                'Failed asserting that response body path "' . $path . '" exists: ' . $exception->getMessage(),
-            );
-        }
-
-        $this->evaluateExpectations(
-            $value,
-            [$expectation, ...$additionalExpectations],
-            'Response body path "' . $path . '" does not match expectations.',
-        );
-
-        return $this;
-    }
-
     #[Override] public function contentType(
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
@@ -192,6 +170,28 @@ final class ResponseExpectations implements ResponseSpecification
             }
             $this->header($name, ...$expectation);
         }
+
+        return $this;
+    }
+
+    #[Override] public function path(
+        string $path,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
+    ): static {
+        try {
+            $value = $this->response->path($path);
+        } catch (PathResolutionFailure $exception) {
+            Assert::fail(
+                'Failed asserting that response body path "' . $path . '" exists: ' . $exception->getMessage(),
+            );
+        }
+
+        $this->evaluateExpectations(
+            $value,
+            [$expectation, ...$additionalExpectations],
+            'Response body path "' . $path . '" does not match expectations.',
+        );
 
         return $this;
     }

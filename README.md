@@ -62,14 +62,14 @@ We can use [JMESPath query language](https://jmespath.org) syntax to assert that
 `lottoId` is equal to `5`:
 
 ``` php
-get('/lotto')->then()->assertThat()->bodyPath('lotto.lottoId', is(equalTo(5)));
+get('/lotto')->then()->assertThat()->path('lotto.lottoId', is(equalTo(5)));
 ```
 
 We can also verify all the winner IDs:
 
 ``` php
 get('/lotto')->then()->assertThat()
-    ->bodyPath('lotto.winners[*].winnerId', hasItems(54, 23));
+    ->path('lotto.winners[*].winnerId', hasItems(54, 23));
 ```
 
 > [!TIP]
@@ -92,7 +92,7 @@ given()
     ->statusCode(200)
     ->and()->header('content-type', 'application/json')
     ->and()->cookie('baz', 'qux')
-    ->and()->bodyPath('id', 123);
+    ->and()->path('id', 123);
 ```
 
 REST Certain supports any HTTP method but has explicit support for `POST`, `GET`,

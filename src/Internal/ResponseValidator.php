@@ -64,16 +64,6 @@ final readonly class ResponseValidator implements ValidatableResponse
         return $this;
     }
 
-    #[Override] public function bodyPath(
-        string $path,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
-        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
-    ): static {
-        $this->responseSpecification->bodyPath($path, $expectation, ...$additionalExpectations);
-
-        return $this;
-    }
-
     #[Override] public function contentType(
         Constraint | Stringable | string $expectation,
         Constraint | Stringable | string ...$additionalExpectations,
@@ -124,6 +114,16 @@ final readonly class ResponseValidator implements ValidatableResponse
     #[Override] public function headers(array $expectations): static
     {
         $this->responseSpecification->headers($expectations);
+
+        return $this;
+    }
+
+    #[Override] public function path(
+        string $path,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null $expectation,
+        Constraint | Stringable | stdClass | array | bool | float | int | string | null ...$additionalExpectations,
+    ): static {
+        $this->responseSpecification->path($path, $expectation, ...$additionalExpectations);
 
         return $this;
     }
