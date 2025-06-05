@@ -18,6 +18,7 @@ use function file_get_contents;
 use function is_array;
 use function is_object;
 use function json_decode;
+use function json_encode;
 
 class MatchesJsonSchemaTest extends TestCase
 {
@@ -34,6 +35,7 @@ class MatchesJsonSchemaTest extends TestCase
         ];
 
         $this->assertThat($testValue, MatchesJsonSchema::fromString($schema));
+        $this->assertThat(json_encode($testValue), MatchesJsonSchema::fromString($schema));
     }
 
     public function testMatchesJsonSchemaFromFile(): void
@@ -53,6 +55,10 @@ class MatchesJsonSchemaTest extends TestCase
         ];
 
         $this->assertThat($testValue, MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/arrays-of-things.json'));
+        $this->assertThat(
+            json_encode($testValue),
+            MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/arrays-of-things.json'),
+        );
     }
 
     public function testMatchesJsonSchemaFromDataAsObject(): void
@@ -67,6 +73,7 @@ class MatchesJsonSchemaTest extends TestCase
         ];
 
         $this->assertThat($testValue, MatchesJsonSchema::fromData($schemaDecoded));
+        $this->assertThat(json_encode($testValue), MatchesJsonSchema::fromData($schemaDecoded));
     }
 
     public function testMatchesJsonSchemaFromDataAsArray(): void
@@ -83,6 +90,7 @@ class MatchesJsonSchemaTest extends TestCase
         ];
 
         $this->assertThat($testValue, MatchesJsonSchema::fromData($schemaDecoded));
+        $this->assertThat(json_encode($testValue), MatchesJsonSchema::fromData($schemaDecoded));
     }
 
     public function testMatchesJsonSchemaFromUriString(): void
@@ -105,6 +113,10 @@ class MatchesJsonSchemaTest extends TestCase
         ];
 
         $this->assertThat($testValue, MatchesJsonSchema::fromUri($baseUrl . '/complex-object.schema.json'));
+        $this->assertThat(
+            json_encode($testValue),
+            MatchesJsonSchema::fromUri($baseUrl . '/complex-object.schema.json'),
+        );
     }
 
     public function testMatchesJsonSchemaFromUriObject(): void
@@ -126,6 +138,7 @@ class MatchesJsonSchemaTest extends TestCase
         $uri = new Uri($baseUrl . '/conditional-validation-dependentRequired.schema.json');
 
         $this->assertThat($testValue, MatchesJsonSchema::fromUri($uri));
+        $this->assertThat(json_encode($testValue), MatchesJsonSchema::fromUri($uri));
     }
 
     public function testFromFileThrowsWhenFileNotFound(): void
@@ -159,7 +172,9 @@ class MatchesJsonSchemaTest extends TestCase
         $constraint = MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/conditional-if-else.json');
 
         $this->assertThat($testValue1, $constraint);
+        $this->assertThat(json_encode($testValue1), $constraint);
         $this->assertThat($testValue2, $constraint);
+        $this->assertThat(json_encode($testValue2), $constraint);
     }
 
     public function testFailureWithConditionalIfElse(): void
@@ -176,6 +191,25 @@ class MatchesJsonSchemaTest extends TestCase
         $this->expectExceptionMessage('Minimum string length is 10, found 9');
 
         $this->assertThat($testValue, MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/conditional-if-else.json'));
+    }
+
+    public function testFailureWithConditionalIfElseWhenTestValueIsString(): void
+    {
+        $testValue = [
+            'isMember' => true,
+            'membershipNumber' => '123456789',
+        ];
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches JSON schema');
+        $this->expectExceptionMessage('Found the following JSON Schema validation errors:');
+        $this->expectExceptionMessage('/membershipNumber:');
+        $this->expectExceptionMessage('Minimum string length is 10, found 9');
+
+        $this->assertThat(
+            json_encode($testValue),
+            MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/conditional-if-else.json'),
+        );
     }
 
     public function testFailureWithMultipleErrors(): void
@@ -207,6 +241,40 @@ class MatchesJsonSchemaTest extends TestCase
         $this->expectExceptionMessage('The data (string) must match the type: array');
 
         $this->assertThat($testValue, MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/complex-object.json'));
+    }
+
+    public function testFailureWithMultipleErrorsWhenTestValueIsString(): void
+    {
+        $testValue = [
+            'name' => 1234,
+            'age' => 'foo',
+            'address' => [
+                'street' => 1234,
+                'postalCode' => '1234',
+            ],
+            'hobbies' => 'something cool',
+        ];
+
+        $this->expectException(AssertionFailedError::class);
+        $this->expectExceptionMessage('matches JSON schema');
+        $this->expectExceptionMessage('Found the following JSON Schema validation errors:');
+        $this->expectExceptionMessage('/name:');
+        $this->expectExceptionMessage('The data (integer) must match the type: string');
+        $this->expectExceptionMessage('/age:');
+        $this->expectExceptionMessage('The data (string) must match the type: integer');
+        $this->expectExceptionMessage('/address:');
+        $this->expectExceptionMessage('The required properties (city, state) are missing');
+        $this->expectExceptionMessage('/address/street:');
+        $this->expectExceptionMessage('The data (integer) must match the type: string');
+        $this->expectExceptionMessage('/address/postalCode:');
+        $this->expectExceptionMessage('The data (integer) must match the type: string');
+        $this->expectExceptionMessage('/hobbies:');
+        $this->expectExceptionMessage('The data (string) must match the type: array');
+
+        $this->assertThat(
+            json_encode($testValue),
+            MatchesJsonSchema::fromFile(__DIR__ . '/fixtures/complex-object.json'),
+        );
     }
 
     public function testMatchesJsonSchemaThrowsExceptionWhenConfigNotSet(): void

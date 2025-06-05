@@ -33,6 +33,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 use Psr\Http\Message\UriInterface;
 use RestCertain\Exception\JsonSchemaFailure;
 use RestCertain\Exception\MissingConfiguration;
+use RestCertain\Exception\UnableToDecodeJson;
 use RestCertain\Json\Json;
 use RestCertain\Json\Schema\Config;
 use RestCertain\RestCertain;
@@ -42,6 +43,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use function assert;
 use function implode;
+use function is_string;
 
 final class MatchesJsonSchema extends Constraint
 {
@@ -87,7 +89,7 @@ final class MatchesJsonSchema extends Constraint
             $this->schema = ($this->schemaLoader)();
         }
 
-        $result = $this->config?->validator->validate(Helper::toJSON($other), $this->schema);
+        $result = $this->config?->validator->validate($this->jsonify($other), $this->schema);
 
         if ($result === null) {
             throw new MissingConfiguration('No JSON Schema validator found. Please configure a JSON Schema validator.');
@@ -105,6 +107,19 @@ final class MatchesJsonSchema extends Constraint
         }
 
         return true;
+    }
+
+    private function jsonify(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            try {
+                $value = Json::decode($value);
+            } catch (UnableToDecodeJson) {
+                // Carry on. No need to do anything.
+            }
+        }
+
+        return Helper::toJSON($value);
     }
 
     /**

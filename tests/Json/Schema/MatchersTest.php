@@ -19,6 +19,7 @@ use function file_get_contents;
 use function is_array;
 use function is_object;
 use function json_decode;
+use function json_encode;
 
 class MatchersTest extends TestCase
 {
@@ -30,6 +31,7 @@ class MatchersTest extends TestCase
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchema($schema));
+        assertThat(json_encode($testValue), matchesJsonSchema($schema));
     }
 
     public function testMatchesJsonSchemaUsingStringable(): void
@@ -39,6 +41,7 @@ class MatchersTest extends TestCase
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchema($schema));
+        assertThat(json_encode($testValue), matchesJsonSchema($schema));
     }
 
     public function testMatchesJsonSchemaDataAsObject(): void
@@ -51,6 +54,7 @@ class MatchersTest extends TestCase
         assert(is_object($schemaData));
 
         assertThat($testValue, matchesJsonSchemaFromData($schemaData));
+        assertThat(json_encode($testValue), matchesJsonSchemaFromData($schemaData));
     }
 
     public function testMatchesJsonSchemaDataAsArray(): void
@@ -63,6 +67,7 @@ class MatchersTest extends TestCase
         assert(is_array($schemaData));
 
         assertThat($testValue, matchesJsonSchemaFromData($schemaData));
+        assertThat(json_encode($testValue), matchesJsonSchemaFromData($schemaData));
     }
 
     public function testMatchesJsonSchemaFromFile(): void
@@ -71,6 +76,7 @@ class MatchersTest extends TestCase
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchemaFromFile($filename));
+        assertThat(json_encode($testValue), matchesJsonSchemaFromFile($filename));
     }
 
     public function testMatchesJsonSchemaFromFileUsingStringable(): void
@@ -79,6 +85,7 @@ class MatchersTest extends TestCase
         $testValue = ['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21];
 
         assertThat($testValue, matchesJsonSchemaFromFile($filename));
+        assertThat(json_encode($testValue), matchesJsonSchemaFromFile($filename));
     }
 
     public function testMatchesJsonSchemaFromUri(): void
@@ -90,6 +97,14 @@ class MatchersTest extends TestCase
 
         assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
         assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
+        assertThat(
+            json_encode(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21]),
+            matchesJsonSchemaFromUri($url),
+        );
+        assertThat(
+            json_encode(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42]),
+            matchesJsonSchemaFromUri($url),
+        );
     }
 
     public function testMatchesJsonSchemaFromUriUsingString(): void
@@ -101,6 +116,14 @@ class MatchersTest extends TestCase
 
         assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
         assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
+        assertThat(
+            json_encode(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21]),
+            matchesJsonSchemaFromUri($url),
+        );
+        assertThat(
+            json_encode(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42]),
+            matchesJsonSchemaFromUri($url),
+        );
     }
 
     public function testMatchesJsonSchemaFromUriUsingStringable(): void
@@ -112,5 +135,13 @@ class MatchersTest extends TestCase
 
         assertThat(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21], matchesJsonSchemaFromUri($url));
         assertThat(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42], matchesJsonSchemaFromUri($url));
+        assertThat(
+            json_encode(['firstName' => 'John', 'lastName' => 'Doe', 'age' => 21]),
+            matchesJsonSchemaFromUri($url),
+        );
+        assertThat(
+            json_encode(['firstName' => 'Jane', 'lastName' => 'Smith', 'age' => 42]),
+            matchesJsonSchemaFromUri($url),
+        );
     }
 }
