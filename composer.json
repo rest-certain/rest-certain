@@ -20,7 +20,7 @@
         "dflydev/fig-cookies": "^3.1",
         "league/uri": "^7.5",
         "league/uri-components": "^7.5",
-        "loilo/jsonpath": "^0.2.0",
+        "loilo/jsonpath": "^0.2.0 || ^0.3.0",
         "mtdowling/jmespath.php": "^2.8",
         "neoncitylights/media-type": "^3.1",
         "opis/json-schema": "^2.4",
