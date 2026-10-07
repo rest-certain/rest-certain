@@ -24,20 +24,20 @@ env:
 jobs:
   coding-standards:
     name: "Coding standards"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
 
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240" # 2.37.2
         with:
           php-version: "latest"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v3"
+        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
       - name: "Check syntax (php-parallel-lint)"
         run: "composer dev:lint:syntax"
@@ -47,20 +47,20 @@ jobs:
 
   static-analysis:
     name: "Static analysis"
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
 
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240" # 2.37.2
         with:
           php-version: "latest"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v3"
+        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
       - name: "Statically analyze code (PHPStan)"
         run: "composer dev:analyze:phpstan"
@@ -68,36 +68,26 @@ jobs:
   code-coverage:
     name: "Code coverage"
     needs: ["coding-standards", "static-analysis"]
-    runs-on: "ubuntu-latest"
+    runs-on: "ubuntu-24.04"
 
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240" # 2.37.2
         with:
           php-version: "latest"
           coverage: "xdebug"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v3"
+        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
       - name: "Run unit tests (PHPUnit)"
         run: "composer dev:test:coverage:ci"
 
       - name: "Publish coverage report to Codecov"
-        uses: "codecov/codecov-action@v5"
-        with:
-          token: "${{ secrets.CODECOV_TOKEN }}"
-
-      - name: "Upload test results to Codecov"
-        if: ${{ !cancelled() }}
-        uses: "codecov/test-results-action@v1"
-        with:
-          token: "${{ secrets.CODECOV_TOKEN }}"
-          disable_search: true
-          file: "./build/junit.xml"
+        uses: "codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5" # v7.1.1
 
   unit-tests:
     name: "Unit tests"
@@ -111,20 +101,20 @@ jobs:
           - "8.3"
           - "8.4"
         os:
-          - "ubuntu-latest"
+          - "ubuntu-24.04"
 
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1" # v7.0.1
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240" # 2.37.2
         with:
           php-version: "${{ matrix.php }}"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v3"
+        uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
       - name: "Run unit tests (PHPUnit)"
         run: "composer dev:test:unit"
