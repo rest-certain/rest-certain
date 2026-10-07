@@ -37,7 +37,7 @@
     "require-dev": {
         "captainhook/captainhook": "^5.25",
         "captainhook/plugin-composer": "^5.3",
-        "ciareis/bypass": "^2.1.1",
+        "ciareis/bypass": "^2.1.1 || ^3.0.0",
         "ergebnis/composer-normalize": "^2.47",
         "laminas/laminas-diactoros": "^3.6",
         "mockery/mockery": "^1.6",
