@@ -51,6 +51,8 @@ use RestCertain\Specification\RequestSpecification;
 use RestCertain\Specification\ResponseSpecification;
 use SplFileInfo;
 use Stringable;
+use Uri\Rfc3986\Uri as Rfc3986Uri;
+use Uri\WhatWg\Url as WhatWgUrl;
 use stdClass;
 
 use function array_map;
@@ -585,14 +587,14 @@ final class RequestBuilder implements RequestSpecification
 
         if (Scheme::fromUri($expandedPath)->value() !== null) {
             // We have a full URI, so we can just use it.
-            $uriModifier = Modifier::from($expandedPath, $this->config->uriFactory);
+            $uriModifier = Modifier::wrap($expandedPath);
         } else {
             // We need to build a URI from the base URI and the expanded path.
             $uri = $this->baseUri->withPath($this->basePath);
             if ($this->port !== 80 && ($this->port !== 443 || $uri->getScheme() !== 'https')) {
                 $uri = $uri->withPort($this->port);
             }
-            $uriModifier = Modifier::from($uri, $this->config->uriFactory)->appendSegment($expandedPath);
+            $uriModifier = Modifier::wrap($uri)->appendPath($expandedPath);
         }
 
         $baseParams = $method !== Method::POST ? $this->params : [];
@@ -602,7 +604,13 @@ final class RequestBuilder implements RequestSpecification
             }
         }
 
-        return $this->config->uriFactory->createUri((string) $uriModifier->getUri());
+        $uri = $uriModifier->unwrap();
+
+        return $this->config->uriFactory->createUri(match (true) {
+            $uri instanceof Stringable => (string) $uri,
+            $uri instanceof Rfc3986Uri => $uri->toString(),
+            $uri instanceof WhatWgUrl => $uri->toUnicodeString(),
+        });
     }
 
     private function buildUrlencodedFormData(string $method): ?string
@@ -614,7 +622,7 @@ final class RequestBuilder implements RequestSpecification
             return null;
         }
 
-        $formData = Modifier::from('', $this->config->uriFactory);
+        $formData = Modifier::wrap('');
 
         foreach ($formParams as $name => $values) {
             foreach ($values as $value) {
@@ -622,7 +630,7 @@ final class RequestBuilder implements RequestSpecification
             }
         }
 
-        return $formData->encodeQuery(PHP_QUERY_RFC1738)->getUri()->getQuery();
+        return $formData->encodeQuery(PHP_QUERY_RFC1738)->unwrap()->getQuery();
     }
 
     private function maybeApplyDefaultUserAgent(RequestInterface $request): RequestInterface

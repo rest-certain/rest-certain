@@ -19,7 +19,7 @@
         "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
         "dflydev/fig-cookies": "^3.1",
         "league/uri": "^7.5",
-        "league/uri-components": "^7.5",
+        "league/uri-components": "^7.6",
         "loilo/jsonpath": "^0.2 || ^0.3",
         "mtdowling/jmespath.php": "^2.8",
         "neoncitylights/media-type": "^3.1",
